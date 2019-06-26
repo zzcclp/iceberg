@@ -248,7 +248,7 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="spark">Spark<a class="headerlink" href="#spark" title="Permanent link">&para;</a></h1>
+<h1 id="spark">Spark</h1>
 <p>Iceberg uses Spark&rsquo;s DataSourceV2 API for data source and catalog implementations. Spark DSv2 is an evolving API with different levels of support in Spark versions.</p>
 <table>
 <thead>
@@ -291,10 +291,10 @@
 </tr>
 </tbody>
 </table>
-<h2 id="spark-24">Spark 2.4<a class="headerlink" href="#spark-24" title="Permanent link">&para;</a></h2>
+<h2 id="spark-24">Spark 2.4</h2>
 <p>To use Iceberg in Spark 2.4, add the <code>iceberg-runtime</code> Jar to Spark&rsquo;s <code>jars</code> folder.</p>
 <p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="api">Iceberg API</a> to create Iceberg tables.</p>
-<h3 id="reading-an-iceberg-table">Reading an Iceberg table<a class="headerlink" href="#reading-an-iceberg-table" title="Permanent link">&para;</a></h3>
+<h3 id="reading-an-iceberg-table">Reading an Iceberg table</h3>
 <p>To read an Iceberg table, use the <code>iceberg</code> format in <code>DataFrameReader</code>:</p>
 <pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table&quot;)
 </code></pre>
@@ -303,7 +303,7 @@
 <pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;hdfs://nn:8020/path/to/table&quot;)
 </code></pre>
 
-<h3 id="time-travel">Time travel<a class="headerlink" href="#time-travel" title="Permanent link">&para;</a></h3>
+<h3 id="time-travel">Time travel</h3>
 <p>To select a specific table snapshot or the snapshot at some time, Iceberg supports two Spark read options:</p>
 <ul>
 <li><code>snapshot-id</code> selects a specific table snapshot</li>
@@ -323,7 +323,7 @@ spark.read
     .load(&quot;db.table&quot;)
 </code></pre>
 
-<h3 id="querying-with-sql">Querying with SQL<a class="headerlink" href="#querying-with-sql" title="Permanent link">&para;</a></h3>
+<h3 id="querying-with-sql">Querying with SQL</h3>
 <p>To run SQL <code>SELECT</code> statements on Iceberg tables in 2.4, register the DataFrame as a temporary table:</p>
 <pre><code class="scala">val df = spark.read.format(&quot;iceberg&quot;).load(&quot;db.table&quot;)
 df.createOrReplaceTempView(&quot;table&quot;)
@@ -331,7 +331,7 @@ df.createOrReplaceTempView(&quot;table&quot;)
 spark.sql(&quot;&quot;&quot;select count(1) from table&quot;&quot;&quot;).show()
 </code></pre>
 
-<h3 id="appending-to-an-iceberg-table">Appending to an Iceberg table<a class="headerlink" href="#appending-to-an-iceberg-table" title="Permanent link">&para;</a></h3>
+<h3 id="appending-to-an-iceberg-table">Appending to an Iceberg table</h3>
 <p>To append a dataframe to an Iceberg table, use the <code>iceberg</code> format with <code>DataFrameReader</code>:</p>
 <pre><code class="scala">spark.write
     .format(&quot;iceberg&quot;)

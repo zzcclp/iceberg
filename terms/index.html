@@ -254,24 +254,24 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="terms">Terms<a class="headerlink" href="#terms" title="Permanent link">&para;</a></h1>
-<h3 id="snapshot">Snapshot<a class="headerlink" href="#snapshot" title="Permanent link">&para;</a></h3>
+<h1 id="terms">Terms</h1>
+<h3 id="snapshot">Snapshot</h3>
 <p>A <strong>snapshot</strong> is the state of a table at some time.</p>
 <p>Each snapshot lists all of the data files that make up the table&rsquo;s contents at the time of the snapshot. Data files are stored across multiple <a href="#manifest-file">manifest</a> files, and the manifests for a snapshot are listed in a single <a href="#manifest-list">manifest list</a> file.</p>
-<h3 id="manifest-list">Manifest list<a class="headerlink" href="#manifest-list" title="Permanent link">&para;</a></h3>
+<h3 id="manifest-list">Manifest list</h3>
 <p>A <strong>manifest list</strong> is a metadata file that lists the <a href="#manifest-file">manifests</a> that make up a table snapshot.</p>
 <p>Each manifest file in the manifest list is stored with information about its contents, like partition value ranges, used to speed up metadata operations.</p>
-<h3 id="manifest-file">Manifest file<a class="headerlink" href="#manifest-file" title="Permanent link">&para;</a></h3>
+<h3 id="manifest-file">Manifest file</h3>
 <p>A <strong>manifest file</strong> is a metadata file that lists a subset of data files that make up a snapshot.</p>
 <p>Each data file in a manifest is stored with a <a href="#partition-tuple">partition tuple</a>, column-level stats, and summary information used to prune splits during <a href="../performance#scan-planning">scan planning</a>.</p>
-<h3 id="partition-spec">Partition spec<a class="headerlink" href="#partition-spec" title="Permanent link">&para;</a></h3>
+<h3 id="partition-spec">Partition spec</h3>
 <p>A <strong>partition spec</strong> is a description of how to <a href="../partitioning">partition</a> data in a table.</p>
 <p>A spec consists of a list of source columns and transforms. A transform produces a partition value from a source value. For example, <code>date(ts)</code> produces the date associated with a timestamp column named <code>ts</code>.</p>
-<h3 id="partition-tuple">Partition tuple<a class="headerlink" href="#partition-tuple" title="Permanent link">&para;</a></h3>
+<h3 id="partition-tuple">Partition tuple</h3>
 <p>A <strong>partition tuple</strong> is a tuple or struct of partition data stored with each data file.</p>
 <p>All values in a partition tuple are the same for all rows stored in a data file. Partition tuples are produced by transforming values from row data using a partition spec.</p>
 <p>Iceberg stores partition values unmodified, unlike Hive tables that convert values to and from strings in file system paths and keys.</p>
-<h3 id="snapshot-log-history-table">Snapshot log (history table)<a class="headerlink" href="#snapshot-log-history-table" title="Permanent link">&para;</a></h3>
+<h3 id="snapshot-log-history-table">Snapshot log (history table)</h3>
 <p>The <strong>snapshot log</strong> is a metadata log of how the table&rsquo;s current snapshot has changed over time.</p>
 <p>The log is a list of timestamp and ID pairs: when the current snapshot changed and the snapshot ID the current snapshot was changed to.</p>
 <p>The snapshot log is stored in <a href="../spec#table-metadata-fields">table metadata as <code>snapshot-log</code></a>.</p></div>
