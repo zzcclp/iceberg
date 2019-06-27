@@ -257,14 +257,14 @@
   - under the License.
   -->
 
-<h2 id="why-iceberg">Why Iceberg?</h2>
+<h2 id="why-iceberg">Why Iceberg?<a class="headerlink" href="#why-iceberg" title="Permanent link">&para;</a></h2>
 <p>Iceberg was created because no other table format for provides a complete solution for SQL tables. Some improve atomicity guarantees, but no other format delivers both reliable operations and behavior that data engineers need.</p>
 <p>Iceberg tracks individual data files in a table instead of directories. This allows writers to create data files in-place and only adds files to the table in an explicit commit.</p>
 <p>Table state is maintained in metadata files. All changes to table state create a new metadata file and replace the old metadata with an atomic operation. The table metadata file tracks the table schema, partitioning config, other properties, and snapshots of the table contents.</p>
 <p>The atomic transitions from one table metadata file to the next provide snapshot isolation. Readers use the latest table state (snapshot) that was current when they load the table metadata and are not affected by changes until they refresh and pick up a new metadata location.</p>
 <p>A <em>snapshot</em> is a complete set of data files in the table at some point in time. Snapshots are listed in the metadata file, but the files in a snapshot are stored across a separate set of <em>manifest</em> files.</p>
 <p>Data files in snapshots are stored in one or more manifest files that contain a row for each data file in the table, its partition data, and its metrics. A snapshot is the union of all files in its manifests. Manifest files can be shared between snapshots to avoid rewriting metadata that is slow-changing.</p>
-<h3 id="goals">Goals</h3>
+<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
 <p>This also provides improved guarantees and performance:</p>
 <ul>
 <li><strong>Snapshot isolation</strong>: Readers always use a consistent snapshot of the table, without needing to hold a lock. All table updates are atomic.</li>
@@ -274,7 +274,7 @@
 <li><strong>Finer granularity partitioning</strong>: Distributed planning and O(1) RPC calls remove the current barriers to finer-grained partitioning.</li>
 <li><strong>Safe file-level operations</strong>. By supporting atomic changes, Iceberg enables new use cases, like safely compacting small files and safely appending late data to tables.</li>
 </ul>
-<h3 id="why-a-new-table-format">Why a new table format?</h3>
+<h3 id="why-a-new-table-format">Why a new table format?<a class="headerlink" href="#why-a-new-table-format" title="Permanent link">&para;</a></h3>
 <p>The central metastore can be a scale bottleneck and the file system doesn&rsquo;t&mdash;and shouldn&rsquo;t&mdash;provide transactions to isolate concurrent reads and writes.</p>
 <p>There are several problems with the current format:</p>
 <ul>
@@ -283,7 +283,7 @@
 <li><strong>Operations depend on file rename</strong>: Most output committers depend on rename operations to implement guarantees and reduce the amount of time tables only have partial data from a write. But rename is not a metadata-only operation in S3 and will copy data. The <a href="https://issues.apache.org/jira/browse/HADOOP-13786">new S3 committers</a> that use multipart upload make this better, but can’t entirely solve the problem and put a lot of load on the file system during job commit.</li>
 </ul>
 <p>The current format&rsquo;s dependence on listing and rename cannot be changed, so a new format is needed.</p>
-<h3 id="other-design-goals">Other design goals</h3>
+<h3 id="other-design-goals">Other design goals<a class="headerlink" href="#other-design-goals" title="Permanent link">&para;</a></h3>
 <p>In addition to changes in how table contents are tracked, Iceberg&rsquo;s design improves a few other areas:</p>
 <ul>
 <li><strong>Reliable types</strong>: Iceberg provides a core set of types, tested to work consistently across all of the supported data formats. Types include date, timestamp, and decimal, as well as nested combinations of map, list, and struct.</li>

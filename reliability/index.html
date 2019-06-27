@@ -248,7 +248,7 @@
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="reliability">Reliability</h1>
+<h1 id="reliability">Reliability<a class="headerlink" href="#reliability" title="Permanent link">&para;</a></h1>
 <p>Iceberg was designed to solve correctness problems that affect Hive tables running in S3.</p>
 <p>Hive tables track data files using both a central metastore for partitions and a file system for individual files. This makes atomic changes to a table&rsquo;s contents impossible, and eventually consistent stores like S3 may return incorrect results due to the use of listing files to reconstruct the state of a table. It also requires job planning to make many slow listing calls: O(n) with the number of partitions.</p>
 <p>Iceberg tracks the complete list of data files in each <a href="../terms#snapshot">snapshot</a> using a persistent tree structure. Every write or delete produces a new snapshot that reuses as much of the previous snapshot&rsquo;s metadata tree as possible to avoid high write volumes.</p>
@@ -266,17 +266,17 @@
 <li><strong>Distributed planning</strong>: File pruning and predicate push-down is distributed to jobs, removing the metastore as a bottleneck</li>
 <li><strong>Finer granularity partitioning</strong>: Distributed planning and O(1) RPC calls remove the current barriers to finer-grained partitioning</li>
 </ul>
-<h2 id="concurrent-write-operations">Concurrent write operations</h2>
+<h2 id="concurrent-write-operations">Concurrent write operations<a class="headerlink" href="#concurrent-write-operations" title="Permanent link">&para;</a></h2>
 <p>Iceberg supports multiple concurrent writes using optimistic concurrency.</p>
 <p>Each writer assumes that no other writers are operating and writes out new table metadata for an operation. Then, the writer attempts to commit by atomically swapping the new table metadata file for the existing metadata file.</p>
 <p>If the atomic swap fails because another writer has committed, the failed writer retries by writing a new metadata tree based on the the new current table state.</p>
-<h3 id="cost-of-retries">Cost of retries</h3>
+<h3 id="cost-of-retries">Cost of retries<a class="headerlink" href="#cost-of-retries" title="Permanent link">&para;</a></h3>
 <p>Writers avoid expensive retry operaitions by structuring changes so that work can be reused across retries.</p>
 <p>For example, appends usually create a new manifest file for the appended data files, which can be added to the table without rewriting the manifest on every attempt.</p>
-<h3 id="retry-validation">Retry validation</h3>
+<h3 id="retry-validation">Retry validation<a class="headerlink" href="#retry-validation" title="Permanent link">&para;</a></h3>
 <p>Commits are structured as assumptions and actions. After a conflict, a writer checks that the assumptions are met by the current table state. If the assumptions are met, then it is safe to re-apply the actions and commit.</p>
 <p>For example, a compaction might rewrite <code>file_a.avro</code> and <code>file_b.avro</code> as <code>merged.parquet</code>. This is safe to commit as long as the table still contains both <code>file_a.avro</code> and <code>file_b.avro</code>. If either file was deleted by a conflicting commit, then the operation must fail. Otherwise, it is safe to remove the source files and add the merged file.</p>
-<h2 id="compatibility">Compatibility</h2>
+<h2 id="compatibility">Compatibility<a class="headerlink" href="#compatibility" title="Permanent link">&para;</a></h2>
 <p>By avoiding file listing and rename operations, Iceberg tables are compatible with any object store. No consistent listing is required.</p></div>
         
         
