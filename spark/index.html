@@ -130,6 +130,12 @@
 
                         
                             
+<li >
+    <a href="../api-quickstart/">Quickstart</a>
+</li>
+
+                        
+                            
 <li class="active">
     <a href="./">Spark</a>
 </li>
@@ -153,6 +159,12 @@
                             
 <li >
     <a href="https://github.com/apache/incubator-iceberg">Git Repo</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../api-quickstart/">Quickstart</a>
 </li>
 
                         
@@ -218,7 +230,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../evolution/">
+                        <a rel="prev" href="../api-quickstart/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -243,7 +255,8 @@
                 <li class="third-level"><a href="#reading-an-iceberg-table">Reading an Iceberg table</a></li>
                 <li class="third-level"><a href="#time-travel">Time travel</a></li>
                 <li class="third-level"><a href="#querying-with-sql">Querying with SQL</a></li>
-                <li class="third-level"><a href="#appending-to-an-iceberg-table">Appending to an Iceberg table</a></li>
+                <li class="third-level"><a href="#appending-data">Appending data</a></li>
+                <li class="third-level"><a href="#overwriting-data">Overwriting data</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -256,6 +269,7 @@
 <th>Feature support</th>
 <th>Spark 2.4</th>
 <th>Spark 3.0 (unreleased)</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
@@ -263,36 +277,76 @@
 <td>SQL create table</td>
 <td></td>
 <td>✔️</td>
+<td></td>
 </tr>
 <tr>
 <td>SQL alter table</td>
 <td></td>
 <td>✔️</td>
+<td></td>
 </tr>
 <tr>
-<td>SQL reads</td>
+<td>SQL drop table</td>
 <td></td>
 <td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td>SQL select</td>
+<td></td>
+<td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td>SQL create table as</td>
+<td></td>
+<td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td>SQL replace table as</td>
+<td></td>
+<td>✔️</td>
+<td></td>
 </tr>
 <tr>
 <td>SQL insert into</td>
 <td></td>
 <td>✔️</td>
+<td></td>
 </tr>
 <tr>
-<td>DataFrame reads</td>
+<td>SQL insert overwrite</td>
+<td></td>
 <td>✔️</td>
-<td>✔️</td>
+<td></td>
 </tr>
 <tr>
-<td>DataFrame append</td>
+<td><a href="#reading-an-iceberg-table">DataFrame reads</a></td>
 <td>✔️</td>
 <td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#appending-data">DataFrame append</a></td>
+<td>✔️</td>
+<td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#overwriting-data">DataFrame overwrite</a></td>
+<td>✔️</td>
+<td>✔️</td>
+<td>Overwrite mode replaces partitions dynamically</td>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Spark 2.4 can&rsquo;t create Iceberg tables with DDL, instead use the <a href="../api-quickstart">Iceberg API</a>.</p>
+</div>
 <h2 id="spark-24">Spark 2.4<a class="headerlink" href="#spark-24" title="Permanent link">&para;</a></h2>
-<p>To use Iceberg in Spark 2.4, add the <code>iceberg-runtime</code> Jar to Spark&rsquo;s <code>jars</code> folder.</p>
+<p>To use Iceberg in Spark 2.4, add the <code>iceberg-spark-runtime</code> Jar to Spark&rsquo;s <code>jars</code> folder.</p>
 <p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="api">Iceberg API</a> to create Iceberg tables.</p>
 <h3 id="reading-an-iceberg-table">Reading an Iceberg table<a class="headerlink" href="#reading-an-iceberg-table" title="Permanent link">&para;</a></h3>
 <p>To read an Iceberg table, use the <code>iceberg</code> format in <code>DataFrameReader</code>:</p>
@@ -331,12 +385,27 @@ df.createOrReplaceTempView(&quot;table&quot;)
 spark.sql(&quot;&quot;&quot;select count(1) from table&quot;&quot;&quot;).show()
 </code></pre>
 
-<h3 id="appending-to-an-iceberg-table">Appending to an Iceberg table<a class="headerlink" href="#appending-to-an-iceberg-table" title="Permanent link">&para;</a></h3>
+<h3 id="appending-data">Appending data<a class="headerlink" href="#appending-data" title="Permanent link">&para;</a></h3>
 <p>To append a dataframe to an Iceberg table, use the <code>iceberg</code> format with <code>DataFrameReader</code>:</p>
-<pre><code class="scala">spark.write
+<pre><code class="scala">val data: DataFrame = ...
+data.write
     .format(&quot;iceberg&quot;)
     .save(&quot;db.table&quot;)
-</code></pre></div>
+</code></pre>
+
+<h3 id="overwriting-data">Overwriting data<a class="headerlink" href="#overwriting-data" title="Permanent link">&para;</a></h3>
+<p>To overwrite values in an Iceberg table, use <code>overwrite</code> mode in the <code>DataFrameReader</code>:</p>
+<pre><code class="scala">val data: DataFrame = ...
+data.write
+    .format(&quot;iceberg&quot;)
+    .mode(&quot;overwrite&quot;)
+    .save(&quot;db.table&quot;)
+</code></pre>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Spark does not define the behavior of DataFrame overwrite</strong>. Like most sources, Iceberg will dynamically overwrite partitions when the dataframe contains rows in a partition. Unpartitioned tables are completely overwritten.</p>
+</div></div>
         
         
     </div>
