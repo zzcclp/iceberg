@@ -47,6 +47,11 @@ h3:target .headerlink {
   opacity: 1;
 }
 
+h4 {
+  font-weight: 500;
+  font-size: 22px;
+}
+
 h4:target .headerlink {
   color: #008cba;
   opacity: 1;
@@ -55,4 +60,22 @@ h4:target .headerlink {
 h5:target .headerlink {
   color: #008cba;
   opacity: 1;
+}
+
+code {
+  color: #458;
+}
+
+pre {
+  width: max-content;
+  min-width: 60em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.admonition {
+  margin: 0.5em;
+  margin-left: 0em;
+  padding: 0.5em;
+  padding-left: 1em;
 }

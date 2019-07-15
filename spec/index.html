@@ -499,10 +499,14 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <p>All transforms must return <code>null</code> for a <code>null</code> input value.</p>
 <h4 id="bucket-transform-details">Bucket Transform Details<a class="headerlink" href="#bucket-transform-details" title="Permanent link">&para;</a></h4>
 <p>Bucket partition transforms use a 32-bit hash of the source value. The 32-bit hash implementation is the 32-bit Murmur3 hash, x86 variant, seeded with 0.</p>
-<p>Transforms are parameterized by a number of buckets[^3], <code>N</code>. The hash mod <code>N</code> must produce a positive value by first discarding the sign bit of the hash value. In pseudo-code, the function is:</p>
+<p>Transforms are parameterized by a number of buckets [1], <code>N</code>. The hash mod <code>N</code> must produce a positive value by first discarding the sign bit of the hash value. In pseudo-code, the function is:</p>
 <pre><code>  def bucket_N(x) = (murmur3_x86_32_hash(x) &amp; Integer.MAX_VALUE) % N
 </code></pre>
 
+<p>Notes:</p>
+<ol>
+<li>Changing the number of buckets as a table grows is possible by evolving the partition spec.</li>
+</ol>
 <p>For hash function details by type, see Appendix B.</p>
 <h4 id="truncate-transform-details">Truncate Transform Details<a class="headerlink" href="#truncate-transform-details" title="Permanent link">&para;</a></h4>
 <table>
@@ -679,7 +683,11 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <h4 id="manifest-entry-fields">Manifest Entry Fields<a class="headerlink" href="#manifest-entry-fields" title="Permanent link">&para;</a></h4>
 <p>The manifest entry fields are used to keep track of the snapshot in which files were added or logically deleted. The <code>data_file</code> struct is nested inside of the manifest entry so that it can be easily passed to job planning without the manifest entry fields.</p>
 <p>When a data file is added to the dataset, it’s manifest entry should store the snapshot ID in which the file was added and set status to 1 (added).</p>
-<p>When a data file is replaced or deleted from the dataset, it’s manifest entry fields store the snapshot ID in which the file was deleted and status 2 (deleted). The file may be deleted from the file system when the snapshot in which it was deleted is garbage collected, assuming that older snapshots have also been garbage collected[^4].</p>
+<p>When a data file is replaced or deleted from the dataset, it’s manifest entry fields store the snapshot ID in which the file was deleted and status 2 (deleted). The file may be deleted from the file system when the snapshot in which it was deleted is garbage collected, assuming that older snapshots have also been garbage collected [1].</p>
+<p>Notes:</p>
+<ol>
+<li>Technically, data files can be deleted when the last snapshot that contains the file as “live” data is garbage collected. But this is harder to detect and requires finding the diff of multiple snapshots. It is easier to track what files are deleted in a snapshot and delete them when that snapshot expires.</li>
+</ol>
 <h3 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h3>
 <p>A snapshot consists of the following fields:</p>
 <ul>
@@ -706,8 +714,12 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <h4 id="scan-planning">Scan Planning<a class="headerlink" href="#scan-planning" title="Permanent link">&para;</a></h4>
 <p>Scans are planned by reading the manifest files for the current snapshot listed in the table metadata. Deleted entries in a manifest are not included in the scan.</p>
 <p>For each manifest, scan predicates, that filter data rows, are converted to partition predicates, that filter data files, and used to select the data files in the manifest. This conversion uses the partition spec used to write the manifest file.</p>
-<p>Scan predicates are converted to partition predicates using an inclusive projection: if a scan predicate matches a row, then the partition predicate must match that row’s partition. This is an <em>inclusive projection</em>[^5] because rows that do not match the scan predicate may be included in the scan by the partition predicate.</p>
+<p>Scan predicates are converted to partition predicates using an inclusive projection: if a scan predicate matches a row, then the partition predicate must match that row’s partition. This is an <em>inclusive projection</em> [1] because rows that do not match the scan predicate may be included in the scan by the partition predicate.</p>
 <p>For example, an <code>events</code> table with a timestamp column named <code>ts</code> that is partitioned by <code>ts_day=day(ts)</code> is queried by users with ranges over the timestamp column: <code>ts &gt; X</code>. The inclusive projection is <code>ts_day &gt;= day(X)</code>, which is used to select files that may have matching rows. Note that, in most cases, timestamps just before <code>X</code> will be included in the scan because the file contains rows that match the predicate and rows that do not match the predicate.</p>
+<p>Notes:</p>
+<ol>
+<li>An alternative, <em>strict projection</em>, creates a partition predicate that will match a file if all of the rows in the file must match the scan predicate. These projections are used to calculate the residual predicates for each file in a scan.</li>
+</ol>
 <h4 id="manifest-lists">Manifest Lists<a class="headerlink" href="#manifest-lists" title="Permanent link">&para;</a></h4>
 <p>Snapshots are embedded in table metadata, but the list of manifests for a snapshot can be stored in a separate manifest list file.</p>
 <p>A manifest list encodes extra fields that can be used to avoid scanning all of the manifests in a snapshot when planning a table scan. </p>
@@ -817,7 +829,11 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <tbody>
 <tr>
 <td><strong><code>format-version</code></strong></td>
-<td>An integer version number for the format. Currently, this is always 1.</td>
+<td>An integer version number for the format. Currently, this is always 1. Implementations must throw an exception if a table&rsquo;s version is higher than the supported version.</td>
+</tr>
+<tr>
+<td><strong><code>table-uuid</code></strong></td>
+<td>A UUID that identifies the table, generated when the table is created. Implementations must throw an exception if a table&rsquo;s UUID does not match the expected UUID after refreshing metadata.</td>
 </tr>
 <tr>
 <td><strong><code>location</code></strong></td>
@@ -867,7 +883,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </table>
 <p>For serialization details, see Appendix C.</p>
 <h4 id="file-system-tables">File System Tables<a class="headerlink" href="#file-system-tables" title="Permanent link">&para;</a></h4>
-<p>An atomic swap can be implemented using atomic rename in file systems that support it, like HDFS or most local file systems[^6].</p>
+<p>An atomic swap can be implemented using atomic rename in file systems that support it, like HDFS or most local file systems [1].</p>
 <p>Each version of table metadata is stored in a metadata folder under the table’s base location using a file naming scheme that includes a version number, <code>V</code>: <code>v&lt;V&gt;.metadata.json</code>. To commit a new metadata version, <code>V+1</code>, the writer performs the following steps:</p>
 <ol>
 <li>Read the current table metadata version <code>V</code>.</li>
@@ -879,8 +895,12 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </ol>
 </li>
 </ol>
+<p>Notes:</p>
+<ol>
+<li>The file system table scheme is implemented in <a href="/javadoc/master/index.html?org/apache/iceberg/hadoop/HadoopTableOperations.html">HadoopTableOperations</a>.</li>
+</ol>
 <h4 id="metastore-tables">Metastore Tables<a class="headerlink" href="#metastore-tables" title="Permanent link">&para;</a></h4>
-<p>The atomic swap needed to commit new versions of table metadata can be implemented by storing a pointer in a metastore or database that is updated with a check-and-put operation[^7]. The check-and-put validates that the version of the table that a write is based on is still current and then makes the new metadata from the write the current version.</p>
+<p>The atomic swap needed to commit new versions of table metadata can be implemented by storing a pointer in a metastore or database that is updated with a check-and-put operation [1]. The check-and-put validates that the version of the table that a write is based on is still current and then makes the new metadata from the write the current version.</p>
 <p>Each version of table metadata is stored in a metadata folder under the table’s base location using a naming scheme that includes a version and UUID: <code>&lt;V&gt;-&lt;uuid&gt;.metadata.json</code>. To commit a new metadata version, <code>V+1</code>, the writer performs the following steps:</p>
 <ol start="2">
 <li>Create a new table metadata file based on the current metadata.</li>
@@ -890,6 +910,10 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <li>If the swap fails, another writer has already created <code>V+1</code>. The current writer goes back to step 1.</li>
 </ol>
 </li>
+</ol>
+<p>Notes:</p>
+<ol>
+<li>The metastore table scheme is partly implemented in <a href="/javadoc/master/index.html?org/apache/iceberg/BaseMetastoreTableOperations.html">BaseMetastoreTableOperations</a>.</li>
 </ol>
 <h2 id="appendix-a-format-specific-requirements">Appendix A: Format-specific Requirements<a class="headerlink" href="#appendix-a-format-specific-requirements" title="Permanent link">&para;</a></h2>
 <h3 id="avro">Avro<a class="headerlink" href="#avro" title="Permanent link">&para;</a></h3>
@@ -1565,6 +1589,11 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <td><strong><code>format-version</code></strong></td>
 <td><code>JSON int</code></td>
 <td><code>1</code></td>
+</tr>
+<tr>
+<td><strong><code>table-uuid</code></strong></td>
+<td><code>JSON string</code></td>
+<td><code>"fb072c92-a02b-11e9-ae9c-1bb7bc9eca94"</code></td>
 </tr>
 <tr>
 <td><strong><code>location</code></strong></td>

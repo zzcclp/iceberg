@@ -257,6 +257,7 @@
                 <li class="third-level"><a href="#querying-with-sql">Querying with SQL</a></li>
                 <li class="third-level"><a href="#appending-data">Appending data</a></li>
                 <li class="third-level"><a href="#overwriting-data">Overwriting data</a></li>
+                <li class="third-level"><a href="#inspecting-tables">Inspecting tables</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -273,6 +274,30 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="#reading-an-iceberg-table">DataFrame reads</a></td>
+<td>✔️</td>
+<td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#appending-data">DataFrame append</a></td>
+<td>✔️</td>
+<td>✔️</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#overwriting-data">DataFrame overwrite</a></td>
+<td>✔️</td>
+<td>✔️</td>
+<td>Overwrite mode replaces partitions dynamically</td>
+</tr>
+<tr>
+<td><a href="#inspecting-tables">Metadata tables</a></td>
+<td>✔️</td>
+<td>✔️</td>
+<td></td>
+</tr>
 <tr>
 <td>SQL create table</td>
 <td></td>
@@ -320,24 +345,6 @@
 <td></td>
 <td>✔️</td>
 <td></td>
-</tr>
-<tr>
-<td><a href="#reading-an-iceberg-table">DataFrame reads</a></td>
-<td>✔️</td>
-<td>✔️</td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#appending-data">DataFrame append</a></td>
-<td>✔️</td>
-<td>✔️</td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#overwriting-data">DataFrame overwrite</a></td>
-<td>✔️</td>
-<td>✔️</td>
-<td>Overwrite mode replaces partitions dynamically</td>
 </tr>
 </tbody>
 </table>
@@ -405,7 +412,98 @@ data.write
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><strong>Spark does not define the behavior of DataFrame overwrite</strong>. Like most sources, Iceberg will dynamically overwrite partitions when the dataframe contains rows in a partition. Unpartitioned tables are completely overwritten.</p>
-</div></div>
+</div>
+<h3 id="inspecting-tables">Inspecting tables<a class="headerlink" href="#inspecting-tables" title="Permanent link">&para;</a></h3>
+<p>To inspect a table&rsquo;s history, snapshots, and other metadata, Iceberg supports metadata tables.</p>
+<p>Metadata tables are identified by adding the metadata table name after the original table name. For example, history for <code>db.table</code> is read using <code>db.table.history</code>.</p>
+<h4 id="history">History<a class="headerlink" href="#history" title="Permanent link">&para;</a></h4>
+<p>To show table history, run:</p>
+<pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.history&quot;).show(truncate = false)
+</code></pre>
+
+<pre><code class="text">+-------------------------+---------------------+---------------------+---------------------+
+| made_current_at         | snapshot_id         | parent_id           | is_current_ancestor |
++-------------------------+---------------------+---------------------+---------------------+
+| 2019-02-08 03:29:51.215 | 5781947118336215154 | NULL                | true                |
+| 2019-02-08 03:47:55.948 | 5179299526185056830 | 5781947118336215154 | true                |
+| 2019-02-09 16:24:30.13  | 296410040247533544  | 5179299526185056830 | false               |
+| 2019-02-09 16:32:47.336 | 2999875608062437330 | 5179299526185056830 | true                |
+| 2019-02-09 19:42:03.919 | 8924558786060583479 | 2999875608062437330 | true                |
+| 2019-02-09 19:49:16.343 | 6536733823181975045 | 8924558786060583479 | true                |
++-------------------------+---------------------+---------------------+---------------------+
+</code></pre>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>This shows a commit that was rolled back.</strong> The example has two snapshots with the same parent, and one is <em>not</em> an ancestor of the current table state.</p>
+</div>
+<h4 id="snapshots">Snapshots<a class="headerlink" href="#snapshots" title="Permanent link">&para;</a></h4>
+<p>To show the valid snapshots for a table, run:</p>
+<pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.snapshots&quot;).show(truncate = false)
+</code></pre>
+
+<pre><code class="text">+-------------------------+----------------+-----------+-----------+----------------------------------------------------+-------------------------------------------------------+
+| committed_at            | snapshot_id    | parent_id | operation | manifest_list                                      | summary                                               |
++-------------------------+----------------+-----------+-----------+----------------------------------------------------+-------------------------------------------------------+
+| 2019-02-08 03:29:51.215 | 57897183625154 | null      | append    | s3://.../table/metadata/snap-57897183625154-1.avro | { added-records -&gt; 2478404, total-records -&gt; 2478404, |
+|                         |                |           |           |                                                    |   added-data-files -&gt; 438, total-data-files -&gt; 438,   |
+|                         |                |           |           |                                                    |   spark.app.id -&gt; application_1520379288616_155055 }  |
+| ...                     | ...            | ...       | ...       | ...                                                | ...                                                   |
++-------------------------+----------------+-----------+-----------+----------------------------------------------------+-------------------------------------------------------+
+</code></pre>
+
+<p>You can also join snapshots to table history. For example, this query will show table history, with the application ID that wrote each snapshot:</p>
+<pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.history&quot;).createOrReplaceTempView(&quot;history&quot;)
+spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.snapshots&quot;).createOrReplaceTempView(&quot;snapshots&quot;)
+</code></pre>
+
+<pre><code class="sql">select
+    h.made_current_at,
+    s.operation,
+    h.snapshot_id,
+    h.is_current_ancestor,
+    s.summary['spark.app.id']
+from history h
+join snapshots s
+  on h.snapshot_id = s.snapshot_id
+order by made_current_at
+</code></pre>
+
+<pre><code class="text">+-------------------------+-----------+----------------+---------------------+----------------------------------+
+| made_current_at         | operation | snapshot_id    | is_current_ancestor | summary[spark.app.id]            |
++-------------------------+-----------+----------------+---------------------+----------------------------------+
+| 2019-02-08 03:29:51.215 | append    | 57897183625154 | true                | application_1520379288616_155055 |
+| 2019-02-09 16:24:30.13  | delete    | 29641004024753 | false               | application_1520379288616_151109 |
+| 2019-02-09 16:32:47.336 | append    | 57897183625154 | true                | application_1520379288616_155055 |
+| 2019-02-08 03:47:55.948 | overwrite | 51792995261850 | true                | application_1520379288616_152431 |
++-------------------------+-----------+----------------+---------------------+----------------------------------+
+</code></pre>
+
+<h4 id="manifests">Manifests<a class="headerlink" href="#manifests" title="Permanent link">&para;</a></h4>
+<p>To show the a table&rsquo;s file manifests and each file&rsquo;s metadata, run:</p>
+<pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.manifests&quot;).show(truncate = false)
+</code></pre>
+
+<pre><code class="text">+----------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+---------------------------------+
+| path                                                                 | length | partition_spec_id | added_snapshot_id   | added_data_files_count | existing_data_files_count | deleted_data_files_count | partitions                      |
++----------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+---------------------------------+
+| s3://.../table/metadata/45b5290b-ee61-4788-b324-b1e2735c0e10-m0.avro | 4479   | 0                 | 6668963634911763636 | 8                      | 0                         | 0                        | [[false,2019-05-13,2019-05-15]] |
++----------------------------------------------------------------------+--------+-------------------+---------------------+------------------------+---------------------------+--------------------------+---------------------------------+
+</code></pre>
+
+<h4 id="files">Files<a class="headerlink" href="#files" title="Permanent link">&para;</a></h4>
+<p>To show the a table&rsquo;s data files and each file&rsquo;s metadata, run:</p>
+<pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.files&quot;).show(truncate = false)
+</code></pre>
+
+<pre><code class="text">+-------------------------------------------------------------------------+-------------+--------------+--------------------+--------------------+------------------+-------------------+-----------------+-----------------+--------------+---------------+
+| file_path                                                               | file_format | record_count | file_size_in_bytes | column_sizes       | value_counts     | null_value_counts | lower_bounds    | upper_bounds    | key_metadata | split_offsets |
++-------------------------------------------------------------------------+-------------+--------------+--------------------+--------------------+------------------+-------------------+-----------------+-----------------+--------------+---------------+
+| s3:/.../table/data/00000-3-8d6d60e8-d427-4809-bcf0-f5d45a4aad96.parquet | PARQUET     | 1            | 597                | [1 -&gt; 90, 2 -&gt; 62] | [1 -&gt; 1, 2 -&gt; 1] | [1 -&gt; 0, 2 -&gt; 0]  | [1 -&gt; , 2 -&gt; c] | [1 -&gt; , 2 -&gt; c] | null         | [4]           |
+| s3:/.../table/data/00001-4-8d6d60e8-d427-4809-bcf0-f5d45a4aad96.parquet | PARQUET     | 1            | 597                | [1 -&gt; 90, 2 -&gt; 62] | [1 -&gt; 1, 2 -&gt; 1] | [1 -&gt; 0, 2 -&gt; 0]  | [1 -&gt; , 2 -&gt; b] | [1 -&gt; , 2 -&gt; b] | null         | [4]           |
+| s3:/.../table/data/00002-5-8d6d60e8-d427-4809-bcf0-f5d45a4aad96.parquet | PARQUET     | 1            | 597                | [1 -&gt; 90, 2 -&gt; 62] | [1 -&gt; 1, 2 -&gt; 1] | [1 -&gt; 0, 2 -&gt; 0]  | [1 -&gt; , 2 -&gt; a] | [1 -&gt; , 2 -&gt; a] | null         | [4]           |
++-------------------------------------------------------------------------+-------------+--------------+--------------------+--------------------+------------------+-------------------+-----------------+-----------------+--------------+---------------+
+</code></pre></div>
         
         
     </div>

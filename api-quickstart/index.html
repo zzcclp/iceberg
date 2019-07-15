@@ -269,7 +269,7 @@
 
 <h1 id="api-quickstart">API Quickstart<a class="headerlink" href="#api-quickstart" title="Permanent link">&para;</a></h1>
 <h2 id="create-a-table">Create a table<a class="headerlink" href="#create-a-table" title="Permanent link">&para;</a></h2>
-<p>Tables are created using either a <code>Catalog</code> or an implementation of the <code>Tables</code> interface.</p>
+<p>Tables are created using either a <a href="/javadoc/master/index.html?org/apache/iceberg/catalog/Catalog.html"><code>Catalog</code></a> or an implementation of the <a href="/javadoc/master/index.html?org/apache/iceberg/Tables.html"><code>Tables</code></a> interface.</p>
 <h3 id="using-a-hive-catalog">Using a Hive catalog<a class="headerlink" href="#using-a-hive-catalog" title="Permanent link">&para;</a></h3>
 <p>The Hive catalog connects to a Hive MetaStore to keep track of Iceberg tables. This example uses Spark&rsquo;s Hadoop configuration to get a Hive catalog:</p>
 <pre><code class="scala">import org.apache.iceberg.hive.HiveCatalog
@@ -285,7 +285,7 @@ val table = catalog.createTable(name, schema, spec)
 // write into the new logs table with Spark 2.4
 logsDF.write
     .format(&quot;iceberg&quot;)
-    .save(&quot;db.table&quot;)
+    .save(&quot;logging.logs&quot;)
 </code></pre>
 
 <p>The logs <a href="#create-a-schema">schema</a> and <a href="#create-a-partition-spec">partition spec</a> are created below.</p>
