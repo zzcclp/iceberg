@@ -354,7 +354,7 @@
 </div>
 <h2 id="spark-24">Spark 2.4<a class="headerlink" href="#spark-24" title="Permanent link">&para;</a></h2>
 <p>To use Iceberg in Spark 2.4, add the <code>iceberg-spark-runtime</code> Jar to Spark&rsquo;s <code>jars</code> folder.</p>
-<p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="api">Iceberg API</a> to create Iceberg tables.</p>
+<p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="../api">Iceberg API</a> to create Iceberg tables.</p>
 <h3 id="reading-an-iceberg-table">Reading an Iceberg table<a class="headerlink" href="#reading-an-iceberg-table" title="Permanent link">&para;</a></h3>
 <p>To read an Iceberg table, use the <code>iceberg</code> format in <code>DataFrameReader</code>:</p>
 <pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table&quot;)

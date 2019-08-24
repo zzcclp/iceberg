@@ -286,6 +286,11 @@
 <td>10</td>
 <td>Number of bins to consider when combining input splits</td>
 </tr>
+<tr>
+<td>read.split.open-file-cost</td>
+<td>4194304 (4 MB)</td>
+<td>The estimated cost to open a file, used as a minimum weight when combining splits.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="write-properties">Write properties<a class="headerlink" href="#write-properties" title="Permanent link">&para;</a></h3>
@@ -332,6 +337,16 @@
 <td>write.metadata.compression-codec</td>
 <td>none</td>
 <td>Metadata compression codec; none or gzip</td>
+</tr>
+<tr>
+<td>write.metadata.metrics.default</td>
+<td>truncate(16)</td>
+<td>Default metrics mode for all columns in the table; none, counts, truncate(length), or full</td>
+</tr>
+<tr>
+<td>write.metadata.metrics.column.col1</td>
+<td>(not set)</td>
+<td>Metrics mode for column &lsquo;col1&rsquo; to allow per-column tuning; none, counts, truncate(length), or full</td>
 </tr>
 </tbody>
 </table>
@@ -405,6 +420,21 @@ spark.read
 <td>as-of-timestamp</td>
 <td>(latest)</td>
 <td>A timestamp in milliseconds; the snapshot used will be the snapshot current at this time.</td>
+</tr>
+<tr>
+<td>split-size</td>
+<td>As per table property</td>
+<td>Overrides this table&rsquo;s read.split.target-size</td>
+</tr>
+<tr>
+<td>lookback</td>
+<td>As per table property</td>
+<td>Overrides this table&rsquo;s read.split.planning-lookback</td>
+</tr>
+<tr>
+<td>file-open-cost</td>
+<td>As per table property</td>
+<td>Overrides this table&rsquo;s read.split.open-file-cost</td>
 </tr>
 </tbody>
 </table>
