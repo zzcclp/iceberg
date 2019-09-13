@@ -180,6 +180,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../custom-catalog/">Custom Catalog</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -486,7 +492,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <td><strong><code>day</code></strong></td>
 <td>Extract a date or timestamp day, as days from 1970-01-01</td>
 <td><code>date</code>, <code>timestamp(tz)</code></td>
-<td><code>int</code></td>
+<td><code>date</code></td>
 </tr>
 <tr>
 <td><strong><code>hour</code></strong></td>
@@ -1319,11 +1325,6 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </thead>
 <tbody>
 <tr>
-<td><strong><code>boolean</code></strong></td>
-<td><code>false: hashInt(0)</code>, <code>true: hashInt(1)</code></td>
-<td><code>true</code> ￫ <code>1392991556</code></td>
-</tr>
-<tr>
 <td><strong><code>int</code></strong></td>
 <td><code>hashLong(long(v))</code>          [1]</td>
 <td><code>34</code> ￫ <code>2017239379</code></td>
@@ -1334,18 +1335,8 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <td><code>34L</code> ￫ <code>2017239379</code></td>
 </tr>
 <tr>
-<td><strong><code>float</code></strong></td>
-<td><code>hashDouble(double(v))</code>      [2]</td>
-<td><code>1.0F</code> ￫ <code>-142385009</code></td>
-</tr>
-<tr>
-<td><strong><code>double</code></strong></td>
-<td><code>hashLong(doubleToLongBits(v))</code></td>
-<td><code>1.0D</code> ￫ <code>-142385009</code></td>
-</tr>
-<tr>
 <td><strong><code>decimal(P,S)</code></strong></td>
-<td><code>hashBytes(minBigEndian(unscaled(v)))</code>[3]</td>
+<td><code>hashBytes(minBigEndian(unscaled(v)))</code>[2]</td>
 <td><code>14.20</code> ￫ <code>-500754589</code></td>
 </tr>
 <tr>
@@ -1375,7 +1366,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </tr>
 <tr>
 <td><strong><code>uuid</code></strong></td>
-<td><code>hashBytes(uuidBytes(v))</code>        [4]</td>
+<td><code>hashBytes(uuidBytes(v))</code>        [3]</td>
 <td><code>f79c3e09-677c-4bbd-a479-3f349cb785e7</code> ￫ <code>1488055340</code></td>
 </tr>
 <tr>
@@ -1390,14 +1381,41 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </tr>
 </tbody>
 </table>
+<p>The types below are not currently valid for bucketing, and so are not hashed. However, if that changes and a hash value is needed, the following table shall apply:</p>
+<table>
+<thead>
+<tr>
+<th>Primitive type</th>
+<th>Hash specification</th>
+<th>Test value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>boolean</code></strong></td>
+<td><code>false: hashInt(0)</code>, <code>true: hashInt(1)</code></td>
+<td><code>true</code> ￫ <code>1392991556</code></td>
+</tr>
+<tr>
+<td><strong><code>float</code></strong></td>
+<td><code>hashDouble(double(v))</code>         [4]</td>
+<td><code>1.0F</code> ￫ <code>-142385009</code></td>
+</tr>
+<tr>
+<td><strong><code>double</code></strong></td>
+<td><code>hashLong(doubleToLongBits(v))</code></td>
+<td><code>1.0D</code> ￫ <code>-142385009</code></td>
+</tr>
+</tbody>
+</table>
 <p>Notes:</p>
 <ol>
 <li>Integer and long hash results must be identical for all integer values. This ensures that schema evolution does not change bucket partition values if integer types are promoted.</li>
-<li>Float hash values are the result of hashing the float cast to double to ensure that schema evolution does not change hash values if float types are promoted. Note that floating point types are not valid source values for partitioning.</li>
 <li>Decimal values are hashed using the minimum number of bytes required to hold the unscaled value as a two’s complement big-endian; this representation does not include padding bytes required for storage in a fixed-length array.
 Hash results are not dependent on decimal scale, which is part of the type, not the data value.</li>
 <li>UUIDs are encoded using big endian. The test UUID for the example above is: <code>f79c3e09-677c-4bbd-a479-3f349cb785e7</code>. This UUID encoded as a byte array is:
 <code>F7 9C 3E 09 67 7C 4B BD A4 79 3F 34 9C B7 85 E7</code></li>
+<li>Float hash values are the result of hashing the float cast to double to ensure that schema evolution does not change hash values if float types are promoted.</li>
 </ol>
 <h2 id="appendix-c-json-serialization">Appendix C: JSON serialization<a class="headerlink" href="#appendix-c-json-serialization" title="Permanent link">&para;</a></h2>
 <h3 id="schemas">Schemas<a class="headerlink" href="#schemas" title="Permanent link">&para;</a></h3>

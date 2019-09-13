@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Definitions - Apache Iceberg (incubating)</title>
+    <title>Custom Catalog - Apache Iceberg (incubating)</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -152,7 +152,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -181,8 +181,8 @@
 
                         
                             
-<li >
-    <a href="../custom-catalog/">Custom Catalog</a>
+<li class="active">
+    <a href="./">Custom Catalog</a>
 </li>
 
                         
@@ -206,13 +206,13 @@
                 
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Format <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li class="active">
-    <a href="./">Definitions</a>
+<li >
+    <a href="../terms/">Definitions</a>
 </li>
 
                         
@@ -236,12 +236,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../custom-catalog/">
+                        <a rel="prev" href="../api/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../spec/">
+                        <a rel="next" href="../terms/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -255,44 +255,146 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#terms">Terms</a></li>
-            <li class="second-level"><a href="#snapshot">Snapshot</a></li>
+        <li class="first-level active"><a href="#custom-catalog-implementation">Custom Catalog Implementation</a></li>
+            <li class="second-level"><a href="#custom-table-operations-implementation">Custom table operations implementation</a></li>
                 
-            <li class="second-level"><a href="#manifest-list">Manifest list</a></li>
+            <li class="second-level"><a href="#custom-table-implementation">Custom table implementation</a></li>
                 
-            <li class="second-level"><a href="#manifest-file">Manifest file</a></li>
-                
-            <li class="second-level"><a href="#partition-spec">Partition spec</a></li>
-                
-            <li class="second-level"><a href="#partition-tuple">Partition tuple</a></li>
-                
-            <li class="second-level"><a href="#snapshot-log-history-table">Snapshot log (history table)</a></li>
+            <li class="second-level"><a href="#custom-icebergsource">Custom IcebergSource</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<h1 id="terms">Terms<a class="headerlink" href="#terms" title="Permanent link">&para;</a></h1>
-<h3 id="snapshot">Snapshot<a class="headerlink" href="#snapshot" title="Permanent link">&para;</a></h3>
-<p>A <strong>snapshot</strong> is the state of a table at some time.</p>
-<p>Each snapshot lists all of the data files that make up the table&rsquo;s contents at the time of the snapshot. Data files are stored across multiple <a href="#manifest-file">manifest</a> files, and the manifests for a snapshot are listed in a single <a href="#manifest-list">manifest list</a> file.</p>
-<h3 id="manifest-list">Manifest list<a class="headerlink" href="#manifest-list" title="Permanent link">&para;</a></h3>
-<p>A <strong>manifest list</strong> is a metadata file that lists the <a href="#manifest-file">manifests</a> that make up a table snapshot.</p>
-<p>Each manifest file in the manifest list is stored with information about its contents, like partition value ranges, used to speed up metadata operations.</p>
-<h3 id="manifest-file">Manifest file<a class="headerlink" href="#manifest-file" title="Permanent link">&para;</a></h3>
-<p>A <strong>manifest file</strong> is a metadata file that lists a subset of data files that make up a snapshot.</p>
-<p>Each data file in a manifest is stored with a <a href="#partition-tuple">partition tuple</a>, column-level stats, and summary information used to prune splits during <a href="../performance#scan-planning">scan planning</a>.</p>
-<h3 id="partition-spec">Partition spec<a class="headerlink" href="#partition-spec" title="Permanent link">&para;</a></h3>
-<p>A <strong>partition spec</strong> is a description of how to <a href="../partitioning">partition</a> data in a table.</p>
-<p>A spec consists of a list of source columns and transforms. A transform produces a partition value from a source value. For example, <code>date(ts)</code> produces the date associated with a timestamp column named <code>ts</code>.</p>
-<h3 id="partition-tuple">Partition tuple<a class="headerlink" href="#partition-tuple" title="Permanent link">&para;</a></h3>
-<p>A <strong>partition tuple</strong> is a tuple or struct of partition data stored with each data file.</p>
-<p>All values in a partition tuple are the same for all rows stored in a data file. Partition tuples are produced by transforming values from row data using a partition spec.</p>
-<p>Iceberg stores partition values unmodified, unlike Hive tables that convert values to and from strings in file system paths and keys.</p>
-<h3 id="snapshot-log-history-table">Snapshot log (history table)<a class="headerlink" href="#snapshot-log-history-table" title="Permanent link">&para;</a></h3>
-<p>The <strong>snapshot log</strong> is a metadata log of how the table&rsquo;s current snapshot has changed over time.</p>
-<p>The log is a list of timestamp and ID pairs: when the current snapshot changed and the snapshot ID the current snapshot was changed to.</p>
-<p>The snapshot log is stored in <a href="../spec#table-metadata-fields">table metadata as <code>snapshot-log</code></a>.</p></div>
+<h1 id="custom-catalog-implementation">Custom Catalog Implementation<a class="headerlink" href="#custom-catalog-implementation" title="Permanent link">&para;</a></h1>
+<p>It&rsquo;s possible to read an iceberg table either from an hdfs path or from a hive table. It&rsquo;s also possible to use a custom metastore in place of hive. The steps to do that are as follows.</p>
+<ul>
+<li><a href="#custom-table-operations-implementation">Custom TableOperations</a></li>
+<li><a href="#custom-table-implementation">Custom Catalog</a></li>
+<li><a href="#custom-icebergsource">Custom IcebergSource</a></li>
+</ul>
+<h3 id="custom-table-operations-implementation">Custom table operations implementation<a class="headerlink" href="#custom-table-operations-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>BaseMetastoreTableOperations</code> to provide implementation on how to read and write metadata</p>
+<p>Example:</p>
+<pre><code class="java">class CustomTableOperations extends BaseMetastoreTableOperations {
+  private String dbName;
+  private String tableName;
+  private Configuration conf;
+  private FileIO fileIO;
+
+  protected CustomTableOperations(Configuration conf, String dbName, String tableName) {
+    this.conf = conf;
+    this.dbName = dbName;
+    this.tableName = tableName;
+  }
+
+  // The doRefresh method should provide implementation on how to get the metadata location
+  @Override
+  public void doRefresh() {
+
+    // Example custom service which returns the metadata location given a dbName and tableName
+    String metadataLocation = CustomService.getMetadataForTable(conf, dbName, tableName);
+
+    // When updating from a metadata file location, call the helper method
+    refreshFromMetadataLocation(metadataLocation);
+
+  }
+
+  // The doCommit method should provide implementation on how to update with metadata location atomically
+  @Override
+  public void doCommit(TableMetadata base, TableMetadata metadata) {
+    String oldMetadataLocation = base.location();
+
+    // Write new metadata using helper method
+    String newMetadataLocation = writeNewMetadata(metadata, currentVersion() + 1);
+
+    // Example custom service which updates the metadata location for the given db and table atomically
+    CustomService.updateMetadataLocation(dbName, tableName, oldMetadataLocation, newMetadataLocation);
+
+  }
+
+  // The io method provides a FileIO which is used to read and write the table metadata files
+  @Override
+  public FileIO io() {
+    if (fileIO == null) {
+      fileIO = new HadoopFileIO(conf);
+    }
+    return fileIO;
+  }
+}
+</code></pre>
+
+<h3 id="custom-table-implementation">Custom table implementation<a class="headerlink" href="#custom-table-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>BaseMetastoreCatalog</code> to provide default warehouse locations and instantiate <code>CustomTableOperations</code></p>
+<p>Example:</p>
+<pre><code class="java">public class CustomCatalog extends BaseMetastoreCatalog {
+
+  private Configuration configuration;
+
+  public CustomCatalog(Configuration configuration) {
+    this.configuration = configuration;
+  }
+
+  @Override
+  protected TableOperations newTableOps(TableIdentifier tableIdentifier) {
+    String dbName = tableIdentifier.namespace().level(0);
+    String tableName = tableIdentifier.name();
+    // instantiate the CustomTableOperations
+    return new CustomTableOperations(configuration, dbName, tableName);
+  }
+
+  @Override
+  protected String defaultWarehouseLocation(TableIdentifier tableIdentifier) {
+
+    // Can choose to use any other configuration name
+    String tableLocation = configuration.get(&quot;custom.iceberg.warehouse.location&quot;);
+
+    // Can be an s3 or hdfs path
+    if (tableLocation == null) {
+      throw new RuntimeException(&quot;custom.iceberg.warehouse.location configuration not set!&quot;);
+    }
+
+    return String.format(
+            &quot;%s/%s.db/%s&quot;, tableLocation,
+            tableIdentifier.namespace().levels()[0],
+            tableIdentifier.name());
+  }
+
+  @Override
+  public boolean dropTable(TableIdentifier identifier, boolean purge) {
+    // Example service to delete table
+    CustomService.deleteTable(identifier.namepsace().level(0), identifier.name());
+  }
+
+  @Override
+  public void renameTable(TableIdentifier from, TableIdentifier to) {
+    Preconditions.checkArgument(from.namespace().level(0).equals(to.namespace().level(0)),
+            &quot;Cannot move table between databases&quot;);
+    // Example service to rename table
+    CustomService.renameTable(from.namepsace().level(0), from.name(), to.name());
+  }
+}
+</code></pre>
+
+<h3 id="custom-icebergsource">Custom IcebergSource<a class="headerlink" href="#custom-icebergsource" title="Permanent link">&para;</a></h3>
+<p>Extend <code>IcebergSource</code> and provide implementation to read from <code>CustomCatalog</code></p>
+<p>Example:</p>
+<pre><code class="java">public class CustomIcebergSource extends IcebergSource {
+
+  @Override
+  protected Table findTable(DataSourceOptions options, Configuration conf) {
+    Optional&lt;String&gt; path = options.get(&quot;path&quot;);
+    Preconditions.checkArgument(path.isPresent(), &quot;Cannot open table: path is not set&quot;);
+
+    // Read table from CustomCatalog
+    CustomCatalog catalog = new CustomCatalog(conf);
+    TableIdentifier tableIdentifier = TableIdentifier.parse(path.get());
+    return catalog.loadTable(tableIdentifier);
+  }
+}
+</code></pre>
+
+<p>Register the <code>CustomIcebergSource</code> by updating  <code>META-INF/services/org.apache.spark.sql.sources.DataSourceRegister</code> with its fully qualified name</p></div>
         
         
     </div>
