@@ -299,7 +299,7 @@ WHERE event_time BETWEEN '2018-12-01 10:00:00' AND '2018-12-01 12:00:00'
 
 <p>If the <code>event_date</code> filter were missing, Hive would scan through every file in the table because it doesn&rsquo;t know that the <code>event_time</code> column is related to the <code>event_date</code> column.</p>
 <h3 id="problems-with-hive-partitioning">Problems with Hive partitioning<a class="headerlink" href="#problems-with-hive-partitioning" title="Permanent link">&para;</a></h3>
-<p>Hive must be given partition values. In the logs example, it doesn&rsquo;t know the relationship bewteen <code>event_time</code> and <code>event_date</code>.</p>
+<p>Hive must be given partition values. In the logs example, it doesn&rsquo;t know the relationship between <code>event_time</code> and <code>event_date</code>.</p>
 <p>This leads to several problems:</p>
 <ul>
 <li>Hive can&rsquo;t validate partition values &ndash; it is up to the writer to produce the correct value<ul>

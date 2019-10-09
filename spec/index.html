@@ -374,7 +374,7 @@
 <tr>
 <td><strong><code>decimal(P,S)</code></strong></td>
 <td>Fixed-point decimal; precision P, scale S</td>
-<td>Scale is fixed [1], Precision must be 38 or less</td>
+<td>Scale is fixed [1], precision must be 38 or less</td>
 </tr>
 <tr>
 <td><strong><code>date</code></strong></td>
@@ -719,7 +719,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <p>Valid snapshots are stored as a list in table metadata. For serialization, see Appendix C.</p>
 <h4 id="scan-planning">Scan Planning<a class="headerlink" href="#scan-planning" title="Permanent link">&para;</a></h4>
 <p>Scans are planned by reading the manifest files for the current snapshot listed in the table metadata. Deleted entries in a manifest are not included in the scan.</p>
-<p>For each manifest, scan predicates, which filter data rows, are converted to partition predicates, which filter data files. These partition predicates are used select the data files in the manifest. This conversion uses the partition spec used to write the manifest file.</p>
+<p>For each manifest, scan predicates, which filter data rows, are converted to partition predicates, which filter data files. These partition predicates are used to select the data files in the manifest. This conversion uses the partition spec used to write the manifest file.</p>
 <p>Scan predicates are converted to partition predicates using an inclusive projection: if a scan predicate matches a row, then the partition predicate must match that row’s partition. This is an <em>inclusive projection</em> [1] because rows that do not match the scan predicate may be included in the scan by the partition predicate.</p>
 <p>For example, an <code>events</code> table with a timestamp column named <code>ts</code> that is partitioned by <code>ts_day=day(ts)</code> is queried by users with ranges over the timestamp column: <code>ts &gt; X</code>. The inclusive projection is <code>ts_day &gt;= day(X)</code>, which is used to select files that may have matching rows. Note that, in most cases, timestamps just before <code>X</code> will be included in the scan because the file contains rows that match the predicate and rows that do not match the predicate.</p>
 <p>Notes:</p>

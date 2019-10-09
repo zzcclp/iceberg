@@ -289,7 +289,7 @@
 <p>Each writer assumes that no other writers are operating and writes out new table metadata for an operation. Then, the writer attempts to commit by atomically swapping the new table metadata file for the existing metadata file.</p>
 <p>If the atomic swap fails because another writer has committed, the failed writer retries by writing a new metadata tree based on the the new current table state.</p>
 <h3 id="cost-of-retries">Cost of retries<a class="headerlink" href="#cost-of-retries" title="Permanent link">&para;</a></h3>
-<p>Writers avoid expensive retry operaitions by structuring changes so that work can be reused across retries.</p>
+<p>Writers avoid expensive retry operations by structuring changes so that work can be reused across retries.</p>
 <p>For example, appends usually create a new manifest file for the appended data files, which can be added to the table without rewriting the manifest on every attempt.</p>
 <h3 id="retry-validation">Retry validation<a class="headerlink" href="#retry-validation" title="Permanent link">&para;</a></h3>
 <p>Commits are structured as assumptions and actions. After a conflict, a writer checks that the assumptions are met by the current table state. If the assumptions are met, then it is safe to re-apply the actions and commit.</p>

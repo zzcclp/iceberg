@@ -354,6 +354,11 @@
 <td>(not set)</td>
 <td>Metrics mode for column &lsquo;col1&rsquo; to allow per-column tuning; none, counts, truncate(length), or full</td>
 </tr>
+<tr>
+<td>write.target-file-size-bytes</td>
+<td>Long.MAX_VALUE</td>
+<td>Controls the size of files generated to target about this many bytes.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="table-behavior-properties">Table behavior properties<a class="headerlink" href="#table-behavior-properties" title="Permanent link">&para;</a></h3>
@@ -466,6 +471,11 @@ df.write
 <td>write-format</td>
 <td>Table write.format.default</td>
 <td>File format to use for this write operation; parquet or avro</td>
+</tr>
+<tr>
+<td>target-file-size-bytes</td>
+<td>As per table property</td>
+<td>Overrides this table&rsquo;s write.target-file-size-bytes</td>
 </tr>
 </tbody>
 </table></div>

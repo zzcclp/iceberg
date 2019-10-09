@@ -399,15 +399,16 @@ spark.sql(&quot;&quot;&quot;select count(1) from table&quot;&quot;&quot;).show()
 </code></pre>
 
 <h3 id="appending-data">Appending data<a class="headerlink" href="#appending-data" title="Permanent link">&para;</a></h3>
-<p>To append a dataframe to an Iceberg table, use the <code>iceberg</code> format with <code>DataFrameReader</code>:</p>
+<p>To append a dataframe to an Iceberg table, use the <code>iceberg</code> format with <code>append</code> mode in the <code>DataFrameWriter</code>:</p>
 <pre><code class="scala">val data: DataFrame = ...
 data.write
     .format(&quot;iceberg&quot;)
+    .mode(&quot;append&quot;)
     .save(&quot;db.table&quot;)
 </code></pre>
 
 <h3 id="overwriting-data">Overwriting data<a class="headerlink" href="#overwriting-data" title="Permanent link">&para;</a></h3>
-<p>To overwrite values in an Iceberg table, use <code>overwrite</code> mode in the <code>DataFrameReader</code>:</p>
+<p>To overwrite values in an Iceberg table, use <code>overwrite</code> mode in the <code>DataFrameWriter</code>:</p>
 <pre><code class="scala">val data: DataFrame = ...
 data.write
     .format(&quot;iceberg&quot;)
@@ -486,7 +487,7 @@ order by made_current_at
 </code></pre>
 
 <h4 id="manifests">Manifests<a class="headerlink" href="#manifests" title="Permanent link">&para;</a></h4>
-<p>To show the a table&rsquo;s file manifests and each file&rsquo;s metadata, run:</p>
+<p>To show a table&rsquo;s file manifests and each file&rsquo;s metadata, run:</p>
 <pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.manifests&quot;).show(truncate = false)
 </code></pre>
 
@@ -498,7 +499,7 @@ order by made_current_at
 </code></pre>
 
 <h4 id="files">Files<a class="headerlink" href="#files" title="Permanent link">&para;</a></h4>
-<p>To show the a table&rsquo;s data files and each file&rsquo;s metadata, run:</p>
+<p>To show a table&rsquo;s data files and each file&rsquo;s metadata, run:</p>
 <pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table.files&quot;).show(truncate = false)
 </code></pre>
 
