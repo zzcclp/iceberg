@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Why iceberg - Apache Iceberg (incubating)</title>
+    <title>Disclaimer - Apache Iceberg (incubating)</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -77,7 +77,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Community <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -88,8 +88,8 @@
 
                         
                             
-<li >
-    <a href="../disclaimer/">Disclaimer</a>
+<li class="active">
+    <a href="./">Disclaimer</a>
 </li>
 
                         
@@ -250,6 +250,16 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                    <li >
+                        <a rel="prev" href="../community/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../schemas/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
             </ul>
         </div>
     </div>
@@ -260,73 +270,13 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#why-iceberg">Why Iceberg?</a></li>
-            <li class="second-level"><a href="#goals">Goals</a></li>
-                
-            <li class="second-level"><a href="#why-a-new-table-format">Why a new table format?</a></li>
-                
-            <li class="second-level"><a href="#other-design-goals">Other design goals</a></li>
-                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
-
-<h2 id="why-iceberg">Why Iceberg?<a class="headerlink" href="#why-iceberg" title="Permanent link">&para;</a></h2>
-<p>Iceberg was created because no other table format for provides a complete solution for SQL tables. Some improve atomicity guarantees, but no other format delivers both reliable operations and behavior that data engineers need.</p>
-<p>Iceberg tracks individual data files in a table instead of directories. This allows writers to create data files in-place and only adds files to the table in an explicit commit.</p>
-<p>Table state is maintained in metadata files. All changes to table state create a new metadata file and replace the old metadata with an atomic operation. The table metadata file tracks the table schema, partitioning config, other properties, and snapshots of the table contents.</p>
-<p>The atomic transitions from one table metadata file to the next provide snapshot isolation. Readers use the latest table state (snapshot) that was current when they load the table metadata and are not affected by changes until they refresh and pick up a new metadata location.</p>
-<p>A <em>snapshot</em> is a complete set of data files in the table at some point in time. Snapshots are listed in the metadata file, but the files in a snapshot are stored across a separate set of <em>manifest</em> files.</p>
-<p>Data files in snapshots are stored in one or more manifest files that contain a row for each data file in the table, its partition data, and its metrics. A snapshot is the union of all files in its manifests. Manifest files can be shared between snapshots to avoid rewriting metadata that is slow-changing.</p>
-<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
-<p>This also provides improved guarantees and performance:</p>
-<ul>
-<li><strong>Snapshot isolation</strong>: Readers always use a consistent snapshot of the table, without needing to hold a lock. All table updates are atomic.</li>
-<li><strong>O(1) RPCs to plan</strong>: Instead of listing O(n) directories in a table to plan a job, reading a snapshot requires O(1) RPC calls.</li>
-<li><strong>Distributed planning</strong>: File pruning and predicate push-down is distributed to jobs, removing the metastore as a bottleneck.</li>
-<li><strong>Version history and rollback</strong>: Table snapshots are kept as history and tables can roll back if a job produces bad data.</li>
-<li><strong>Finer granularity partitioning</strong>: Distributed planning and O(1) RPC calls remove the current barriers to finer-grained partitioning.</li>
-<li><strong>Safe file-level operations</strong>. By supporting atomic changes, Iceberg enables new use cases, like safely compacting small files and safely appending late data to tables.</li>
-</ul>
-<h3 id="why-a-new-table-format">Why a new table format?<a class="headerlink" href="#why-a-new-table-format" title="Permanent link">&para;</a></h3>
-<p>The central metastore can be a scale bottleneck and the file system doesn&rsquo;t&mdash;and shouldn&rsquo;t&mdash;provide transactions to isolate concurrent reads and writes.</p>
-<p>There are several problems with the current format:</p>
-<ul>
-<li><strong>There is no specification</strong>: Implementations don’t handle all cases consistently. For example, bucketing in Hive and Spark use different hash functions and are not compatible. Hive uses a locking scheme to make cross-partition changes safe, but no other implementations use it.</li>
-<li><strong>Table data is tracked in two stores</strong>: a central metastore, for partitions, and the file system, for files. This makes atomic changes to a table’s contents impossible. It also requires job planning to make listing calls that are O(n) with the number of partitions. These listing calls are expensive, especially when using a remote object store.</li>
-<li><strong>Operations depend on file rename</strong>: Most output committers depend on rename operations to implement guarantees and reduce the amount of time tables only have partial data from a write. But rename is not a metadata-only operation in S3 and will copy data. The <a href="https://issues.apache.org/jira/browse/HADOOP-13786">new S3 committers</a> that use multipart upload make this better, but can’t entirely solve the problem and put a lot of load on the file system during job commit.</li>
-</ul>
-<p>The current format&rsquo;s dependence on listing and rename cannot be changed, so a new format is needed.</p>
-<h3 id="other-design-goals">Other design goals<a class="headerlink" href="#other-design-goals" title="Permanent link">&para;</a></h3>
-<p>In addition to changes in how table contents are tracked, Iceberg&rsquo;s design improves a few other areas:</p>
-<ul>
-<li><strong>Reliable types</strong>: Iceberg provides a core set of types, tested to work consistently across all of the supported data formats. Types include date, timestamp, and decimal, as well as nested combinations of map, list, and struct.</li>
-<li><strong>Schema evolution</strong>: Columns are tracked by ID to fully support add, drop, and rename across all columns and nested fields.</li>
-<li><strong>Hidden partitioning</strong>: Partitioning is built into Iceberg as table configuration; it can plan efficient queries without extra partition predicates.</li>
-<li><strong>Stats-based split filtering</strong>: Stats for the columns in each data file are used to eliminate splits before creating tasks, boosting performance for highly selective queries.</li>
-<li><strong>Metrics</strong>: The format includes cost-based optimization metrics stored with data files for better job planning.</li>
-<li><strong>Unmodified partition data</strong>: The Hive layout stores partition data escaped in strings. Iceberg stores partition data without modification.</li>
-<li><strong>Portable spec</strong>: Tables are not tied to Java. Iceberg has a clear specification for other implementations.</li>
-</ul></div>
+<p>Apache Iceberg is an effort undergoing incubation at the Apache Software Foundation (ASF), sponsored by the Apache Incubator PMC.</p>
+<p>Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects.</p>
+<p>While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.</p></div>
         
         
     </div>
