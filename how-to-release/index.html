@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Configuration - Apache Iceberg (incubating)</title>
+    <title>How to Release - Apache Iceberg (incubating)</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -77,7 +77,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -94,8 +94,8 @@
 
                         
                             
-<li >
-    <a href="../how-to-release/">How to Release</a>
+<li class="active">
+    <a href="./">How to Release</a>
 </li>
 
                         
@@ -104,7 +104,7 @@
                 
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -121,8 +121,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">Configuration</a>
+<li >
+    <a href="../configuration/">Configuration</a>
 </li>
 
                         
@@ -275,12 +275,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../partitioning/">
+                        <a rel="prev" href="../disclaimer/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../performance/">
+                        <a rel="next" href="../schemas/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -294,247 +294,113 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#configuration">Configuration</a></li>
-            <li class="second-level"><a href="#table-properties">Table properties</a></li>
+        <li class="first-level active"><a href="#setup">Setup</a></li>
+            <li class="second-level"><a href="#nexus-access">Nexus access</a></li>
                 
-                <li class="third-level"><a href="#read-properties">Read properties</a></li>
-                <li class="third-level"><a href="#write-properties">Write properties</a></li>
-                <li class="third-level"><a href="#table-behavior-properties">Table behavior properties</a></li>
-            <li class="second-level"><a href="#spark-options">Spark options</a></li>
+            <li class="second-level"><a href="#pgp-signing">PGP signing</a></li>
                 
-                <li class="third-level"><a href="#read-options">Read options</a></li>
-                <li class="third-level"><a href="#write-options">Write options</a></li>
+        <li class="first-level "><a href="#creating-a-release-candidate">Creating a release candidate</a></li>
+            <li class="second-level"><a href="#build-the-source-release">Build the source release</a></li>
+                
+            <li class="second-level"><a href="#build-and-stage-convenience-binaries">Build and stage convenience binaries</a></li>
+                
+            <li class="second-level"><a href="#start-a-vote-thread">Start a VOTE thread</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
-<!--
- - Licensed to the Apache Software Foundation (ASF) under one or more
- - contributor license agreements.  See the NOTICE file distributed with
- - this work for additional information regarding copyright ownership.
- - The ASF licenses this file to You under the Apache License, Version 2.0
- - (the "License"); you may not use this file except in compliance with
- - the License.  You may obtain a copy of the License at
- -
- -   http://www.apache.org/licenses/LICENSE-2.0
- -
- - Unless required by applicable law or agreed to in writing, software
- - distributed under the License is distributed on an "AS IS" BASIS,
- - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- - See the License for the specific language governing permissions and
- - limitations under the License.
- -->
-
-<h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
-<h2 id="table-properties">Table properties<a class="headerlink" href="#table-properties" title="Permanent link">&para;</a></h2>
-<p>Iceberg tables support table properties to configure table behavior, like the default split size for readers.</p>
-<h3 id="read-properties">Read properties<a class="headerlink" href="#read-properties" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>read.split.target-size</td>
-<td>134217728 (128 MB)</td>
-<td>Target size when combining input splits</td>
-</tr>
-<tr>
-<td>read.split.planning-lookback</td>
-<td>10</td>
-<td>Number of bins to consider when combining input splits</td>
-</tr>
-<tr>
-<td>read.split.open-file-cost</td>
-<td>4194304 (4 MB)</td>
-<td>The estimated cost to open a file, used as a minimum weight when combining splits.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="write-properties">Write properties<a class="headerlink" href="#write-properties" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>write.format.default</td>
-<td>parquet</td>
-<td>Default file format for the table; parquet or avro</td>
-</tr>
-<tr>
-<td>write.parquet.row-group-size-bytes</td>
-<td>134217728 (128 MB)</td>
-<td>Parquet row group size</td>
-</tr>
-<tr>
-<td>write.parquet.page-size-bytes</td>
-<td>1048576 (1 MB)</td>
-<td>Parquet page size</td>
-</tr>
-<tr>
-<td>write.parquet.dict-size-bytes</td>
-<td>2097152 (2 MB)</td>
-<td>Parquet dictionary page size</td>
-</tr>
-<tr>
-<td>write.parquet.compression-codec</td>
-<td>gzip</td>
-<td>Parquet compression codec</td>
-</tr>
-<tr>
-<td>write.avro.compression-codec</td>
-<td>gzip</td>
-<td>Avro compression codec</td>
-</tr>
-<tr>
-<td>write.metadata.compression-codec</td>
-<td>none</td>
-<td>Metadata compression codec; none or gzip</td>
-</tr>
-<tr>
-<td>write.metadata.metrics.default</td>
-<td>truncate(16)</td>
-<td>Default metrics mode for all columns in the table; none, counts, truncate(length), or full</td>
-</tr>
-<tr>
-<td>write.metadata.metrics.column.col1</td>
-<td>(not set)</td>
-<td>Metrics mode for column &lsquo;col1&rsquo; to allow per-column tuning; none, counts, truncate(length), or full</td>
-</tr>
-<tr>
-<td>write.target-file-size-bytes</td>
-<td>Long.MAX_VALUE</td>
-<td>Controls the size of files generated to target about this many bytes.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="table-behavior-properties">Table behavior properties<a class="headerlink" href="#table-behavior-properties" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>commit.retry.num-retries</td>
-<td>4</td>
-<td>Number of times to retry a commit before failing</td>
-</tr>
-<tr>
-<td>commit.retry.min-wait-ms</td>
-<td>100</td>
-<td>Minimum time in milliseconds to wait before retrying a commit</td>
-</tr>
-<tr>
-<td>commit.retry.max-wait-ms</td>
-<td>60000 (1 min)</td>
-<td>Maximum time in milliseconds to wait before retrying a commit</td>
-</tr>
-<tr>
-<td>commit.retry.total-timeout-ms</td>
-<td>1800000 (30 min)</td>
-<td>Maximum time in milliseconds to wait before retrying a commit</td>
-</tr>
-<tr>
-<td>commit.manifest.target-size-bytes</td>
-<td>8388608 (8 MB)</td>
-<td>Target size when merging manifest files</td>
-</tr>
-<tr>
-<td>commit.manifest.min-count-to-merge</td>
-<td>100</td>
-<td>Minimum number of manifests to accumulate before merging</td>
-</tr>
-</tbody>
-</table>
-<h2 id="spark-options">Spark options<a class="headerlink" href="#spark-options" title="Permanent link">&para;</a></h2>
-<h3 id="read-options">Read options<a class="headerlink" href="#read-options" title="Permanent link">&para;</a></h3>
-<p>Spark read options are passed when configuring the DataFrameReader, like this:</p>
-<pre><code class="scala">// time travel
-spark.read
-    .format(&quot;iceberg&quot;)
-    .option(&quot;snapshot-id&quot;, 10963874102873L)
-    .load(&quot;db.table&quot;)
+<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
+<p>To create a release candidate, you will need:</p>
+<ul>
+<li>Apache LDAP credentals for Nexus and SVN</li>
+<li>A <a href="https://www.apache.org/dev/release-signing#generate">GPG key for signing</a>, published in <a href="https://dist.apache.org/repos/dist/dev/incubator/iceberg/KEYS">KEYS</a></li>
+</ul>
+<h3 id="nexus-access">Nexus access<a class="headerlink" href="#nexus-access" title="Permanent link">&para;</a></h3>
+<p>Nexus credentials are configured in your personal <code>~/.gradle/gradle.properties</code> file using <code>mavenUser</code> and <code>mavenPassword</code>:</p>
+<pre><code>mavenUser=yourApacheID
+mavenPassword=SomePassword
 </code></pre>
 
-<table>
-<thead>
-<tr>
-<th>Spark option</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>snapshot-id</td>
-<td>(latest)</td>
-<td>Snapshot ID of the table snapshot to read</td>
-</tr>
-<tr>
-<td>as-of-timestamp</td>
-<td>(latest)</td>
-<td>A timestamp in milliseconds; the snapshot used will be the snapshot current at this time.</td>
-</tr>
-<tr>
-<td>split-size</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.target-size</td>
-</tr>
-<tr>
-<td>lookback</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.planning-lookback</td>
-</tr>
-<tr>
-<td>file-open-cost</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.open-file-cost</td>
-</tr>
-</tbody>
-</table>
-<h3 id="write-options">Write options<a class="headerlink" href="#write-options" title="Permanent link">&para;</a></h3>
-<p>Spark write options are passed when configuring the DataFrameWriter, like this:</p>
-<pre><code class="scala">// write with Avro instead of Parquet
-df.write
-    .format(&quot;iceberg&quot;)
-    .option(&quot;write-format&quot;, &quot;avro&quot;)
-    .save(&quot;db.table&quot;)
+<h3 id="pgp-signing">PGP signing<a class="headerlink" href="#pgp-signing" title="Permanent link">&para;</a></h3>
+<p>The release scripts use the command-line <code>gpg</code> utility so that signing can use the gpg-agent and does not require writing your private key&rsquo;s passphrase to a configuration file.</p>
+<p>To configure gradle to sign convenience binary artifacts, add the following settings to <code>~/.gradle/gradle.properties</code>:</p>
+<pre><code>signing.gnupg.keyName=Your Name (CODE SIGNING KEY)
 </code></pre>
 
-<table>
-<thead>
-<tr>
-<th>Spark option</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>write-format</td>
-<td>Table write.format.default</td>
-<td>File format to use for this write operation; parquet or avro</td>
-</tr>
-<tr>
-<td>target-file-size-bytes</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s write.target-file-size-bytes</td>
-</tr>
-</tbody>
-</table></div>
+<p>To use <code>gpg</code> instead of <code>gpg2</code>, also set <code>signing.gnupg.executable=gpg</code></p>
+<p>For more information, see the Gradle <a href="https://docs.gradle.org/current/userguide/signing_plugin.html#sec:signatory_credentials">signing documentation</a>.</p>
+<h2 id="creating-a-release-candidate">Creating a release candidate<a class="headerlink" href="#creating-a-release-candidate" title="Permanent link">&para;</a></h2>
+<h3 id="build-the-source-release">Build the source release<a class="headerlink" href="#build-the-source-release" title="Permanent link">&para;</a></h3>
+<p>To create the source release artifacts, run the <code>source-release.sh</code> script with the release version and release candidate number:</p>
+<pre><code class="bash">dev/source-release.sh 0.7.0 0
+</code></pre>
+
+<pre><code>Preparing source for apache-iceberg-0.7.0-incubating-rc0
+...
+Success! The release candidate is available here:
+  https://dist.apache.org/repos/dist/dev/incubator/iceberg/apache-iceberg-0.7.0-incubating-rc0/
+
+Commit SHA1: 4b4716c76559b3cdf3487e6b60ab52950241989b
+</code></pre>
+
+<p>The source release script will create a candidate tag based on the HEAD revision in git and will prepare the release tarball, signature, and checksum files. It will also upload the source artifacts to SVN.</p>
+<p>Note the commit SHA1 and candidate location because those will be added to the vote thread.</p>
+<p>Once the source release is ready, use it to stage convenience binary artifacts in Nexus.</p>
+<h3 id="build-and-stage-convenience-binaries">Build and stage convenience binaries<a class="headerlink" href="#build-and-stage-convenience-binaries" title="Permanent link">&para;</a></h3>
+<p>Convenience binaries are created using the source release tarball from in the last step.</p>
+<p>Untar the source release and go into the release directory:</p>
+<pre><code class="bash">tar xzf apache-iceberg-0.7.0-incubating.tar.gz
+cd apache-iceberg-0.7.0-incubating
+</code></pre>
+
+<p>To build and publish the convenience binaries, run the <code>dev/stage-binaries.sh</code> script. This will push to a release staging repository.</p>
+<pre><code>dev/stage-binaries.sh
+</code></pre>
+
+<p>Next, you need to close the staging repository:</p>
+<ol>
+<li>Go to <a href="https://repository.apache.org/">Nexus</a> and log in</li>
+<li>In the menu on the left, choose &ldquo;Staging Repositories&rdquo;</li>
+<li>Select the Iceberg repository</li>
+<li>At the top, select &ldquo;Close&rdquo; and follow the instructions<ul>
+<li>In the comment field use &ldquo;Apache Iceberg (incubating) &lt;version&gt; RC&lt;num&gt;&ldquo;</li>
+</ul>
+</li>
+</ol>
+<h3 id="start-a-vote-thread">Start a VOTE thread<a class="headerlink" href="#start-a-vote-thread" title="Permanent link">&para;</a></h3>
+<p>The last step for a candidate is to create a VOTE thread on the dev mailing list.</p>
+<pre><code class="text">Subject: [VOTE] Release Apache Iceberg &lt;VERSION&gt; RC&lt;NUM&gt;
+</code></pre>
+
+<pre><code class="text">Hi everyone,
+
+I propose the following RC to be released as official Apache Iceberg &lt;VERSION&gt; release.
+
+The commit id is &lt;SHA1&gt;
+* This corresponds to the tag: apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;
+* https://github.com/apache/incubator-iceberg/commits/apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;
+* https://github.com/apache/incubator-iceberg/tree/&lt;SHA1&gt;
+
+The release tarball, signature, and checksums are here:
+* https://dist.apache.org/repos/dist/dev/incubator/iceberg/apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;/
+
+You can find the KEYS file here:
+* https://dist.apache.org/repos/dist/dev/incubator/iceberg/KEYS
+
+Convenience binary artifacts are staged in Nexus. The Maven repository URL is:
+* https://repository.apache.org/content/repositories/orgapacheiceberg-&lt;ID&gt;/
+
+This release includes important changes that I should have summarized here, but I'm lazy.
+
+Please download, verify, and test.
+
+Please vote in the next 72 hours.
+
+[ ] +1 Release this as Apache Parquet &lt;VERSION&gt;
+[ ] +0
+[ ] -1 Do not release this because...
+</code></pre></div>
         
         
     </div>
