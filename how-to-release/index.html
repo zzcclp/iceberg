@@ -89,6 +89,12 @@
                         
                             
 <li >
+    <a href="../releases/">Releases</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../disclaimer/">Disclaimer</a>
 </li>
 
@@ -306,6 +312,8 @@
                 
             <li class="second-level"><a href="#start-a-vote-thread">Start a VOTE thread</a></li>
                 
+            <li class="second-level"><a href="#finishing-the-release">Finishing the release</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -397,9 +405,45 @@ Please download, verify, and test.
 
 Please vote in the next 72 hours.
 
-[ ] +1 Release this as Apache Parquet &lt;VERSION&gt;
+[ ] +1 Release this as Apache Iceberg &lt;VERSION&gt;
 [ ] +0
 [ ] -1 Do not release this because...
+</code></pre>
+
+<h3 id="finishing-the-release">Finishing the release<a class="headerlink" href="#finishing-the-release" title="Permanent link">&para;</a></h3>
+<p>After the release vote has passed, you need to release the last candidate&rsquo;s artifacts.</p>
+<p>First, copy the source release directory to releases:</p>
+<pre><code class="bash">mkdir iceberg
+cd iceberg
+svn co https://dist.apache.org/repos/dist/dev/incubator/iceberg candidates
+svn co https://dist.apache.org/repos/dist/release/incubator/iceberg releases
+cp -r candidates/apache-iceberg-&lt;VERSION&gt;-rcN/ releases/apache-iceberg-&lt;VERSION&gt;
+cd releases
+svn add apache-iceberg-&lt;VERSION&gt;
+svn ci -m 'Iceberg: Add release &lt;VERSION&gt;'
+</code></pre>
+
+<p>Next, add a release tag to the git repository based on the passing candidate tag:</p>
+<pre><code class="bash">git tag -am 'Release Apache Iceberg &lt;VERSION&gt;' apache-iceberg-&lt;VERSION&gt; apache-iceberg-&lt;VERSION&gt;-rcN
+</code></pre>
+
+<p>Then release the candidate repository in <a href="https://repository.apache.org/#stagingRepositories">Nexus</a>.</p>
+<p>To announce the release, wait until Maven central has mirrored the Apache binaries, then update the Iceberg site and send an announcement email:</p>
+<pre><code class="text">[ANNOUNCE] Apache Iceberg release &lt;VERSION&gt;
+</code></pre>
+
+<pre><code class="text">I'm please to announce the release of Apache Iceberg &lt;VERSION&gt;!
+
+Apache Iceberg is an open table format for huge analytic datasets. Iceberg
+delivers high query performance for tables with tens of petabytes of data,
+along with atomic commits, concurrent writes, and SQL-compatible table
+evolution.
+
+This release can be downloaded from: https://www.apache.org/dyn/closer.cgi/incubator/iceberg/&lt;TARBALL NAME WITHOUT .tar.gz&gt;/&lt;TARBALL NAME&gt;
+
+Java artifacts are available from Maven Central.
+
+Thanks to everyone for contributing!
 </code></pre></div>
         
         
