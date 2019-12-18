@@ -397,6 +397,11 @@
 <td>Parquet compression codec</td>
 </tr>
 <tr>
+<td>write.parquet.compression-level</td>
+<td>null</td>
+<td>Parquet compression level</td>
+</tr>
+<tr>
 <td>write.avro.compression-codec</td>
 <td>gzip</td>
 <td>Avro compression codec</td>
@@ -419,7 +424,22 @@
 <tr>
 <td>write.target-file-size-bytes</td>
 <td>Long.MAX_VALUE</td>
-<td>Controls the size of files generated to target about this many bytes.</td>
+<td>Controls the size of files generated to target about this many bytes</td>
+</tr>
+<tr>
+<td>write.wap.enabled</td>
+<td>false</td>
+<td>Enables write-audit-publish writes</td>
+</tr>
+<tr>
+<td>write.metadata.delete-after-commit.enabled</td>
+<td>false</td>
+<td>Controls whether to delete the oldest version metadata files after commit</td>
+</tr>
+<tr>
+<td>write.metadata.previous-versions-max</td>
+<td>100</td>
+<td>The max number of previous version metadata files to keep before deleting after commit</td>
 </tr>
 </tbody>
 </table>
@@ -462,6 +482,11 @@
 <td>commit.manifest.min-count-to-merge</td>
 <td>100</td>
 <td>Minimum number of manifests to accumulate before merging</td>
+</tr>
+<tr>
+<td>commit.manifest-merge.enabled</td>
+<td>true</td>
+<td>Controls whether to automatically merge manifests on writes</td>
 </tr>
 </tbody>
 </table>
@@ -538,6 +563,11 @@ df.write
 <td>target-file-size-bytes</td>
 <td>As per table property</td>
 <td>Overrides this table&rsquo;s write.target-file-size-bytes</td>
+</tr>
+<tr>
+<td>check-nullability</td>
+<td>true</td>
+<td>Sets the nullable check on fields</td>
 </tr>
 </tbody>
 </table></div>

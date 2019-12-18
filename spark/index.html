@@ -331,7 +331,7 @@
  -->
 
 <h1 id="spark">Spark<a class="headerlink" href="#spark" title="Permanent link">&para;</a></h1>
-<p>Iceberg uses Spark&rsquo;s DataSourceV2 API for data source and catalog implementations. Spark DSv2 is an evolving API with different levels of support in Spark versions.</p>
+<p>Iceberg uses Apache Spark&rsquo;s DataSourceV2 API for data source and catalog implementations. Spark DSv2 is an evolving API with different levels of support in Spark versions.</p>
 <table>
 <thead>
 <tr>
@@ -423,6 +423,16 @@
 <h2 id="spark-24">Spark 2.4<a class="headerlink" href="#spark-24" title="Permanent link">&para;</a></h2>
 <p>To use Iceberg in Spark 2.4, add the <code>iceberg-spark-runtime</code> Jar to Spark&rsquo;s <code>jars</code> folder.</p>
 <p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="../api">Iceberg API</a> to create Iceberg tables.</p>
+<p>Recommended way is to include Iceberg&rsquo;s latest released using the <code>--packages</code> option:</p>
+<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark-runtime:0.7.0-incubating
+</code></pre>
+
+<p>You can also build Iceberg locally, and add the jar to Spark&rsquo;s classpath. This can be helpful to test unreleased features or while developing something new:</p>
+<pre><code class="sh">./gradlew assemble
+spark-shell --jars spark-runtime/build/libs/iceberg-spark-runtime-93990904.jar
+</code></pre>
+
+<p>Where you have to replace <code>93990904</code> with the git hash that you&rsquo;re using.</p>
 <h3 id="reading-an-iceberg-table">Reading an Iceberg table<a class="headerlink" href="#reading-an-iceberg-table" title="Permanent link">&para;</a></h3>
 <p>To read an Iceberg table, use the <code>iceberg</code> format in <code>DataFrameReader</code>:</p>
 <pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;db.table&quot;)

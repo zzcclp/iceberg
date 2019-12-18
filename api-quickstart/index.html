@@ -342,7 +342,7 @@
 <p>The Hive catalog connects to a Hive MetaStore to keep track of Iceberg tables. This example uses Spark&rsquo;s Hadoop configuration to get a Hive catalog:</p>
 <pre><code class="scala">import org.apache.iceberg.hive.HiveCatalog
 
-val catalog = new HiveCatalog(spark.sparkContext.hadoopConfiguration)
+val catalog = new HiveCatalog(spark.sessionState.newHadoopConf())
 </code></pre>
 
 <p>The <code>Catalog</code> interface defines methods for working with tables, like <code>createTable</code>, <code>loadTable</code>, <code>renameTable</code>, and <code>dropTable</code>.</p>
@@ -353,6 +353,7 @@ val table = catalog.createTable(name, schema, spec)
 // write into the new logs table with Spark 2.4
 logsDF.write
     .format(&quot;iceberg&quot;)
+    .mode(&quot;append&quot;)
     .save(&quot;logging.logs&quot;)
 </code></pre>
 
@@ -362,13 +363,14 @@ logsDF.write
 <p>To create a table in HDFS, use <code>HadoopTables</code>:</p>
 <pre><code class="scala">import org.apache.iceberg.hadoop.HadoopTables
 
-val tables = new HadoopTables(conf)
+val tables = new HadoopTables(spark.sessionState.newHadoopConf())
 
 val table = tables.create(schema, spec, &quot;hdfs:/tables/logging/logs&quot;)
 
 // write into the new logs table with Spark 2.4
 logsDF.write
     .format(&quot;iceberg&quot;)
+    .mode(&quot;append&quot;)
     .save(&quot;hdfs:/tables/logging/logs&quot;)
 </code></pre>
 
@@ -402,15 +404,12 @@ val schema = new Schema(
 <p>When a table is created, all IDs in the schema are re-assigned to ensure uniqueness.</p>
 <h3 id="convert-a-schema-from-avro">Convert a schema from Avro<a class="headerlink" href="#convert-a-schema-from-avro" title="Permanent link">&para;</a></h3>
 <p>To create an Iceberg schema from an existing Avro schema, use converters in <code>AvroSchemaUtil</code>:</p>
-<pre><code class="scala">import org.apache.iceberg.avro.AvroSchemaUtil
-import org.apache.avro.Schema.Parser
+<pre><code class="scala">import org.apache.avro.Schema.Parser
+import org.apache.iceberg.avro.AvroSchemaUtil
 
-val avroSchema = new Parser().parse(
-    &quot;&quot;&quot;{ &quot;type&quot;: &quot;record&quot;, &quot;name&quot;: &quot;com.example.AvroType&quot;,
-      |  &quot;fields&quot;: [ ... ]
-      |}&quot;&quot;&quot;.stripMargin
+val avroSchema = new Parser().parse(&quot;&quot;&quot;{&quot;type&quot;: &quot;record&quot;, ... }&quot;&quot;&quot;)
 
-val schema = AvroSchemaUtil.convert(avroSchema)
+val icebergSchema = AvroSchemaUtil.toIceberg(avroSchema)
 </code></pre>
 
 <h3 id="convert-a-schema-from-spark">Convert a schema from Spark<a class="headerlink" href="#convert-a-schema-from-spark" title="Permanent link">&para;</a></h3>
