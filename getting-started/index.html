@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Getting started - Apache Iceberg (incubating)</title>
+    <title>Getting Started - Apache Iceberg (incubating)</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -110,9 +110,21 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li class="active">
+    <a href="./">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../configuration/">Configuration</a>
+</li>
+
                         
                             
 <li >
@@ -123,12 +135,6 @@
                             
 <li >
     <a href="../partitioning/">Partitioning</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../configuration/">Configuration</a>
 </li>
 
                         
@@ -152,13 +158,13 @@
                         
                             
 <li >
-    <a href="../spark#time-travel">Time travel</a>
+    <a href="../spark#time-travel">Time Travel</a>
 </li>
 
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../api-quickstart/">Spark Quickstart</a>
 </li>
 
                         
@@ -191,7 +197,7 @@
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Quickstart</a>
 </li>
 
                         
@@ -236,7 +242,7 @@
                         
                             
 <li >
-    <a href="../python-api-intro/">API intro</a>
+    <a href="../python-api-intro/">API Intro</a>
 </li>
 
                         
@@ -280,6 +286,16 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                    <li >
+                        <a rel="prev" href="../how-to-release/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../configuration/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
             </ul>
         </div>
     </div>
@@ -291,6 +307,12 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#getting-started">Getting Started</a></li>
+            <li class="second-level"><a href="#including-iceberg">Including Iceberg</a></li>
+                
+                <li class="third-level"><a href="#downloads">Downloads</a></li>
+                <li class="third-level"><a href="#gradle">Gradle</a></li>
+                <li class="third-level"><a href="#maven">Maven</a></li>
+                <li class="third-level"><a href="#using-the-api">Using the API</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -312,7 +334,57 @@
  - limitations under the License.
  -->
 
-<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2></div>
+<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
+<h2 id="including-iceberg">Including Iceberg<a class="headerlink" href="#including-iceberg" title="Permanent link">&para;</a></h2>
+<h3 id="downloads">Downloads<a class="headerlink" href="#downloads" title="Permanent link">&para;</a></h3>
+<p>The latest version of Iceberg is <a href="https://github.com/apache/incubator-iceberg/releases/tag/apache-iceberg-0.7.0-incubating">0.7.0-incubating</a>.</p>
+<ul>
+<li><a href="https://www.apache.org/dyn/closer.cgi/incubator/iceberg/apache-iceberg-0.7.0-incubating/apache-iceberg-0.7.0-incubating.tar.gz">0.7.0-incubating source tar.gz</a> &ndash; <a href="https://dist.apache.org/repos/dist/release/incubator/iceberg/apache-iceberg-0.7.0-incubating/apache-iceberg-0.7.0-incubating.tar.gz.asc">signature</a> &ndash; <a href="https://dist.apache.org/repos/dist/release/incubator/iceberg/apache-iceberg-0.7.0-incubating/apache-iceberg-0.7.0-incubating.tar.gz.sha512">sha512</a></li>
+<li><a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark-runtime/0.7.0-incubating/iceberg-spark-runtime-0.7.0-incubating.jar">0.7.0-incubating Spark 2.4 runtime Jar</a></li>
+</ul>
+<p>One way to use Iceberg in Spark 2.4 is to download the runtime Jar and add it to the jars folder of your Spark install.</p>
+<p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="../api">Iceberg API</a> to create Iceberg tables.</p>
+<p>The recommended way is to include Iceberg&rsquo;s latest release using the <code>--packages</code> option:</p>
+<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark-runtime:0.7.0-incubating
+</code></pre>
+
+<p>You can also build Iceberg locally, and add the jar to Spark&rsquo;s classpath. This can be helpful to test unreleased features or while developing something new:</p>
+<pre><code class="sh">./gradlew assemble
+
+spark-shell --jars spark-runtime/build/libs/iceberg-spark-runtime-93990904.jar
+</code></pre>
+
+<p>Where you have to replace <code>93990904</code> with the git hash that you&rsquo;re using.</p>
+<h3 id="gradle">Gradle<a class="headerlink" href="#gradle" title="Permanent link">&para;</a></h3>
+<p>To add a dependency on Iceberg in Gradle, add the following to <code>build.gradle</code>:</p>
+<pre><code>dependencies {
+  compile 'org.apache.iceberg:iceberg-core:0.7.0-incubating'
+}
+</code></pre>
+
+<h3 id="maven">Maven<a class="headerlink" href="#maven" title="Permanent link">&para;</a></h3>
+<p>If you&rsquo;d like to try out Iceberg in a Maven project using the Spark Iceberg API, you can add the <code>iceberg-spark-runtime</code> dependency to your <code>pom.xml</code> file:</p>
+<pre><code class="xml">   &lt;dependency&gt;
+     &lt;groupId&gt;org.apache.iceberg&lt;/groupId&gt;
+     &lt;artifactId&gt;iceberg-spark-runtime&lt;/artifactId&gt;
+     &lt;version&gt;${iceberg.version}&lt;/version&gt;
+   &lt;/dependency&gt;
+</code></pre>
+
+<p>You&rsquo;ll also need <code>spark-sql</code> to read tables:</p>
+<pre><code class="xml">  &lt;dependency&gt; 
+    &lt;groupId&gt;org.apache.spark&lt;/groupId&gt;
+    &lt;artifactId&gt;spark-sql_2.11&lt;/artifactId&gt;
+    &lt;version&gt;2.4.4&lt;/version&gt;
+  &lt;/dependency&gt;
+</code></pre>
+
+<h3 id="using-the-api">Using the API<a class="headerlink" href="#using-the-api" title="Permanent link">&para;</a></h3>
+<p>For examples on how to use the Iceberg API see:</p>
+<ul>
+<li><a href="../api-quickstart/">Spark</a></li>
+<li><a href="../java-api-quickstart/">Java</a></li>
+</ul></div>
         
         
     </div>

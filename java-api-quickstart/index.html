@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Why iceberg - Apache Iceberg (incubating)</title>
+    <title>Quickstart - Apache Iceberg (incubating)</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -185,7 +185,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -196,8 +196,8 @@
 
                         
                             
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
+<li class="active">
+    <a href="./">Quickstart</a>
 </li>
 
                         
@@ -286,6 +286,16 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                    <li >
+                        <a rel="prev" href="../presto/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../api/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
             </ul>
         </div>
     </div>
@@ -296,73 +306,131 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#why-iceberg">Why Iceberg?</a></li>
-            <li class="second-level"><a href="#goals">Goals</a></li>
+        <li class="first-level active"><a href="#java-api-quickstart">Java API Quickstart</a></li>
+            <li class="second-level"><a href="#create-a-table">Create a table</a></li>
                 
-            <li class="second-level"><a href="#why-a-new-table-format">Why a new table format?</a></li>
+                <li class="third-level"><a href="#using-a-hive-catalog">Using a Hive catalog</a></li>
+                <li class="third-level"><a href="#using-hadoop-tables">Using Hadoop tables</a></li>
+                <li class="third-level"><a href="#tables-in-spark">Tables in Spark</a></li>
+            <li class="second-level"><a href="#schemas">Schemas</a></li>
                 
-            <li class="second-level"><a href="#other-design-goals">Other design goals</a></li>
+                <li class="third-level"><a href="#create-a-schema">Create a schema</a></li>
+                <li class="third-level"><a href="#convert-a-schema-from-avro">Convert a schema from Avro</a></li>
+                <li class="third-level"><a href="#convert-a-schema-from-spark">Convert a schema from Spark</a></li>
+            <li class="second-level"><a href="#partitioning">Partitioning</a></li>
                 
+                <li class="third-level"><a href="#create-a-partition-spec">Create a partition spec</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+ - Licensed to the Apache Software Foundation (ASF) under one or more
+ - contributor license agreements.  See the NOTICE file distributed with
+ - this work for additional information regarding copyright ownership.
+ - The ASF licenses this file to You under the Apache License, Version 2.0
+ - (the "License"); you may not use this file except in compliance with
+ - the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+ -->
 
-<h2 id="why-iceberg">Why Iceberg?<a class="headerlink" href="#why-iceberg" title="Permanent link">&para;</a></h2>
-<p>Iceberg was created because no other table format for provides a complete solution for SQL tables. Some improve atomicity guarantees, but no other format delivers both reliable operations and behavior that data engineers need.</p>
-<p>Iceberg tracks individual data files in a table instead of directories. This allows writers to create data files in-place and only adds files to the table in an explicit commit.</p>
-<p>Table state is maintained in metadata files. All changes to table state create a new metadata file and replace the old metadata with an atomic operation. The table metadata file tracks the table schema, partitioning config, other properties, and snapshots of the table contents.</p>
-<p>The atomic transitions from one table metadata file to the next provide snapshot isolation. Readers use the latest table state (snapshot) that was current when they load the table metadata and are not affected by changes until they refresh and pick up a new metadata location.</p>
-<p>A <em>snapshot</em> is a complete set of data files in the table at some point in time. Snapshots are listed in the metadata file, but the files in a snapshot are stored across a separate set of <em>manifest</em> files.</p>
-<p>Data files in snapshots are stored in one or more manifest files that contain a row for each data file in the table, its partition data, and its metrics. A snapshot is the union of all files in its manifests. Manifest files can be shared between snapshots to avoid rewriting metadata that is slow-changing.</p>
-<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
-<p>This also provides improved guarantees and performance:</p>
+<h1 id="java-api-quickstart">Java API Quickstart<a class="headerlink" href="#java-api-quickstart" title="Permanent link">&para;</a></h1>
+<h2 id="create-a-table">Create a table<a class="headerlink" href="#create-a-table" title="Permanent link">&para;</a></h2>
+<p>Tables are created using either a <a href="/javadoc/master/index.html?org/apache/iceberg/catalog/Catalog.html"><code>Catalog</code></a> or an implementation of the <a href="/javadoc/master/index.html?org/apache/iceberg/Tables.html"><code>Tables</code></a> interface.</p>
+<h3 id="using-a-hive-catalog">Using a Hive catalog<a class="headerlink" href="#using-a-hive-catalog" title="Permanent link">&para;</a></h3>
+<p>The Hive catalog connects to a Hive MetaStore to keep track of Iceberg tables. This example uses Spark&rsquo;s Hadoop configuration to get a Hive catalog:</p>
+<pre><code class="java">import org.apache.iceberg.hive.HiveCatalog;
+
+Catalog catalog = new HiveCatalog(spark.sparkContext().hadoopConfiguration());
+</code></pre>
+
+<p>The <code>Catalog</code> interface defines methods for working with tables, like <code>createTable</code>, <code>loadTable</code>, <code>renameTable</code>, and <code>dropTable</code>.</p>
+<p>To create a table, pass an <code>Identifier</code> and a <code>Schema</code> along with other initial metadata:</p>
+<pre><code class="java">import org.apache.iceberg.Table;
+import org.apache.iceberg.catalog.TableIdentifier;
+
+TableIdentifier name = TableIdentifier.of(&quot;logging&quot;, &quot;logs&quot;);
+Table table = catalog.createTable(name, schema, spec);
+</code></pre>
+
+<p>The logs <a href="#create-a-schema">schema</a> and <a href="#create-a-partition-spec">partition spec</a> are created below.</p>
+<h3 id="using-hadoop-tables">Using Hadoop tables<a class="headerlink" href="#using-hadoop-tables" title="Permanent link">&para;</a></h3>
+<p>Iceberg also supports tables that are stored in a directory in HDFS or the local file system. Directory tables don&rsquo;t support all catalog operations, like rename, so they use the <code>Tables</code> interface instead of <code>Catalog</code>.</p>
+<p>To create a table in HDFS, use <code>HadoopTables</code>:</p>
+<pre><code class="java">import org.apache.hadoop.conf.Configuration;
+import org.apache.iceberg.hadoop.HadoopTables;
+import org.apache.iceberg.Table;
+
+Configuration conf = new Configuration():
+HadoopTables tables = new HadoopTables(conf);
+Table table = tables.create(schema, spec, table_location);
+</code></pre>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Hadoop tables shouldn&rsquo;t be used with file systems that do not support atomic rename. Iceberg relies on rename to synchronize concurrent commits for directory tables.</p>
+</div>
+<h3 id="tables-in-spark">Tables in Spark<a class="headerlink" href="#tables-in-spark" title="Permanent link">&para;</a></h3>
+<p>Spark uses both <code>HiveCatalog</code> and <code>HadoopTables</code> to load tables. Hive is used when the identifier passed to <code>load</code> or <code>save</code> is not a path, otherwise Spark assumes it is a path-based table.</p>
+<p>To read and write to tables from Spark see:</p>
 <ul>
-<li><strong>Snapshot isolation</strong>: Readers always use a consistent snapshot of the table, without needing to hold a lock. All table updates are atomic.</li>
-<li><strong>O(1) RPCs to plan</strong>: Instead of listing O(n) directories in a table to plan a job, reading a snapshot requires O(1) RPC calls.</li>
-<li><strong>Distributed planning</strong>: File pruning and predicate push-down is distributed to jobs, removing the metastore as a bottleneck.</li>
-<li><strong>Version history and rollback</strong>: Table snapshots are kept as history and tables can roll back if a job produces bad data.</li>
-<li><strong>Finer granularity partitioning</strong>: Distributed planning and O(1) RPC calls remove the current barriers to finer-grained partitioning.</li>
-<li><strong>Safe file-level operations</strong>. By supporting atomic changes, Iceberg enables new use cases, like safely compacting small files and safely appending late data to tables.</li>
+<li><a href="../spark#reading-an-iceberg-table">Reading a table in Spark</a></li>
+<li><a href="../spark#appending-data">Appending to a table in Spark</a></li>
+<li><a href="../spark#overwriting-data">Overwriting data in a table in Spark</a></li>
 </ul>
-<h3 id="why-a-new-table-format">Why a new table format?<a class="headerlink" href="#why-a-new-table-format" title="Permanent link">&para;</a></h3>
-<p>The central metastore can be a scale bottleneck and the file system doesn&rsquo;t&mdash;and shouldn&rsquo;t&mdash;provide transactions to isolate concurrent reads and writes.</p>
-<p>There are several problems with the current format:</p>
-<ul>
-<li><strong>There is no specification</strong>: Implementations don’t handle all cases consistently. For example, bucketing in Hive and Spark use different hash functions and are not compatible. Hive uses a locking scheme to make cross-partition changes safe, but no other implementations use it.</li>
-<li><strong>Table data is tracked in two stores</strong>: a central metastore, for partitions, and the file system, for files. This makes atomic changes to a table’s contents impossible. It also requires job planning to make listing calls that are O(n) with the number of partitions. These listing calls are expensive, especially when using a remote object store.</li>
-<li><strong>Operations depend on file rename</strong>: Most output committers depend on rename operations to implement guarantees and reduce the amount of time tables only have partial data from a write. But rename is not a metadata-only operation in S3 and will copy data. The <a href="https://issues.apache.org/jira/browse/HADOOP-13786">new S3 committers</a> that use multipart upload make this better, but can’t entirely solve the problem and put a lot of load on the file system during job commit.</li>
-</ul>
-<p>The current format&rsquo;s dependence on listing and rename cannot be changed, so a new format is needed.</p>
-<h3 id="other-design-goals">Other design goals<a class="headerlink" href="#other-design-goals" title="Permanent link">&para;</a></h3>
-<p>In addition to changes in how table contents are tracked, Iceberg&rsquo;s design improves a few other areas:</p>
-<ul>
-<li><strong>Reliable types</strong>: Iceberg provides a core set of types, tested to work consistently across all of the supported data formats. Types include date, timestamp, and decimal, as well as nested combinations of map, list, and struct.</li>
-<li><strong>Schema evolution</strong>: Columns are tracked by ID to fully support add, drop, and rename across all columns and nested fields.</li>
-<li><strong>Hidden partitioning</strong>: Partitioning is built into Iceberg as table configuration; it can plan efficient queries without extra partition predicates.</li>
-<li><strong>Stats-based split filtering</strong>: Stats for the columns in each data file are used to eliminate splits before creating tasks, boosting performance for highly selective queries.</li>
-<li><strong>Metrics</strong>: The format includes cost-based optimization metrics stored with data files for better job planning.</li>
-<li><strong>Unmodified partition data</strong>: The Hive layout stores partition data escaped in strings. Iceberg stores partition data without modification.</li>
-<li><strong>Portable spec</strong>: Tables are not tied to Java. Iceberg has a clear specification for other implementations.</li>
-</ul></div>
+<h2 id="schemas">Schemas<a class="headerlink" href="#schemas" title="Permanent link">&para;</a></h2>
+<h3 id="create-a-schema">Create a schema<a class="headerlink" href="#create-a-schema" title="Permanent link">&para;</a></h3>
+<p>This example creates a schema for a <code>logs</code> table:</p>
+<pre><code class="java">import org.apache.iceberg.Schema;
+import org.apache.iceberg.types.Types;
+
+Schema schema = new Schema(
+      Types.NestedField.required(1, &quot;level&quot;, Types.StringType.get()),
+      Types.NestedField.required(2, &quot;event_time&quot;, Types.TimestampType.withZone()),
+      Types.NestedField.required(3, &quot;message&quot;, Types.StringType.get()),
+      Types.NestedField.optional(4, &quot;call_stack&quot;, Types.ListType.ofRequired(5, Types.StringType.get()))
+    );
+</code></pre>
+
+<p>When using the Iceberg API directly, type IDs are required. Conversions from other schema formats, like Spark, Avro, and Parquet will automatically assign new IDs.</p>
+<p>When a table is created, all IDs in the schema are re-assigned to ensure uniqueness.</p>
+<h3 id="convert-a-schema-from-avro">Convert a schema from Avro<a class="headerlink" href="#convert-a-schema-from-avro" title="Permanent link">&para;</a></h3>
+<p>To create an Iceberg schema from an existing Avro schema, use converters in <code>AvroSchemaUtil</code>:</p>
+<pre><code class="java">import org.apache.avro.Schema;
+import org.apache.avro.Schema.Parser;
+import org.apache.iceberg.avro.AvroSchemaUtil;
+
+Schema avroSchema = new Parser().parse(&quot;{\&quot;type\&quot;: \&quot;record\&quot; , ... }&quot;);
+Schema icebergSchema = AvroSchemaUtil.toIceberg(avroSchema);
+</code></pre>
+
+<h3 id="convert-a-schema-from-spark">Convert a schema from Spark<a class="headerlink" href="#convert-a-schema-from-spark" title="Permanent link">&para;</a></h3>
+<p>To create an Iceberg schema from an existing table, use converters in <code>SparkSchemaUtil</code>:</p>
+<pre><code class="java">import org.apache.iceberg.spark.SparkSchemaUtil;
+
+Schema schema = SparkSchemaUtil.schemaForTable(sparkSession, table_name);
+</code></pre>
+
+<h2 id="partitioning">Partitioning<a class="headerlink" href="#partitioning" title="Permanent link">&para;</a></h2>
+<h3 id="create-a-partition-spec">Create a partition spec<a class="headerlink" href="#create-a-partition-spec" title="Permanent link">&para;</a></h3>
+<p>Partition specs describe how Iceberg should group records into data files. Partition specs are created for a table&rsquo;s schema using a builder.</p>
+<p>This example creates a partition spec for the <code>logs</code> table that partitions records by the hour of the log event&rsquo;s timestamp and by log level:</p>
+<pre><code class="java">import org.apache.iceberg.PartitionSpec;
+
+PartitionSpec spec = PartitionSpec.builderFor(schema)
+      .hour(&quot;event_time&quot;)
+      .identity(&quot;level&quot;)
+      .build();
+</code></pre>
+
+<p>For more information on the different partition transforms that Iceberg offers, visit <a href="../spec#partitioning">this page</a>.</p></div>
         
         
     </div>

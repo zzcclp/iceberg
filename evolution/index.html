@@ -116,6 +116,18 @@
                         
                             
 <li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../configuration/">Configuration</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../schemas/">Schemas</a>
 </li>
 
@@ -123,12 +135,6 @@
                             
 <li >
     <a href="../partitioning/">Partitioning</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../configuration/">Configuration</a>
 </li>
 
                         
@@ -152,13 +158,13 @@
                         
                             
 <li >
-    <a href="../spark#time-travel">Time travel</a>
+    <a href="../spark#time-travel">Time Travel</a>
 </li>
 
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../api-quickstart/">Spark Quickstart</a>
 </li>
 
                         
@@ -191,7 +197,7 @@
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Quickstart</a>
 </li>
 
                         
@@ -236,7 +242,7 @@
                         
                             
 <li >
-    <a href="../python-api-intro/">API intro</a>
+    <a href="../python-api-intro/">API Intro</a>
 </li>
 
                         
@@ -356,6 +362,9 @@
 </ul>
 <h2 id="partition-evolution">Partition evolution<a class="headerlink" href="#partition-evolution" title="Permanent link">&para;</a></h2>
 <p>Iceberg table partitioning can be updated in an existing table because queries do not reference partition values directly.</p>
+<p>When you evolve a partition spec, the old data written with an earlier spec remains unchanged. New data is written using the new spec in a new layout. Metadata for each of the partition versions is kept separately. Because of this, when you start writing queries, you get split planning. This is where each partition layout plans files separately using the filter it derives for that specific partition layout. Here&rsquo;s a visual representation of a contrived example: </p>
+<p><img alt="Partition evolution diagram" src="../img/partition-spec-evolution.png" />
+<em>The data for 2008 is partitioned by month. Starting from 2009 the table is updated so that the data is instead partitioned by day. Both partitioning layouts are able to coexist in the same table.</em></p>
 <p>Iceberg uses <a href="../partitioning">hidden partitioning</a>, so you don&rsquo;t <em>need</em> to write queries for a specific partition layout to be fast. Instead, you can write queries that select the data you need, and Iceberg automatically prunes out files that don&rsquo;t contain matching data.</p>
 <p>Partition evolution is a metadata operation and does not eagerly rewrite files.</p></div>
         

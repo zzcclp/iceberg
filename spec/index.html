@@ -116,6 +116,18 @@
                         
                             
 <li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../configuration/">Configuration</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../schemas/">Schemas</a>
 </li>
 
@@ -123,12 +135,6 @@
                             
 <li >
     <a href="../partitioning/">Partitioning</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../configuration/">Configuration</a>
 </li>
 
                         
@@ -152,13 +158,13 @@
                         
                             
 <li >
-    <a href="../spark#time-travel">Time travel</a>
+    <a href="../spark#time-travel">Time Travel</a>
 </li>
 
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../api-quickstart/">Spark Quickstart</a>
 </li>
 
                         
@@ -191,7 +197,7 @@
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Quickstart</a>
 </li>
 
                         
@@ -236,7 +242,7 @@
                         
                             
 <li >
-    <a href="../python-api-intro/">API intro</a>
+    <a href="../python-api-intro/">API Intro</a>
 </li>
 
                         
@@ -315,6 +321,7 @@
                 <li class="third-level"><a href="#manifests">Manifests</a></li>
                 <li class="third-level"><a href="#snapshots">Snapshots</a></li>
                 <li class="third-level"><a href="#table-metadata">Table Metadata</a></li>
+                <li class="third-level"><a href="#delete-format">Delete Format</a></li>
             <li class="second-level"><a href="#appendix-a-format-specific-requirements">Appendix A: Format-specific Requirements</a></li>
                 
                 <li class="third-level"><a href="#avro">Avro</a></li>
@@ -329,6 +336,9 @@
                 <li class="third-level"><a href="#table-metadata-and-snapshots">Table Metadata and Snapshots</a></li>
             <li class="second-level"><a href="#appendix-d-single-value-serialization">Appendix D: Single-value serialization</a></li>
                 
+            <li class="second-level"><a href="#format-version-changes">Format version changes</a></li>
+                
+                <li class="third-level"><a href="#version-2">Version 2</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -691,14 +701,14 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <td><strong>Deprecated. Always write a default value and do not read.</strong></td>
 </tr>
 <tr>
-<td><strong><code>106  file_ordinal</code></strong></td>
+<td><del><strong><code>106  file_ordinal</code></strong></del></td>
 <td><code>optional int</code></td>
-<td>Ordinal of the file w.r.t files with the same partition tuple and snapshot id</td>
+<td><strong>Deprecated. Do not use.</strong></td>
 </tr>
 <tr>
-<td><strong><code>107  sort_columns</code></strong></td>
+<td><del><strong><code>107  sort_columns</code></strong></del></td>
 <td><code>optional list</code></td>
-<td>Columns the file is sorted by</td>
+<td><strong>Deprecated. Do not use.</strong></td>
 </tr>
 <tr>
 <td><strong><code>108  column_sizes</code></strong></td>
@@ -761,6 +771,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <ul>
 <li><strong><code>snapshot-id</code></strong> &ndash; A unique long ID.</li>
 <li><strong><code>parent-snapshot-id</code></strong> &ndash; (Optional) The snapshot ID of the snapshot’s parent. This field is not present for snapshots that have no parent snapshot, such as snapshots created before this field was added or the first snapshot of a table.</li>
+<li><strong><code>sequence-number</code></strong> &ndash; A monotonically increasing long that tracks the order of snapshots in a table. (<strong>v2 only</strong>)</li>
 <li><strong><code>timestamp-ms</code></strong> &ndash; A timestamp when the snapshot was created. This is used when garbage collecting snapshots.</li>
 <li><strong><code>manifests</code></strong> &ndash; A list of manifest file locations. The data files in a snapshot are the union of all data files listed in these manifests. (Deprecated in favor of <code>manifest-list</code>)</li>
 <li><strong><code>manifest-list</code></strong> &ndash; (Optional) The location of a manifest list file for this snapshot, which contains a list of manifest files with additional metadata. If present, the manifests field must be omitted.</li>
@@ -841,6 +852,21 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <td><code>list&lt;508: field_summary&gt;</code> (see below)</td>
 <td>A list of field summaries for each partition field in the spec. Each field in the list corresponds to a field in the manifest file’s partition spec.</td>
 </tr>
+<tr>
+<td><strong><code>512 added_rows_count</code></strong></td>
+<td><code>long</code></td>
+<td>Number of rows in all of files in the manifest that have status <code>ADDED</code></td>
+</tr>
+<tr>
+<td><strong><code>513 existing_rows_count</code></strong></td>
+<td><code>long</code></td>
+<td>Number of rows in all of files in the manifest that have status <code>EXISTING</code></td>
+</tr>
+<tr>
+<td><strong><code>514 deleted_rows_count</code></strong></td>
+<td><code>long</code></td>
+<td>Number of rows in all of files in the manifest that have status <code>DELETED</code></td>
+</tr>
 </tbody>
 </table>
 <p><code>field_summary</code> is a struct with the following fields</p>
@@ -877,6 +903,38 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <h3 id="table-metadata">Table Metadata<a class="headerlink" href="#table-metadata" title="Permanent link">&para;</a></h3>
 <p>Table metadata is stored as JSON. Each table metadata change creates a new table metadata file that is committed by an atomic operation. This operation is used to ensure that a new version of table metadata replaces the version on which it was based. This produces a linear history of table versions and ensures that concurrent writes are not lost.</p>
 <p>The atomic operation used to commit metadata depends on how tables are tracked and is not standardized by this spec. See the sections below for examples.</p>
+<h3 id="delete-format">Delete Format<a class="headerlink" href="#delete-format" title="Permanent link">&para;</a></h3>
+<p>This section details how to encode row-level deletes in Iceberg metadata. Row-level deletes are not supported in the current format version 1. This part of the spec is not yet complete and will be completed as format version 2.</p>
+<h4 id="position-based-delete-files">Position-based Delete Files<a class="headerlink" href="#position-based-delete-files" title="Permanent link">&para;</a></h4>
+<p>Position-based delete files identify rows in one or more data files that have been deleted.</p>
+<p>Position-based delete files store <code>file_position_delete</code>, a struct with the following fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field id, name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>1  file_path</code></strong></td>
+<td><code>required string</code></td>
+<td>The full URI of a data file with FS scheme. This must match the <code>file_path</code> of the target data file in a manifest entry.</td>
+</tr>
+<tr>
+<td><strong><code>2  position</code></strong></td>
+<td><code>required long</code></td>
+<td>The ordinal position of a deleted row in the target data file identified by <code>file_path</code>, starting at <code>0</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The rows in the delete file must be sorted by <code>file_path</code> then <code>position</code> to optimize filtering rows while scanning. </p>
+<ul>
+<li>Sorting by <code>file_path</code> allows filter pushdown by file in columnar storage formats.</li>
+<li>Sorting by <code>position</code> allows filtering rows while scanning, to avoid keeping deletes in memory.</li>
+</ul>
+<p>Though the delete files can be written using any supported data file format in Iceberg, it is recommended to write delete files with same file format as the table&rsquo;s file format.</p>
 <h4 id="commit-conflict-resolution-and-retry">Commit Conflict Resolution and Retry<a class="headerlink" href="#commit-conflict-resolution-and-retry" title="Permanent link">&para;</a></h4>
 <p>When two commits happen at the same time and are based on the same version, only one commit will succeed. In most cases, the failed commit can be applied to the new current version of table metadata and retried. Updates verify the conditions under which they can be applied to a new version and retry if those conditions are met.</p>
 <ul>
@@ -890,60 +948,94 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <table>
 <thead>
 <tr>
+<th>Format v1</th>
+<th>Format v2</th>
 <th>Field</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>format-version</code></strong></td>
 <td>An integer version number for the format. Currently, this is always 1. Implementations must throw an exception if a table&rsquo;s version is higher than the supported version.</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>required</em></td>
 <td><strong><code>table-uuid</code></strong></td>
 <td>A UUID that identifies the table, generated when the table is created. Implementations must throw an exception if a table&rsquo;s UUID does not match the expected UUID after refreshing metadata.</td>
 </tr>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>location</code></strong></td>
-<td>The table’s base location. This is used by writers to determine where to store data files, manifest files, and table metadata files.</td>
+<td>The table&rsquo;s base location. This is used by writers to determine where to store data files, manifest files, and table metadata files.</td>
 </tr>
 <tr>
+<td><em>omitted</em></td>
+<td><em>required</em></td>
+<td><strong><code>sequence-number</code></strong></td>
+<td>The table&rsquo;s highest assigned sequence number, a monotonically increasing long that tracks the order of snapshots in a table.</td>
+</tr>
+<tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>last-updated-ms</code></strong></td>
 <td>Timestamp in milliseconds from the unix epoch when the table was last updated. Each table metadata file should update this field just before writing.</td>
 </tr>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>last-column-id</code></strong></td>
 <td>An integer; the highest assigned column ID for the table. This is used to ensure columns are always assigned an unused ID when evolving schemas.</td>
 </tr>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>schema</code></strong></td>
 <td>The table’s current schema.</td>
 </tr>
 <tr>
+<td><em>required</em></td>
+<td><em>omitted</em></td>
 <td><strong><code>partition-spec</code></strong></td>
 <td>The table’s current partition spec, stored as only fields. Note that this is used by writers to partition data, but is not used when reading because reads use the specs stored in manifest files. (<strong>Deprecated</strong>: use <code>partition-specs</code> and <code>default-spec-id</code>instead )</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>required</em></td>
 <td><strong><code>partition-specs</code></strong></td>
 <td>A list of partition specs, stored as full partition spec objects.</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>required</em></td>
 <td><strong><code>default-spec-id</code></strong></td>
 <td>ID of the “current” spec that writers should use by default.</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>properties</code></strong></td>
 <td>A string to string map of table properties. This is used to control settings that affect reading and writing and is not intended to be used for arbitrary metadata. For example, <code>commit.retry.num-retries</code> is used to control the number of commit retries.</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>current-snapshot-id</code></strong></td>
 <td><code>long</code> ID of the current table snapshot.</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>snapshots</code></strong></td>
 <td>A list of valid snapshots. Valid snapshots are snapshots for which all data files exist in the file system. A data file must not be deleted from the file system until the last snapshot in which it was listed is garbage collected.</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>snapshot-log</code></strong></td>
 <td>A list (optional) of timestamp and snapshot ID pairs that encodes changes to the current snapshot for the table. Each time the current-snapshot-id is changed, a new entry should be added with the last-updated-ms and the new current-snapshot-id. When snapshots are expired from the list of valid snapshots, all entries before a snapshot that has expired should be removed.</td>
 </tr>
@@ -1257,6 +1349,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <tr>
 <th>Type</th>
 <th>ORC type</th>
+<th>ORC type attributes</th>
 <th>Notes</th>
 </tr>
 </thead>
@@ -1265,91 +1358,112 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <td><strong><code>boolean</code></strong></td>
 <td><code>boolean</code></td>
 <td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong><code>int</code></strong></td>
 <td><code>int</code></td>
+<td></td>
 <td>ORC <code>tinyint</code> and <code>smallint</code> would also map to <strong><code>int</code></strong>.</td>
 </tr>
 <tr>
 <td><strong><code>long</code></strong></td>
 <td><code>long</code></td>
 <td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong><code>float</code></strong></td>
 <td><code>float</code></td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><strong><code>double</code></strong></td>
 <td><code>double</code></td>
 <td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong><code>decimal(P,S)</code></strong></td>
 <td><code>decimal</code></td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><strong><code>date</code></strong></td>
 <td><code>date</code></td>
 <td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong><code>time</code></strong></td>
-<td><code>int</code></td>
+<td><code>long</code></td>
+<td><code>iceberg.long-type</code>=<code>TIME</code></td>
 <td>Stores microseconds from midnight.</td>
 </tr>
 <tr>
 <td><strong><code>timestamp</code></strong></td>
 <td><code>timestamp</code></td>
 <td></td>
+<td>[1]</td>
 </tr>
 <tr>
 <td><strong><code>timestamptz</code></strong></td>
-<td><code>struct</code></td>
-<td>We should add this to ORC’s type model (ORC-294).</td>
+<td><code>timestamp_instant</code></td>
+<td></td>
+<td>[1]</td>
 </tr>
 <tr>
 <td><strong><code>string</code></strong></td>
 <td><code>string</code></td>
+<td></td>
 <td>ORC <code>varchar</code> and <code>char</code> would also map to <strong><code>string</code></strong>.</td>
 </tr>
 <tr>
 <td><strong><code>uuid</code></strong></td>
 <td><code>binary</code></td>
+<td><code>iceberg.binary-type</code>=<code>UUID</code></td>
 <td></td>
 </tr>
 <tr>
 <td><strong><code>fixed(L)</code></strong></td>
 <td><code>binary</code></td>
+<td><code>iceberg.binary-type</code>=<code>FIXED</code> &amp; <code>iceberg.length</code>=<code>L</code></td>
 <td>The length would not be checked by the ORC reader and should be checked by the adapter.</td>
 </tr>
 <tr>
 <td><strong><code>binary</code></strong></td>
 <td><code>binary</code></td>
 <td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong><code>struct</code></strong></td>
 <td><code>struct</code></td>
-<td>ORC <code>uniontype</code> would also map to <strong><code>struct</code></strong>.</td>
+<td></td>
+<td></td>
 </tr>
 <tr>
 <td><strong><code>list</code></strong></td>
 <td><code>array</code></td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><strong><code>map</code></strong></td>
 <td><code>map</code></td>
 <td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
+<p>Notes:</p>
+<ol>
+<li>ORC&rsquo;s <a href="https://orc.apache.org/api/hive-storage-api/org/apache/hadoop/hive/ql/exec/vector/TimestampColumnVector.html">TimestampColumnVector</a> comprises of a time field (milliseconds since epoch) and a nanos field (nanoseconds within the second). Hence the milliseconds within the second are reported twice; once in the time field and again in the nanos field. The read adapter should only use milliseconds within the second from one of these fields. The write adapter should also report milliseconds within the second twice; once in the time field and again in the nanos field. ORC writer is expected to correctly consider millis information from one of the fields. More details at https://issues.apache.org/jira/browse/ORC-546</li>
+</ol>
 <p>One of the interesting challenges with this is how to map Iceberg’s schema evolution (id based) on to ORC’s (name based). In theory, we could use Iceberg’s column ids as the column and field names, but that would suck from a user’s point of view. </p>
-<p>The column ids would be stored in ORC’s user metadata as <code>iceberg.column.id</code> with a comma separated list of the ids.</p>
+<p>The column IDs must be stored in ORC type attributes using the key <code>iceberg.id</code>, and <code>iceberg.required</code> to store <code>"true"</code> if the Iceberg column is required, otherwise it will be optional.</p>
 <p>Iceberg would build the desired reader schema with their schema evolution rules and pass that down to the ORC reader, which would then use its schema evolution to map that to the writer’s schema. Basically, Iceberg would need to change the names of columns and fields to get the desired mapping.</p>
 <table>
 <thead>
@@ -1811,7 +1925,25 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <td>Not supported</td>
 </tr>
 </tbody>
-</table></div>
+</table>
+<h2 id="format-version-changes">Format version changes<a class="headerlink" href="#format-version-changes" title="Permanent link">&para;</a></h2>
+<h3 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link">&para;</a></h3>
+<p>Writing v1 metadata:
+* Table metadata field <code>last-sequence-number</code> should not be written.
+* Snapshot field <code>sequence-number</code> should not be written.</p>
+<p>Reading v1 metadata:
+* Table metadata field <code>last-sequence-number</code> must default to 0.
+* Snapshot field <code>sequence-number</code> must default to 0.</p>
+<p>Writing v2 metadata:
+* Table metadata added required field <code>last-sequence-number</code>.
+* Table metadata now requires field <code>table-uuid</code>.
+* Table metadata now requires field <code>partition-specs</code>.
+* Table metadata now requires field <code>default-spec-id</code>.
+* Table metadata field <code>partition-spec</code> is no longer required and may be omitted.
+* Snapshot added required field field <code>sequence-number</code>.
+* Snapshot now requires field <code>manifest-list</code>.
+* Snapshot field <code>manifests</code> is no longer allowed.</p>
+<p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p></div>
         
         
     </div>

@@ -116,6 +116,18 @@
                         
                             
 <li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Configuration</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../schemas/">Schemas</a>
 </li>
 
@@ -123,12 +135,6 @@
                             
 <li >
     <a href="../partitioning/">Partitioning</a>
-</li>
-
-                        
-                            
-<li class="active">
-    <a href="./">Configuration</a>
 </li>
 
                         
@@ -152,13 +158,13 @@
                         
                             
 <li >
-    <a href="../spark#time-travel">Time travel</a>
+    <a href="../spark#time-travel">Time Travel</a>
 </li>
 
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../api-quickstart/">Spark Quickstart</a>
 </li>
 
                         
@@ -191,7 +197,7 @@
                         
                             
 <li >
-    <a href="../api-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Quickstart</a>
 </li>
 
                         
@@ -236,7 +242,7 @@
                         
                             
 <li >
-    <a href="../python-api-intro/">API intro</a>
+    <a href="../python-api-intro/">API Intro</a>
 </li>
 
                         
@@ -281,12 +287,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../partitioning/">
+                        <a rel="prev" href="../getting-started/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../performance/">
+                        <a rel="next" href="../schemas/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -306,6 +312,9 @@
                 <li class="third-level"><a href="#read-properties">Read properties</a></li>
                 <li class="third-level"><a href="#write-properties">Write properties</a></li>
                 <li class="third-level"><a href="#table-behavior-properties">Table behavior properties</a></li>
+                <li class="third-level"><a href="#compatibility-flags">Compatibility flags</a></li>
+            <li class="second-level"><a href="#hadoop-options">Hadoop options</a></li>
+                
             <li class="second-level"><a href="#spark-options">Spark options</a></li>
                 
                 <li class="third-level"><a href="#read-options">Read options</a></li>
@@ -347,7 +356,12 @@
 <tr>
 <td>read.split.target-size</td>
 <td>134217728 (128 MB)</td>
-<td>Target size when combining input splits</td>
+<td>Target size when combining data input splits</td>
+</tr>
+<tr>
+<td>read.split.metadata-target-size</td>
+<td>33554432 (32 MB)</td>
+<td>Target size when combining metadata input splits</td>
 </tr>
 <tr>
 <td>read.split.planning-lookback</td>
@@ -490,6 +504,45 @@
 </tr>
 </tbody>
 </table>
+<h3 id="compatibility-flags">Compatibility flags<a class="headerlink" href="#compatibility-flags" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>compatibility.snapshot-id-inheritance.enabled</td>
+<td>false</td>
+<td>Enables committing snapshots without explicit snapshot IDs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="hadoop-options">Hadoop options<a class="headerlink" href="#hadoop-options" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>iceberg.hive.client-pool-size</td>
+<td>5</td>
+<td>The size of the Hive client pool when tracking tables in HMS</td>
+</tr>
+<tr>
+<td>iceberg.hive.lock-timeout-ms</td>
+<td>180000 (3 min)</td>
+<td>Maximum time in milliseconds to acquire a lock</td>
+</tr>
+</tbody>
+</table>
 <h2 id="spark-options">Spark options<a class="headerlink" href="#spark-options" title="Permanent link">&para;</a></h2>
 <h3 id="read-options">Read options<a class="headerlink" href="#read-options" title="Permanent link">&para;</a></h3>
 <p>Spark read options are passed when configuring the DataFrameReader, like this:</p>
@@ -522,7 +575,7 @@ spark.read
 <tr>
 <td>split-size</td>
 <td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.target-size</td>
+<td>Overrides this table&rsquo;s read.split.target-size and read.split.metadata-target-size</td>
 </tr>
 <tr>
 <td>lookback</td>

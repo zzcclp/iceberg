@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Quickstart - Apache Iceberg (incubating)</title>
+    <title>Spark Quickstart - Apache Iceberg (incubating)</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -110,9 +110,21 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../configuration/">Configuration</a>
+</li>
+
                         
                             
 <li >
@@ -123,12 +135,6 @@
                             
 <li >
     <a href="../partitioning/">Partitioning</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../configuration/">Configuration</a>
 </li>
 
                         
@@ -152,13 +158,13 @@
                         
                             
 <li >
-    <a href="../spark#time-travel">Time travel</a>
+    <a href="../spark#time-travel">Time Travel</a>
 </li>
 
                         
                             
-<li >
-    <a href="./">Quickstart</a>
+<li class="active">
+    <a href="./">Spark Quickstart</a>
 </li>
 
                         
@@ -179,7 +185,7 @@
                 
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -190,8 +196,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">Quickstart</a>
+<li >
+    <a href="../java-api-quickstart/">Quickstart</a>
 </li>
 
                         
@@ -236,7 +242,7 @@
                         
                             
 <li >
-    <a href="../python-api-intro/">API intro</a>
+    <a href="../python-api-intro/">API Intro</a>
 </li>
 
                         
@@ -281,12 +287,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../presto/">
+                        <a rel="prev" href="../evolution/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../api/">
+                        <a rel="next" href="../spark/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -300,7 +306,7 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#api-quickstart">API Quickstart</a></li>
+        <li class="first-level active"><a href="#spark-api-quickstart">Spark API Quickstart</a></li>
             <li class="second-level"><a href="#create-a-table">Create a table</a></li>
                 
                 <li class="third-level"><a href="#using-a-hive-catalog">Using a Hive catalog</a></li>
@@ -335,7 +341,7 @@
  - limitations under the License.
  -->
 
-<h1 id="api-quickstart">API Quickstart<a class="headerlink" href="#api-quickstart" title="Permanent link">&para;</a></h1>
+<h1 id="spark-api-quickstart">Spark API Quickstart<a class="headerlink" href="#spark-api-quickstart" title="Permanent link">&para;</a></h1>
 <h2 id="create-a-table">Create a table<a class="headerlink" href="#create-a-table" title="Permanent link">&para;</a></h2>
 <p>Tables are created using either a <a href="/javadoc/master/index.html?org/apache/iceberg/catalog/Catalog.html"><code>Catalog</code></a> or an implementation of the <a href="/javadoc/master/index.html?org/apache/iceberg/Tables.html"><code>Tables</code></a> interface.</p>
 <h3 id="using-a-hive-catalog">Using a Hive catalog<a class="headerlink" href="#using-a-hive-catalog" title="Permanent link">&para;</a></h3>
