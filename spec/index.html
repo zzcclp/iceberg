@@ -307,6 +307,10 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#iceberg-table-spec">Iceberg Table Spec</a></li>
+            <li class="second-level"><a href="#version-1-analytic-data-tables">Version 1: Analytic Data Tables</a></li>
+                
+            <li class="second-level"><a href="#version-2-row-level-deletes">Version 2: Row-level Deletes</a></li>
+                
             <li class="second-level"><a href="#goals">Goals</a></li>
                 
             <li class="second-level"><a href="#overview">Overview</a></li>
@@ -321,7 +325,7 @@
                 <li class="third-level"><a href="#manifests">Manifests</a></li>
                 <li class="third-level"><a href="#snapshots">Snapshots</a></li>
                 <li class="third-level"><a href="#table-metadata">Table Metadata</a></li>
-                <li class="third-level"><a href="#delete-format">Delete Format</a></li>
+                <li class="third-level"><a href="#delete-formats">Delete Formats</a></li>
             <li class="second-level"><a href="#appendix-a-format-specific-requirements">Appendix A: Format-specific Requirements</a></li>
                 
                 <li class="third-level"><a href="#avro">Avro</a></li>
@@ -362,6 +366,11 @@
 
 <h1 id="iceberg-table-spec">Iceberg Table Spec<a class="headerlink" href="#iceberg-table-spec" title="Permanent link">&para;</a></h1>
 <p>This is a specification for the Iceberg table format that is designed to manage a large, slow-changing collection of files in a distributed file system or key-value store as a table.</p>
+<h4 id="version-1-analytic-data-tables">Version 1: Analytic Data Tables<a class="headerlink" href="#version-1-analytic-data-tables" title="Permanent link">&para;</a></h4>
+<p><strong>Iceberg format version 1 is the current version</strong>. It defines how to manage large analytic tables using immutable file formats, like Parquet, Avro, and ORC.</p>
+<h4 id="version-2-row-level-deletes">Version 2: Row-level Deletes<a class="headerlink" href="#version-2-row-level-deletes" title="Permanent link">&para;</a></h4>
+<p>The Iceberg community is currently working on version 2 of the Iceberg format that supports encoding row-level deletes. <strong>The v2 specification is incomplete and may change until it is finished and adopted.</strong> This document includes tentative v2 format requirements, but there are currently no compatibility guarantees with the unfinished v2 spec.</p>
+<p>The goal of version 2 is to provide a way to encode row-level deletes. This update can be used to delete or replace individual rows in an immutable data file without rewriting the file.</p>
 <h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Snapshot isolation</strong> &ndash; Reads will be isolated from concurrent writes and always use a committed snapshot of a table’s data. Writes will support removing and adding files in a single operation and are never partially visible. Readers will not acquire locks.</li>
@@ -800,12 +809,14 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <li>An alternative, <em>strict projection</em>, creates a partition predicate that will match a file if all of the rows in the file must match the scan predicate. These projections are used to calculate the residual predicates for each file in a scan.</li>
 </ol>
 <h4 id="manifest-lists">Manifest Lists<a class="headerlink" href="#manifest-lists" title="Permanent link">&para;</a></h4>
-<p>Snapshots are embedded in table metadata, but the list of manifests for a snapshot can be stored in a separate manifest list file.</p>
+<p>Snapshots are embedded in table metadata, but the list of manifests is stored in a separate manifest list file (<em>optional</em> in v1 only).</p>
 <p>A manifest list encodes extra fields that can be used to avoid scanning all of the manifests in a snapshot when planning a table scan. </p>
 <p>Manifest list files store <code>manifest_file</code>, a struct with the following fields:</p>
 <table>
 <thead>
 <tr>
+<th>Format v1</th>
+<th>Format v2</th>
 <th>Field id, name</th>
 <th>Type</th>
 <th>Description</th>
@@ -813,63 +824,105 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </thead>
 <tbody>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>500 manifest_path</code></strong></td>
 <td><code>string</code></td>
 <td>Location of the manifest file</td>
 </tr>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>501 manifest_length</code></strong></td>
 <td><code>long</code></td>
 <td>Length of the manifest file</td>
 </tr>
 <tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
 <td><strong><code>502 partition_spec_id</code></strong></td>
 <td><code>int</code></td>
 <td>ID of a partition spec for the table; must be listed in table metadata <code>partition-specs</code></td>
 </tr>
 <tr>
+<td><em>omitted</em></td>
+<td><em>required</em></td>
+<td><strong><code>515 sequence_number</code></strong></td>
+<td><code>long</code></td>
+<td>Sequence number of the snapshot in which the manifest file was added to the table</td>
+</tr>
+<tr>
+<td><em>omitted</em></td>
+<td><em>required</em></td>
+<td><strong><code>516 min_sequence_number</code></strong></td>
+<td><code>long</code></td>
+<td>Lowest sequence number of any data or delete file contained in the manifest</td>
+</tr>
+<tr>
+<td><em>required</em></td>
+<td><em>optional</em></td>
 <td><strong><code>503 added_snapshot_id</code></strong></td>
 <td><code>long</code></td>
 <td>ID of the snapshot where the  manifest file was added</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>504 added_files_count</code></strong></td>
 <td><code>int</code></td>
 <td>Number of entries in the manifest that have status <code>ADDED</code> (1)</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>505 existing_files_count</code></strong></td>
 <td><code>int</code></td>
 <td>Number of entries in the manifest that have status <code>EXISTING</code> (0)</td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>506 deleted_files_count</code></strong></td>
 <td><code>int</code></td>
 <td>Number of entries in the manifest that have status <code>DELETED</code> (2)</td>
 </tr>
 <tr>
-<td><strong><code>507 partitions</code></strong></td>
-<td><code>list&lt;508: field_summary&gt;</code> (see below)</td>
-<td>A list of field summaries for each partition field in the spec. Each field in the list corresponds to a field in the manifest file’s partition spec.</td>
-</tr>
-<tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>512 added_rows_count</code></strong></td>
 <td><code>long</code></td>
 <td>Number of rows in all of files in the manifest that have status <code>ADDED</code></td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>513 existing_rows_count</code></strong></td>
 <td><code>long</code></td>
 <td>Number of rows in all of files in the manifest that have status <code>EXISTING</code></td>
 </tr>
 <tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
 <td><strong><code>514 deleted_rows_count</code></strong></td>
 <td><code>long</code></td>
 <td>Number of rows in all of files in the manifest that have status <code>DELETED</code></td>
 </tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
+<td><strong><code>507 partitions</code></strong></td>
+<td><code>list&lt;508: field_summary&gt;</code> (see below)</td>
+<td>A list of field summaries for each partition field in the spec. Each field in the list corresponds to a field in the manifest file’s partition spec.</td>
+</tr>
+<tr>
+<td><code>field_summary</code> is a struct with the following fields</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
 </tbody>
 </table>
-<p><code>field_summary</code> is a struct with the following fields</p>
 <table>
 <thead>
 <tr>
@@ -903,46 +956,6 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <h3 id="table-metadata">Table Metadata<a class="headerlink" href="#table-metadata" title="Permanent link">&para;</a></h3>
 <p>Table metadata is stored as JSON. Each table metadata change creates a new table metadata file that is committed by an atomic operation. This operation is used to ensure that a new version of table metadata replaces the version on which it was based. This produces a linear history of table versions and ensures that concurrent writes are not lost.</p>
 <p>The atomic operation used to commit metadata depends on how tables are tracked and is not standardized by this spec. See the sections below for examples.</p>
-<h3 id="delete-format">Delete Format<a class="headerlink" href="#delete-format" title="Permanent link">&para;</a></h3>
-<p>This section details how to encode row-level deletes in Iceberg metadata. Row-level deletes are not supported in the current format version 1. This part of the spec is not yet complete and will be completed as format version 2.</p>
-<h4 id="position-based-delete-files">Position-based Delete Files<a class="headerlink" href="#position-based-delete-files" title="Permanent link">&para;</a></h4>
-<p>Position-based delete files identify rows in one or more data files that have been deleted.</p>
-<p>Position-based delete files store <code>file_position_delete</code>, a struct with the following fields:</p>
-<table>
-<thead>
-<tr>
-<th>Field id, name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong><code>1  file_path</code></strong></td>
-<td><code>required string</code></td>
-<td>The full URI of a data file with FS scheme. This must match the <code>file_path</code> of the target data file in a manifest entry.</td>
-</tr>
-<tr>
-<td><strong><code>2  position</code></strong></td>
-<td><code>required long</code></td>
-<td>The ordinal position of a deleted row in the target data file identified by <code>file_path</code>, starting at <code>0</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>The rows in the delete file must be sorted by <code>file_path</code> then <code>position</code> to optimize filtering rows while scanning. </p>
-<ul>
-<li>Sorting by <code>file_path</code> allows filter pushdown by file in columnar storage formats.</li>
-<li>Sorting by <code>position</code> allows filtering rows while scanning, to avoid keeping deletes in memory.</li>
-</ul>
-<p>Though the delete files can be written using any supported data file format in Iceberg, it is recommended to write delete files with same file format as the table&rsquo;s file format.</p>
-<h4 id="commit-conflict-resolution-and-retry">Commit Conflict Resolution and Retry<a class="headerlink" href="#commit-conflict-resolution-and-retry" title="Permanent link">&para;</a></h4>
-<p>When two commits happen at the same time and are based on the same version, only one commit will succeed. In most cases, the failed commit can be applied to the new current version of table metadata and retried. Updates verify the conditions under which they can be applied to a new version and retry if those conditions are met.</p>
-<ul>
-<li>Append operations have no requirements and can always be applied.</li>
-<li>Replace operations must verify that the files that will be deleted are still in the table. Examples of replace operations include format changes (replace an Avro file with a Parquet file) and compactions (several files are replaced with a single file that contains the same rows).</li>
-<li>Delete operations must verify that specific files to delete are still in the table. Delete operations based on expressions can always be applied (e.g., where timestamp &lt; X).</li>
-<li>Table schema updates and partition spec changes must validate that the schema has not changed between the base version and the current version.</li>
-</ul>
 <h4 id="table-metadata-fields">Table Metadata Fields<a class="headerlink" href="#table-metadata-fields" title="Permanent link">&para;</a></h4>
 <p>Table metadata consists of the following fields:</p>
 <table>
@@ -1042,6 +1055,14 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </tbody>
 </table>
 <p>For serialization details, see Appendix C.</p>
+<h4 id="commit-conflict-resolution-and-retry">Commit Conflict Resolution and Retry<a class="headerlink" href="#commit-conflict-resolution-and-retry" title="Permanent link">&para;</a></h4>
+<p>When two commits happen at the same time and are based on the same version, only one commit will succeed. In most cases, the failed commit can be applied to the new current version of table metadata and retried. Updates verify the conditions under which they can be applied to a new version and retry if those conditions are met.</p>
+<ul>
+<li>Append operations have no requirements and can always be applied.</li>
+<li>Replace operations must verify that the files that will be deleted are still in the table. Examples of replace operations include format changes (replace an Avro file with a Parquet file) and compactions (several files are replaced with a single file that contains the same rows).</li>
+<li>Delete operations must verify that specific files to delete are still in the table. Delete operations based on expressions can always be applied (e.g., where timestamp &lt; X).</li>
+<li>Table schema updates and partition spec changes must validate that the schema has not changed between the base version and the current version.</li>
+</ul>
 <h4 id="file-system-tables">File System Tables<a class="headerlink" href="#file-system-tables" title="Permanent link">&para;</a></h4>
 <p>An atomic swap can be implemented using atomic rename in file systems that support it, like HDFS or most local file systems [1].</p>
 <p>Each version of table metadata is stored in a metadata folder under the table’s base location using a file naming scheme that includes a version number, <code>V</code>: <code>v&lt;V&gt;.metadata.json</code>. To commit a new metadata version, <code>V+1</code>, the writer performs the following steps:</p>
@@ -1075,6 +1096,38 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <ol>
 <li>The metastore table scheme is partly implemented in <a href="/javadoc/master/index.html?org/apache/iceberg/BaseMetastoreTableOperations.html">BaseMetastoreTableOperations</a>.</li>
 </ol>
+<h3 id="delete-formats">Delete Formats<a class="headerlink" href="#delete-formats" title="Permanent link">&para;</a></h3>
+<p>This section details how to encode row-level deletes in Iceberg metadata. Row-level deletes are not supported in the current format version 1. This part of the spec is not yet complete and will be completed as format version 2.</p>
+<h4 id="position-based-delete-files">Position-based Delete Files<a class="headerlink" href="#position-based-delete-files" title="Permanent link">&para;</a></h4>
+<p>Position-based delete files identify rows in one or more data files that have been deleted.</p>
+<p>Position-based delete files store <code>file_position_delete</code>, a struct with the following fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field id, name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>1  file_path</code></strong></td>
+<td><code>required string</code></td>
+<td>The full URI of a data file with FS scheme. This must match the <code>file_path</code> of the target data file in a manifest entry.</td>
+</tr>
+<tr>
+<td><strong><code>2  position</code></strong></td>
+<td><code>required long</code></td>
+<td>The ordinal position of a deleted row in the target data file identified by <code>file_path</code>, starting at <code>0</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The rows in the delete file must be sorted by <code>file_path</code> then <code>position</code> to optimize filtering rows while scanning.</p>
+<ul>
+<li>Sorting by <code>file_path</code> allows filter pushdown by file in columnar storage formats.</li>
+<li>Sorting by <code>position</code> allows filtering rows while scanning, to avoid keeping deletes in memory.</li>
+</ul>
+<p>Though the delete files can be written using any supported data file format in Iceberg, it is recommended to write delete files with same file format as the table&rsquo;s file format.</p>
 <h2 id="appendix-a-format-specific-requirements">Appendix A: Format-specific Requirements<a class="headerlink" href="#appendix-a-format-specific-requirements" title="Permanent link">&para;</a></h2>
 <h3 id="avro">Avro<a class="headerlink" href="#avro" title="Permanent link">&para;</a></h3>
 <p><strong>Data Type Mappings</strong></p>
@@ -1928,22 +1981,42 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 </table>
 <h2 id="format-version-changes">Format version changes<a class="headerlink" href="#format-version-changes" title="Permanent link">&para;</a></h2>
 <h3 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link">&para;</a></h3>
-<p>Writing v1 metadata:
-* Table metadata field <code>last-sequence-number</code> should not be written.
-* Snapshot field <code>sequence-number</code> should not be written.</p>
-<p>Reading v1 metadata:
-* Table metadata field <code>last-sequence-number</code> must default to 0.
-* Snapshot field <code>sequence-number</code> must default to 0.</p>
-<p>Writing v2 metadata:
-* Table metadata added required field <code>last-sequence-number</code>.
-* Table metadata now requires field <code>table-uuid</code>.
-* Table metadata now requires field <code>partition-specs</code>.
-* Table metadata now requires field <code>default-spec-id</code>.
-* Table metadata field <code>partition-spec</code> is no longer required and may be omitted.
-* Snapshot added required field field <code>sequence-number</code>.
-* Snapshot now requires field <code>manifest-list</code>.
-* Snapshot field <code>manifests</code> is no longer allowed.</p>
-<p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p></div>
+<p>Writing v1 metadata:</p>
+<ul>
+<li>Table metadata field <code>last-sequence-number</code> should not be written.</li>
+<li>Table metadata field <code>last-partition-field-id</code> should not be written.</li>
+<li>Snapshot field <code>sequence-number</code> should not be written.</li>
+</ul>
+<p>Reading v1 metadata:</p>
+<ul>
+<li>Table metadata field <code>last-sequence-number</code> must default to 0.</li>
+<li>Snapshot field <code>sequence-number</code> must default to 0.</li>
+<li>Assign partition spec field IDs in sequential order starting at 1,000 and do not skip IDs</li>
+</ul>
+<p>Writing v2 metadata:</p>
+<ul>
+<li>Table metadata added required field <code>last-sequence-number</code>.</li>
+<li>Table metadata now requires field <code>table-uuid</code>.</li>
+<li>Table metadata now requires field <code>partition-specs</code>.</li>
+<li>Table metadata now requires field <code>default-spec-id</code>.</li>
+<li>Table metadata field <code>partition-spec</code> is no longer required and may be omitted.</li>
+<li>Snapshot added required field field <code>sequence-number</code>.</li>
+<li>Snapshot now requires field <code>manifest-list</code>.</li>
+<li>Snapshot field <code>manifests</code> is no longer allowed.</li>
+<li>Partition specs now require <code>field-id</code> for each partition field.</li>
+</ul>
+<p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p>
+<h4 id="partition-specs_1">Partition specs<a class="headerlink" href="#partition-specs_1" title="Permanent link">&para;</a></h4>
+<p>In v1, partition specs did not track IDs for each partition field.</p>
+<p>To build each manifest file schema, the reference implementation assigned field IDs starting from 1,000 independently. This caused potential ID reuse for incompatible fields across manifest files written using different partition specs.</p>
+<p>Partition field ID reuse is not a correctness problem for maintaining data in Iceberg tables. However, ID reuse prevents viewing the set of manifests as a metadata table in some cases. To fix this problem, v2 requires implementations assign unique field IDs &ndash; that do not conflict with other manifest file IDs &ndash; for each partition field.</p>
+<p>When writing to v1 tables, the following is recommended:</p>
+<ol>
+<li>Assign partition field IDs starting at 1,000</li>
+<li>Write partition field IDs as <code>field-id</code>, but assume older writers may inadvertently remove the IDs</li>
+<li>Do not remove partition fields; instead replace a field&rsquo;s transform with the <code>void</code> (<code>alwaysNull</code>) transform to ensure IDs are assigned correctly by the reference implementation</li>
+</ol>
+<h4 id="nan-requirements">NaN requirements<a class="headerlink" href="#nan-requirements" title="Permanent link">&para;</a></h4></div>
         
         
     </div>
