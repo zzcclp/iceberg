@@ -523,6 +523,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <p>Tables are configured with a <strong>partition spec</strong> that defines how to produce a tuple of partition values from a record. A partition spec has a list of fields that consist of:</p>
 <ul>
 <li>A <strong>source column id</strong> from the table’s schema</li>
+<li>A <strong>partition field id</strong> that is used to identify a partition field, which is unique within a partition spec. In v2 table metadata, it will be unique across all partition specs.</li>
 <li>A <strong>transform</strong> that is applied to the source column to produce a partition value</li>
 <li>A <strong>partition name</strong></li>
 </ul>
@@ -809,14 +810,12 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 <li>An alternative, <em>strict projection</em>, creates a partition predicate that will match a file if all of the rows in the file must match the scan predicate. These projections are used to calculate the residual predicates for each file in a scan.</li>
 </ol>
 <h4 id="manifest-lists">Manifest Lists<a class="headerlink" href="#manifest-lists" title="Permanent link">&para;</a></h4>
-<p>Snapshots are embedded in table metadata, but the list of manifests is stored in a separate manifest list file (<em>optional</em> in v1 only).</p>
+<p>Snapshots are embedded in table metadata, but the list of manifests for a snapshot can be stored in a separate manifest list file.</p>
 <p>A manifest list encodes extra fields that can be used to avoid scanning all of the manifests in a snapshot when planning a table scan. </p>
 <p>Manifest list files store <code>manifest_file</code>, a struct with the following fields:</p>
 <table>
 <thead>
 <tr>
-<th>Format v1</th>
-<th>Format v2</th>
 <th>Field id, name</th>
 <th>Type</th>
 <th>Description</th>
@@ -824,105 +823,63 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </thead>
 <tbody>
 <tr>
-<td><em>required</em></td>
-<td><em>required</em></td>
 <td><strong><code>500 manifest_path</code></strong></td>
 <td><code>string</code></td>
 <td>Location of the manifest file</td>
 </tr>
 <tr>
-<td><em>required</em></td>
-<td><em>required</em></td>
 <td><strong><code>501 manifest_length</code></strong></td>
 <td><code>long</code></td>
 <td>Length of the manifest file</td>
 </tr>
 <tr>
-<td><em>required</em></td>
-<td><em>required</em></td>
 <td><strong><code>502 partition_spec_id</code></strong></td>
 <td><code>int</code></td>
 <td>ID of a partition spec for the table; must be listed in table metadata <code>partition-specs</code></td>
 </tr>
 <tr>
-<td><em>omitted</em></td>
-<td><em>required</em></td>
-<td><strong><code>515 sequence_number</code></strong></td>
-<td><code>long</code></td>
-<td>Sequence number of the snapshot in which the manifest file was added to the table</td>
-</tr>
-<tr>
-<td><em>omitted</em></td>
-<td><em>required</em></td>
-<td><strong><code>516 min_sequence_number</code></strong></td>
-<td><code>long</code></td>
-<td>Lowest sequence number of any data or delete file contained in the manifest</td>
-</tr>
-<tr>
-<td><em>required</em></td>
-<td><em>optional</em></td>
 <td><strong><code>503 added_snapshot_id</code></strong></td>
 <td><code>long</code></td>
 <td>ID of the snapshot where the  manifest file was added</td>
 </tr>
 <tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
 <td><strong><code>504 added_files_count</code></strong></td>
 <td><code>int</code></td>
 <td>Number of entries in the manifest that have status <code>ADDED</code> (1)</td>
 </tr>
 <tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
 <td><strong><code>505 existing_files_count</code></strong></td>
 <td><code>int</code></td>
 <td>Number of entries in the manifest that have status <code>EXISTING</code> (0)</td>
 </tr>
 <tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
 <td><strong><code>506 deleted_files_count</code></strong></td>
 <td><code>int</code></td>
 <td>Number of entries in the manifest that have status <code>DELETED</code> (2)</td>
 </tr>
 <tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
-<td><strong><code>512 added_rows_count</code></strong></td>
-<td><code>long</code></td>
-<td>Number of rows in all of files in the manifest that have status <code>ADDED</code></td>
-</tr>
-<tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
-<td><strong><code>513 existing_rows_count</code></strong></td>
-<td><code>long</code></td>
-<td>Number of rows in all of files in the manifest that have status <code>EXISTING</code></td>
-</tr>
-<tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
-<td><strong><code>514 deleted_rows_count</code></strong></td>
-<td><code>long</code></td>
-<td>Number of rows in all of files in the manifest that have status <code>DELETED</code></td>
-</tr>
-<tr>
-<td><em>optional</em></td>
-<td><em>optional</em></td>
 <td><strong><code>507 partitions</code></strong></td>
 <td><code>list&lt;508: field_summary&gt;</code> (see below)</td>
 <td>A list of field summaries for each partition field in the spec. Each field in the list corresponds to a field in the manifest file’s partition spec.</td>
 </tr>
 <tr>
-<td><code>field_summary</code> is a struct with the following fields</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td><strong><code>512 added_rows_count</code></strong></td>
+<td><code>long</code></td>
+<td>Number of rows in all of files in the manifest that have status <code>ADDED</code></td>
+</tr>
+<tr>
+<td><strong><code>513 existing_rows_count</code></strong></td>
+<td><code>long</code></td>
+<td>Number of rows in all of files in the manifest that have status <code>EXISTING</code></td>
+</tr>
+<tr>
+<td><strong><code>514 deleted_rows_count</code></strong></td>
+<td><code>long</code></td>
+<td>Number of rows in all of files in the manifest that have status <code>DELETED</code></td>
 </tr>
 </tbody>
 </table>
+<p><code>field_summary</code> is a struct with the following fields</p>
 <table>
 <thead>
 <tr>
@@ -1122,7 +1079,7 @@ Timestamps <em>without time zone</em> represent a date and time of day regardles
 </tr>
 </tbody>
 </table>
-<p>The rows in the delete file must be sorted by <code>file_path</code> then <code>position</code> to optimize filtering rows while scanning.</p>
+<p>The rows in the delete file must be sorted by <code>file_path</code> then <code>position</code> to optimize filtering rows while scanning. </p>
 <ul>
 <li>Sorting by <code>file_path</code> allows filter pushdown by file in columnar storage formats.</li>
 <li>Sorting by <code>position</code> allows filtering rows while scanning, to avoid keeping deletes in memory.</li>
@@ -1764,7 +1721,7 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <tr>
 <td><strong><code>fields</code></strong></td>
 <td><code>JSON list: [</code><br />&nbsp;&nbsp;<code>&lt;partition field JSON&gt;,</code><br />&nbsp;&nbsp;<code>...</code><br /><code>]</code></td>
-<td><code>[ {</code><br />&nbsp;&nbsp;<code>"source-id": 4,</code><br />&nbsp;&nbsp;<code>"name": "ts_day",</code><br />&nbsp;&nbsp;<code>"transform": "day"</code><br /><code>}, {</code><br />&nbsp;&nbsp;<code>"source-id": 1,</code><br />&nbsp;&nbsp;<code>"name": "id_bucket",</code><br />&nbsp;&nbsp;<code>"transform": "bucket[16]"</code><br /><code>} ]</code></td>
+<td><code>[ {</code><br />&nbsp;&nbsp;<code>"source-id": 4,</code><br />&nbsp;&nbsp;<code>"field-id": 1000,</code><br />&nbsp;&nbsp;<code>"name": "ts_day",</code><br />&nbsp;&nbsp;<code>"transform": "day"</code><br /><code>}, {</code><br />&nbsp;&nbsp;<code>"source-id": 1,</code><br />&nbsp;&nbsp;<code>"field-id": 1001,</code><br />&nbsp;&nbsp;<code>"name": "id_bucket",</code><br />&nbsp;&nbsp;<code>"transform": "bucket[16]"</code><br /><code>} ]</code></td>
 </tr>
 </tbody>
 </table>
@@ -1815,8 +1772,8 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 </tr>
 <tr>
 <td><strong><code>Partition Field</code></strong></td>
-<td><code>JSON object: {</code><br />&nbsp;&nbsp;<code>"source-id": &lt;id int&gt;,</code><br />&nbsp;&nbsp;<code>"name": &lt;name string&gt;,</code><br />&nbsp;&nbsp;<code>"transform": &lt;transform JSON&gt;</code><br /><code>}</code></td>
-<td><code>{</code><br />&nbsp;&nbsp;<code>"source-id": 1,</code><br />&nbsp;&nbsp;<code>"name": "id_bucket",</code><br />&nbsp;&nbsp;<code>"transform": "bucket[16]"</code><br /><code>}</code></td>
+<td><code>JSON object: {</code><br />&nbsp;&nbsp;<code>"source-id": &lt;id int&gt;,</code><br />&nbsp;&nbsp;<code>"field-id": &lt;field id int&gt;,</code><br />&nbsp;&nbsp;<code>"name": &lt;name string&gt;,</code><br />&nbsp;&nbsp;<code>"transform": &lt;transform JSON&gt;</code><br /><code>}</code></td>
+<td><code>{</code><br />&nbsp;&nbsp;<code>"source-id": 1,</code><br />&nbsp;&nbsp;<code>"field-id": 1000,</code><br />&nbsp;&nbsp;<code>"name": "id_bucket",</code><br />&nbsp;&nbsp;<code>"transform": "bucket[16]"</code><br /><code>}</code></td>
 </tr>
 </tbody>
 </table>
@@ -1981,42 +1938,22 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 </table>
 <h2 id="format-version-changes">Format version changes<a class="headerlink" href="#format-version-changes" title="Permanent link">&para;</a></h2>
 <h3 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link">&para;</a></h3>
-<p>Writing v1 metadata:</p>
-<ul>
-<li>Table metadata field <code>last-sequence-number</code> should not be written.</li>
-<li>Table metadata field <code>last-partition-field-id</code> should not be written.</li>
-<li>Snapshot field <code>sequence-number</code> should not be written.</li>
-</ul>
-<p>Reading v1 metadata:</p>
-<ul>
-<li>Table metadata field <code>last-sequence-number</code> must default to 0.</li>
-<li>Snapshot field <code>sequence-number</code> must default to 0.</li>
-<li>Assign partition spec field IDs in sequential order starting at 1,000 and do not skip IDs</li>
-</ul>
-<p>Writing v2 metadata:</p>
-<ul>
-<li>Table metadata added required field <code>last-sequence-number</code>.</li>
-<li>Table metadata now requires field <code>table-uuid</code>.</li>
-<li>Table metadata now requires field <code>partition-specs</code>.</li>
-<li>Table metadata now requires field <code>default-spec-id</code>.</li>
-<li>Table metadata field <code>partition-spec</code> is no longer required and may be omitted.</li>
-<li>Snapshot added required field field <code>sequence-number</code>.</li>
-<li>Snapshot now requires field <code>manifest-list</code>.</li>
-<li>Snapshot field <code>manifests</code> is no longer allowed.</li>
-<li>Partition specs now require <code>field-id</code> for each partition field.</li>
-</ul>
-<p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p>
-<h4 id="partition-specs_1">Partition specs<a class="headerlink" href="#partition-specs_1" title="Permanent link">&para;</a></h4>
-<p>In v1, partition specs did not track IDs for each partition field.</p>
-<p>To build each manifest file schema, the reference implementation assigned field IDs starting from 1,000 independently. This caused potential ID reuse for incompatible fields across manifest files written using different partition specs.</p>
-<p>Partition field ID reuse is not a correctness problem for maintaining data in Iceberg tables. However, ID reuse prevents viewing the set of manifests as a metadata table in some cases. To fix this problem, v2 requires implementations assign unique field IDs &ndash; that do not conflict with other manifest file IDs &ndash; for each partition field.</p>
-<p>When writing to v1 tables, the following is recommended:</p>
-<ol>
-<li>Assign partition field IDs starting at 1,000</li>
-<li>Write partition field IDs as <code>field-id</code>, but assume older writers may inadvertently remove the IDs</li>
-<li>Do not remove partition fields; instead replace a field&rsquo;s transform with the <code>void</code> (<code>alwaysNull</code>) transform to ensure IDs are assigned correctly by the reference implementation</li>
-</ol>
-<h4 id="nan-requirements">NaN requirements<a class="headerlink" href="#nan-requirements" title="Permanent link">&para;</a></h4></div>
+<p>Writing v1 metadata:
+* Table metadata field <code>last-sequence-number</code> should not be written.
+* Snapshot field <code>sequence-number</code> should not be written.</p>
+<p>Reading v1 metadata:
+* Table metadata field <code>last-sequence-number</code> must default to 0.
+* Snapshot field <code>sequence-number</code> must default to 0.</p>
+<p>Writing v2 metadata:
+* Table metadata added required field <code>last-sequence-number</code>.
+* Table metadata now requires field <code>table-uuid</code>.
+* Table metadata now requires field <code>partition-specs</code>.
+* Table metadata now requires field <code>default-spec-id</code>.
+* Table metadata field <code>partition-spec</code> is no longer required and may be omitted.
+* Snapshot added required field field <code>sequence-number</code>.
+* Snapshot now requires field <code>manifest-list</code>.
+* Snapshot field <code>manifests</code> is no longer allowed.</p>
+<p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p></div>
         
         
     </div>
