@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>How to Release - Apache Iceberg (incubating)</title>
+    <title>How to Release - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -62,7 +62,7 @@
 
             <!-- Main title -->
 
-            <a class="navbar-brand" href="..">Apache Iceberg (incubating)</a>
+            <a class="navbar-brand" href="..">Apache Iceberg</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -90,12 +90,6 @@
                             
 <li >
     <a href="../releases/">Releases</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../disclaimer/">Disclaimer</a>
 </li>
 
                         
@@ -395,10 +389,10 @@ mavenPassword=SomePassword
 <pre><code class="bash">dev/source-release.sh 0.7.0 0
 </code></pre>
 
-<pre><code>Preparing source for apache-iceberg-0.7.0-incubating-rc0
+<pre><code>Preparing source for apache-iceberg-0.8.1-rc0
 ...
 Success! The release candidate is available here:
-  https://dist.apache.org/repos/dist/dev/incubator/iceberg/apache-iceberg-0.7.0-incubating-rc0/
+  https://dist.apache.org/repos/dist/dev/incubator/iceberg/apache-iceberg-0.8.1-rc0/
 
 Commit SHA1: 4b4716c76559b3cdf3487e6b60ab52950241989b
 </code></pre>
@@ -409,8 +403,8 @@ Commit SHA1: 4b4716c76559b3cdf3487e6b60ab52950241989b
 <h3 id="build-and-stage-convenience-binaries">Build and stage convenience binaries<a class="headerlink" href="#build-and-stage-convenience-binaries" title="Permanent link">&para;</a></h3>
 <p>Convenience binaries are created using the source release tarball from in the last step.</p>
 <p>Untar the source release and go into the release directory:</p>
-<pre><code class="bash">tar xzf apache-iceberg-0.7.0-incubating.tar.gz
-cd apache-iceberg-0.7.0-incubating
+<pre><code class="bash">tar xzf apache-iceberg-0.8.1.tar.gz
+cd apache-iceberg-0.8.1
 </code></pre>
 
 <p>To build and publish the convenience binaries, run the <code>dev/stage-binaries.sh</code> script. This will push to a release staging repository.</p>
@@ -423,7 +417,7 @@ cd apache-iceberg-0.7.0-incubating
 <li>In the menu on the left, choose &ldquo;Staging Repositories&rdquo;</li>
 <li>Select the Iceberg repository</li>
 <li>At the top, select &ldquo;Close&rdquo; and follow the instructions<ul>
-<li>In the comment field use &ldquo;Apache Iceberg (incubating) &lt;version&gt; RC&lt;num&gt;&ldquo;</li>
+<li>In the comment field use &ldquo;Apache Iceberg &lt;version&gt; RC&lt;num&gt;&ldquo;</li>
 </ul>
 </li>
 </ol>
