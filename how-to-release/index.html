@@ -191,7 +191,7 @@
                         
                             
 <li >
-    <a href="https://github.com/apache/incubator-iceberg">Git Repo</a>
+    <a href="https://github.com/apache/iceberg">Git Repo</a>
 </li>
 
                         
@@ -230,7 +230,7 @@
                         
                             
 <li >
-    <a href="https://github.com/apache/incubator-iceberg/tree/master/python">Git Repo</a>
+    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
 </li>
 
                         
@@ -279,7 +279,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/incubator-iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
                     </li>
                 
                 
@@ -367,7 +367,7 @@
 <p>To create a release candidate, you will need:</p>
 <ul>
 <li>Apache LDAP credentals for Nexus and SVN</li>
-<li>A <a href="https://www.apache.org/dev/release-signing#generate">GPG key for signing</a>, published in <a href="https://dist.apache.org/repos/dist/dev/incubator/iceberg/KEYS">KEYS</a></li>
+<li>A <a href="https://www.apache.org/dev/release-signing#generate">GPG key for signing</a>, published in <a href="https://dist.apache.org/repos/dist/dev/iceberg/KEYS">KEYS</a></li>
 </ul>
 <h3 id="nexus-access">Nexus access<a class="headerlink" href="#nexus-access" title="Permanent link">&para;</a></h3>
 <p>Nexus credentials are configured in your personal <code>~/.gradle/gradle.properties</code> file using <code>mavenUser</code> and <code>mavenPassword</code>:</p>
@@ -386,13 +386,13 @@ mavenPassword=SomePassword
 <h2 id="creating-a-release-candidate">Creating a release candidate<a class="headerlink" href="#creating-a-release-candidate" title="Permanent link">&para;</a></h2>
 <h3 id="build-the-source-release">Build the source release<a class="headerlink" href="#build-the-source-release" title="Permanent link">&para;</a></h3>
 <p>To create the source release artifacts, run the <code>source-release.sh</code> script with the release version and release candidate number:</p>
-<pre><code class="bash">dev/source-release.sh 0.7.0 0
+<pre><code class="bash">dev/source-release.sh 0.8.1 0
 </code></pre>
 
 <pre><code>Preparing source for apache-iceberg-0.8.1-rc0
 ...
 Success! The release candidate is available here:
-  https://dist.apache.org/repos/dist/dev/incubator/iceberg/apache-iceberg-0.8.1-rc0/
+  https://dist.apache.org/repos/dist/dev/iceberg/apache-iceberg-0.8.1-rc0/
 
 Commit SHA1: 4b4716c76559b3cdf3487e6b60ab52950241989b
 </code></pre>
@@ -432,14 +432,14 @@ I propose the following RC to be released as official Apache Iceberg &lt;VERSION
 
 The commit id is &lt;SHA1&gt;
 * This corresponds to the tag: apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;
-* https://github.com/apache/incubator-iceberg/commits/apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;
-* https://github.com/apache/incubator-iceberg/tree/&lt;SHA1&gt;
+* https://github.com/apache/iceberg/commits/apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;
+* https://github.com/apache/iceberg/tree/&lt;SHA1&gt;
 
 The release tarball, signature, and checksums are here:
-* https://dist.apache.org/repos/dist/dev/incubator/iceberg/apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;/
+* https://dist.apache.org/repos/dist/dev/iceberg/apache-iceberg-&lt;VERSION&gt;-rc&lt;NUM&gt;/
 
 You can find the KEYS file here:
-* https://dist.apache.org/repos/dist/dev/incubator/iceberg/KEYS
+* https://dist.apache.org/repos/dist/dev/iceberg/KEYS
 
 Convenience binary artifacts are staged in Nexus. The Maven repository URL is:
 * https://repository.apache.org/content/repositories/orgapacheiceberg-&lt;ID&gt;/
@@ -460,8 +460,8 @@ Please vote in the next 72 hours.
 <p>First, copy the source release directory to releases:</p>
 <pre><code class="bash">mkdir iceberg
 cd iceberg
-svn co https://dist.apache.org/repos/dist/dev/incubator/iceberg candidates
-svn co https://dist.apache.org/repos/dist/release/incubator/iceberg releases
+svn co https://dist.apache.org/repos/dist/dev/iceberg candidates
+svn co https://dist.apache.org/repos/dist/release/iceberg releases
 cp -r candidates/apache-iceberg-&lt;VERSION&gt;-rcN/ releases/apache-iceberg-&lt;VERSION&gt;
 cd releases
 svn add apache-iceberg-&lt;VERSION&gt;
@@ -484,7 +484,7 @@ delivers high query performance for tables with tens of petabytes of data,
 along with atomic commits, concurrent writes, and SQL-compatible table
 evolution.
 
-This release can be downloaded from: https://www.apache.org/dyn/closer.cgi/incubator/iceberg/&lt;TARBALL NAME WITHOUT .tar.gz&gt;/&lt;TARBALL NAME&gt;
+This release can be downloaded from: https://www.apache.org/dyn/closer.cgi/iceberg/&lt;TARBALL NAME WITHOUT .tar.gz&gt;/&lt;TARBALL NAME&gt;
 
 Java artifacts are available from Maven Central.
 
