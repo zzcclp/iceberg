@@ -41,6 +41,10 @@
   opacity: 0;
 }
 
+h2, h3, h4 {
+  padding-top: 1.5em;
+}
+
 h2:target .headerlink {
   color: #008cba;
   opacity: 1;
