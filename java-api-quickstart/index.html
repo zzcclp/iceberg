@@ -349,6 +349,7 @@
             <li class="second-level"><a href="#create-a-table">Create a table</a></li>
                 
                 <li class="third-level"><a href="#using-a-hive-catalog">Using a Hive catalog</a></li>
+                <li class="third-level"><a href="#using-a-hadoop-catalog">Using a Hadoop catalog</a></li>
                 <li class="third-level"><a href="#using-hadoop-tables">Using Hadoop tables</a></li>
                 <li class="third-level"><a href="#tables-in-spark">Tables in Spark</a></li>
             <li class="second-level"><a href="#schemas">Schemas</a></li>
@@ -400,8 +401,28 @@ Table table = catalog.createTable(name, schema, spec);
 </code></pre>
 
 <p>The logs <a href="#create-a-schema">schema</a> and <a href="#create-a-partition-spec">partition spec</a> are created below.</p>
+<h3 id="using-a-hadoop-catalog">Using a Hadoop catalog<a class="headerlink" href="#using-a-hadoop-catalog" title="Permanent link">&para;</a></h3>
+<p>A Hadoop catalog doesn&rsquo;t need to connect to a Hive MetaStore, but can only be used with HDFS or similar file systems that support atomic rename. Concurrent writes with a Hadoop catalog are not safe with a local FS or S3. To create a Hadoop catalog:</p>
+<pre><code class="java">import org.apache.hadoop.conf.Configuration;
+import org.apache.iceberg.hadoop.HadoopCatalog;
+
+Configuration conf = new Configuration();
+String warehousePath = &quot;hdfs://host:8020/warehouse_path&quot;;
+HadoopCatalog catalog = new HadoopCatalog(conf, warehousePath);
+</code></pre>
+
+<p>Like the Hive catalog, <code>HadoopCatalog</code> implements <code>Catalog</code>, so it also has methods for working with tables, like <code>createTable</code>, <code>loadTable</code>, and <code>dropTable</code>.</p>
+<p>This example creates a table with Hadoop catalog:</p>
+<pre><code class="java">import org.apache.iceberg.Table;
+import org.apache.iceberg.catalog.TableIdentifier;
+
+TableIdentifier name = TableIdentifier.of(&quot;logging&quot;, &quot;logs&quot;);
+Table table = catalog.createTable(name, schema, spec);
+</code></pre>
+
+<p>The logs <a href="#create-a-schema">schema</a> and <a href="#create-a-partition-spec">partition spec</a> are created below.</p>
 <h3 id="using-hadoop-tables">Using Hadoop tables<a class="headerlink" href="#using-hadoop-tables" title="Permanent link">&para;</a></h3>
-<p>Iceberg also supports tables that are stored in a directory in HDFS or the local file system. Directory tables don&rsquo;t support all catalog operations, like rename, so they use the <code>Tables</code> interface instead of <code>Catalog</code>.</p>
+<p>Iceberg also supports tables that are stored in a directory in HDFS. Concurrent writes with a Hadoop tables are not safe when stored in the local FS or S3. Directory tables don&rsquo;t support all catalog operations, like rename, so they use the <code>Tables</code> interface instead of <code>Catalog</code>.</p>
 <p>To create a table in HDFS, use <code>HadoopTables</code>:</p>
 <pre><code class="java">import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.hadoop.HadoopTables;
