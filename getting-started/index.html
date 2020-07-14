@@ -346,14 +346,15 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#getting-started">Getting Started</a></li>
-            <li class="second-level"><a href="#using-iceberg-in-spark">Using Iceberg in Spark</a></li>
+            <li class="second-level"><a href="#using-iceberg-in-spark-3">Using Iceberg in Spark 3</a></li>
                 
-            <li class="second-level"><a href="#installing-with-spark">Installing with Spark</a></li>
+                <li class="third-level"><a href="#installing-with-spark">Installing with Spark</a></li>
+            <li class="second-level"><a href="#adding-catalogs">Adding catalogs</a></li>
                 
             <li class="second-level"><a href="#creating-a-table">Creating a table</a></li>
                 
-                <li class="third-level"><a href="#reading-and-writing">Reading and writing</a></li>
-                <li class="third-level"><a href="#reading-with-sql">Reading with SQL</a></li>
+                <li class="third-level"><a href="#writing">Writing</a></li>
+                <li class="third-level"><a href="#reading">Reading</a></li>
                 <li class="third-level"><a href="#next-steps">Next steps</a></li>
     </ul>
 </div></div>
@@ -377,58 +378,77 @@
  -->
 
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
-<h2 id="using-iceberg-in-spark">Using Iceberg in Spark<a class="headerlink" href="#using-iceberg-in-spark" title="Permanent link">&para;</a></h2>
-<p>The latest version of Iceberg is <a href="../releases">0.8.0-incubating</a>.</p>
+<h2 id="using-iceberg-in-spark-3">Using Iceberg in Spark 3<a class="headerlink" href="#using-iceberg-in-spark-3" title="Permanent link">&para;</a></h2>
+<p>The latest version of Iceberg is <a href="../releases">0.9.0</a>.</p>
 <p>To use Iceberg in a Spark shell, use the <code>--packages</code> option:</p>
-<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark-runtime:0.8.0-incubating
+<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0
 </code></pre>
 
-<p>You can also build Iceberg locally, and add the jar using <code>--jars</code>. This can be helpful to test unreleased features or while developing something new:</p>
-<pre><code class="sh">./gradlew assemble
-spark-shell --jars spark-runtime/build/libs/iceberg-spark-runtime-8c05a2f.jar
+<h3 id="installing-with-spark">Installing with Spark<a class="headerlink" href="#installing-with-spark" title="Permanent link">&para;</a></h3>
+<p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.9.0/iceberg-spark3-runtime-0.9.0.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
+<h2 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h2>
+<p>Iceberg comes with <a href="../spark#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
+<p>This command creates a path-based catalog named <code>local</code> for tables under <code>$PWD/warehouse</code> and adds support for Iceberg tables to Spark&rsquo;s built-in catalog:</p>
+<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0 \
+    --conf spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog \
+    --conf spark.sql.catalog.spark_catalog.type=hive \
+    --conf spark.sql.catalog.local=org.apache.iceberg.spark.SparkCatalog \
+    --conf spark.sql.catalog.local.type=hadoop \
+    --conf spark.sql.catalog.local.uri=$PWD/warehouse
 </code></pre>
 
-<h2 id="installing-with-spark">Installing with Spark<a class="headerlink" href="#installing-with-spark" title="Permanent link">&para;</a></h2>
-<p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark-runtime/0.8.0-incubating/iceberg-spark-runtime-0.8.0-incubating.jar"><code>iceberg-spark-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
-<p>Where you have to replace <code>8c05a2f</code> with the git hash that you&rsquo;re using.</p>
 <h2 id="creating-a-table">Creating a table<a class="headerlink" href="#creating-a-table" title="Permanent link">&para;</a></h2>
-<p>Spark 2.4 is limited to reading and writing existing Iceberg tables. Use the <a href="../api">Iceberg API</a> to create Iceberg tables.</p>
-<p>Here&rsquo;s how to create your first Iceberg table in Spark, using a source Dataset</p>
-<p>First, import Iceberg classes and create a catalog client:</p>
-<pre><code class="scala">import org.apache.iceberg.hive.HiveCatalog
-import org.apache.iceberg.catalog.TableIdentifier
-import org.apache.iceberg.spark.SparkSchemaUtil
-
-val catalog = new HiveCatalog(spark.sparkContext.hadoopConfiguration)
+<p>To create your first Iceberg table in Spark, use the <code>spark-sql</code> shell or <code>spark.sql(...)</code> to run a <a href="../spark#create-table"><code>CREATE TABLE</code></a> command:</p>
+<pre><code class="sql">-- local is the path-based catalog defined above
+CREATE TABLE local.db.table (id bigint, data string) USING iceberg
 </code></pre>
 
-<p>Next, create a dataset to write into your table and get an Iceberg schema for it:</p>
-<pre><code class="scala">val data = Seq((1, &quot;a&quot;), (2, &quot;b&quot;), (3, &quot;c&quot;)).toDF(&quot;id&quot;, &quot;data&quot;)
-val schema = SparkSchemaUtil.convert(data.schema)
+<p>Iceberg catalogs support the full range of SQL DDL commands, including:</p>
+<ul>
+<li><a href="../spark#create-table"><code>CREATE TABLE ... PARTITIONED BY</code></a></li>
+<li><a href="../spark#create-table-as-select"><code>CREATE TABLE ... AS SELECT</code></a></li>
+<li><a href="../spark#alter-table"><code>ALTER TABLE</code></a></li>
+<li><a href="../spark#drop-table"><code>DROP TABLE</code></a></li>
+</ul>
+<h3 id="writing">Writing<a class="headerlink" href="#writing" title="Permanent link">&para;</a></h3>
+<p>Once your table is created, insert data using <a href="../spark#insert-into"><code>INSERT INTO</code></a>:</p>
+<pre><code class="sql">INSERT INTO local.db.table VALUES (1, 'a'), (2, 'b'), (3, 'c');
+INSERT INTO local.db.table SELECT id, data FROM source WHERE length(data) = 1;
 </code></pre>
 
-<p>Finally, create a table using the schema:</p>
-<pre><code class="scala">val name = TableIdentifier.of(&quot;default&quot;, &quot;test_table&quot;)
-val table = catalog.createTable(name, schema)
+<p>Iceberg supports DataFrames, including the <a href="../spark#writing-with-dataframes">v2 DataFrame write API</a> (recommended):</p>
+<pre><code class="scala">spark.table(&quot;source&quot;).select(&quot;id&quot;, &quot;data&quot;)
+     .writeTo(&quot;local.db.table&quot;).append()
 </code></pre>
 
-<h3 id="reading-and-writing">Reading and writing<a class="headerlink" href="#reading-and-writing" title="Permanent link">&para;</a></h3>
-<p>Once your table is created, you can use it in <code>load</code> and <code>save</code> in Spark 2.4:</p>
-<pre><code class="scala">// write the dataset to the table
-data.write.format(&quot;iceberg&quot;).mode(&quot;append&quot;).save(&quot;default.test_table&quot;)
-
-// read the table
-spark.read.format(&quot;iceberg&quot;).load(&quot;default.test_table&quot;)
+<h3 id="reading">Reading<a class="headerlink" href="#reading" title="Permanent link">&para;</a></h3>
+<p>To read with SQL, use the an Iceberg table name in a <code>SELECT</code> query:</p>
+<pre><code class="sql">SELECT count(1) as count, data
+FROM local.db.table
+GROUP BY data
 </code></pre>
 
-<h3 id="reading-with-sql">Reading with SQL<a class="headerlink" href="#reading-with-sql" title="Permanent link">&para;</a></h3>
-<p>You can also create a temporary view to use the table in SQL:</p>
-<pre><code class="scala">spark.read.format(&quot;iceberg&quot;).load(&quot;default.test_table&quot;).createOrReplaceTempView(&quot;test_table&quot;)
-spark.sql(&quot;&quot;&quot;SELECT count(1) FROM test_table&quot;&quot;&quot;)
+<p>SQL is also the recommended way to <a href="../spark#inspecting-tables">inspect tables</a>. To view all of the snapshots in a table, use the <code>snapshots</code> metadata table:</p>
+<pre><code class="sql">SELECT * FROM local.db.table.snapshots
+</code></pre>
+
+<pre><code>+-------------------------+----------------+-----------+-----------+----------------------------------------------------+-----+
+| committed_at            | snapshot_id    | parent_id | operation | manifest_list                                      | ... |
++-------------------------+----------------+-----------+-----------+----------------------------------------------------+-----+
+| 2019-02-08 03:29:51.215 | 57897183625154 | null      | append    | s3://.../table/metadata/snap-57897183625154-1.avro | ... |
+|                         |                |           |           |                                                    | ... |
+|                         |                |           |           |                                                    | ... |
+| ...                     | ...            | ...       | ...       | ...                                                | ... |
++-------------------------+----------------+-----------+-----------+----------------------------------------------------+-----+
+</code></pre>
+
+<p><a href="../spark#querying-with-dataframes">DataFrame reads</a> are supported and can now reference tables by name using <code>spark.table</code>:</p>
+<pre><code class="scala">val df = spark.table(&quot;local.db.table&quot;)
+df.count()
 </code></pre>
 
 <h3 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
-<p>Next, you can learn more about the <a href="../api">Iceberg Table API</a>, or about <a href="../spark">Iceberg tables in Spark</a></p></div>
+<p>Next, you can learn more about <a href="../spark">Iceberg tables in Spark</a>, or about the <a href="../api">Iceberg Table API</a>.</p></div>
         
         
     </div>
