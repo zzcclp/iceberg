@@ -349,10 +349,8 @@
             <li class="second-level"><a href="#using-iceberg-in-spark-3">Using Iceberg in Spark 3</a></li>
                 
                 <li class="third-level"><a href="#installing-with-spark">Installing with Spark</a></li>
-            <li class="second-level"><a href="#adding-catalogs">Adding catalogs</a></li>
-                
-            <li class="second-level"><a href="#creating-a-table">Creating a table</a></li>
-                
+                <li class="third-level"><a href="#adding-catalogs">Adding catalogs</a></li>
+                <li class="third-level"><a href="#creating-a-table">Creating a table</a></li>
                 <li class="third-level"><a href="#writing">Writing</a></li>
                 <li class="third-level"><a href="#reading">Reading</a></li>
                 <li class="third-level"><a href="#next-steps">Next steps</a></li>
@@ -386,7 +384,7 @@
 
 <h3 id="installing-with-spark">Installing with Spark<a class="headerlink" href="#installing-with-spark" title="Permanent link">&para;</a></h3>
 <p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.9.0/iceberg-spark3-runtime-0.9.0.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
-<h2 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h2>
+<h3 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h3>
 <p>Iceberg comes with <a href="../spark#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
 <p>This command creates a path-based catalog named <code>local</code> for tables under <code>$PWD/warehouse</code> and adds support for Iceberg tables to Spark&rsquo;s built-in catalog:</p>
 <pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0 \
@@ -397,7 +395,7 @@
     --conf spark.sql.catalog.local.uri=$PWD/warehouse
 </code></pre>
 
-<h2 id="creating-a-table">Creating a table<a class="headerlink" href="#creating-a-table" title="Permanent link">&para;</a></h2>
+<h3 id="creating-a-table">Creating a table<a class="headerlink" href="#creating-a-table" title="Permanent link">&para;</a></h3>
 <p>To create your first Iceberg table in Spark, use the <code>spark-sql</code> shell or <code>spark.sql(...)</code> to run a <a href="../spark#create-table"><code>CREATE TABLE</code></a> command:</p>
 <pre><code class="sql">-- local is the path-based catalog defined above
 CREATE TABLE local.db.table (id bigint, data string) USING iceberg
@@ -416,11 +414,12 @@ CREATE TABLE local.db.table (id bigint, data string) USING iceberg
 INSERT INTO local.db.table SELECT id, data FROM source WHERE length(data) = 1;
 </code></pre>
 
-<p>Iceberg supports DataFrames, including the <a href="../spark#writing-with-dataframes">v2 DataFrame write API</a> (recommended):</p>
+<p>Iceberg supports writing DataFrames using the new <a href="../spark#writing-with-dataframes">v2 DataFrame write API</a>:</p>
 <pre><code class="scala">spark.table(&quot;source&quot;).select(&quot;id&quot;, &quot;data&quot;)
      .writeTo(&quot;local.db.table&quot;).append()
 </code></pre>
 
+<p>The old <code>write</code> API is supported, but <em>not</em> recommended.</p>
 <h3 id="reading">Reading<a class="headerlink" href="#reading" title="Permanent link">&para;</a></h3>
 <p>To read with SQL, use the an Iceberg table name in a <code>SELECT</code> query:</p>
 <pre><code class="sql">SELECT count(1) as count, data
