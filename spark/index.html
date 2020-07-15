@@ -678,6 +678,11 @@ ALTER TABLE prod.db.sample DROP COLUMN point.z
     .table(&quot;prod.db.table&quot;)
 </code></pre>
 
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When reading with DataFrames in Spark 3, use <code>table</code> to load a table by name from a catalog.
+Using <code>format("iceberg")</code> loads an isolated table reference that is not refreshed when other queries update the table.</p>
+</div>
 <h3 id="time-travel">Time travel<a class="headerlink" href="#time-travel" title="Permanent link">&para;</a></h3>
 <p>To select a specific table snapshot or the snapshot at some time, Iceberg supports two Spark read options:</p>
 <ul>
@@ -790,6 +795,11 @@ WHERE ts &gt;= '2020-05-01 00:00:00' and ts &lt; '2020-06-01 00:00:00'
 </ul>
 </li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When writing with the v1 DataFrame API in Spark 3, use <code>saveAsTable</code> or <code>insertInto</code> to load tables with a catalog.
+Using <code>format("iceberg")</code> loads an isolated table reference that will not refresh tables used by queries.</p>
+</div>
 <h3 id="appending-data">Appending data<a class="headerlink" href="#appending-data" title="Permanent link">&para;</a></h3>
 <p>To append a dataframe to an Iceberg table, use <code>append</code>:</p>
 <pre><code class="scala">val data: DataFrame = ...
