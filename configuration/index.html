@@ -346,10 +346,11 @@
                 <li class="third-level"><a href="#write-properties">Write properties</a></li>
                 <li class="third-level"><a href="#table-behavior-properties">Table behavior properties</a></li>
                 <li class="third-level"><a href="#compatibility-flags">Compatibility flags</a></li>
-            <li class="second-level"><a href="#hadoop-options">Hadoop options</a></li>
+            <li class="second-level"><a href="#hadoop-configuration">Hadoop configuration</a></li>
                 
-            <li class="second-level"><a href="#spark-options">Spark options</a></li>
+            <li class="second-level"><a href="#spark-configuration">Spark configuration</a></li>
                 
+                <li class="third-level"><a href="#catalogs">Catalogs</a></li>
                 <li class="third-level"><a href="#read-options">Read options</a></li>
                 <li class="third-level"><a href="#write-options">Write options</a></li>
     </ul>
@@ -554,7 +555,8 @@
 </tr>
 </tbody>
 </table>
-<h2 id="hadoop-options">Hadoop options<a class="headerlink" href="#hadoop-options" title="Permanent link">&para;</a></h2>
+<h2 id="hadoop-configuration">Hadoop configuration<a class="headerlink" href="#hadoop-configuration" title="Permanent link">&para;</a></h2>
+<p>The following properties from the Hadoop configuration are used by the Hive Metastore connector.</p>
 <table>
 <thead>
 <tr>
@@ -576,7 +578,45 @@
 </tr>
 </tbody>
 </table>
-<h2 id="spark-options">Spark options<a class="headerlink" href="#spark-options" title="Permanent link">&para;</a></h2>
+<h2 id="spark-configuration">Spark configuration<a class="headerlink" href="#spark-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="catalogs">Catalogs<a class="headerlink" href="#catalogs" title="Permanent link">&para;</a></h3>
+<p><a href="../spark#configuring-catalogs">Spark catalogs</a> are configured using Spark session properties.</p>
+<p>A catalog is created and named by adding a property <code>spark.sql.catalog.(catalog-name)</code> with an implementation class for its value.</p>
+<p>Iceberg supplies two implementations:
+* <code>org.apache.iceberg.spark.SparkCatalog</code> supports a Hive Metastore or a Hadoop warehouse as a catalog
+* <code>org.apache.iceberg.spark.SparkSessionCatalog</code> adds support for Iceberg tables to Spark&rsquo;s built-in catalog, and delegates to the built-in catalog for non-Iceberg tables</p>
+<p>Both catalogs are configured using properties nested under the catalog name:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Values</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spark.sql.catalog.<em>catalog-name</em>.type</td>
+<td>hive or hadoop</td>
+<td>The underlying Iceberg catalog implementation</td>
+</tr>
+<tr>
+<td>spark.sql.catalog.<em>catalog-name</em>.default-namespace</td>
+<td>default</td>
+<td>The default current namespace for the catalog</td>
+</tr>
+<tr>
+<td>spark.sql.catalog.<em>catalog-name</em>.uri</td>
+<td>thrift://host:port</td>
+<td>URI for the Hive Metastore; default from <code>hive-site.xml</code> (Hive only)</td>
+</tr>
+<tr>
+<td>spark.sql.catalog.<em>catalog-name</em>.warehouse</td>
+<td>hdfs://nn:8020/warehouse/path</td>
+<td>Base path for the warehouse directory (Hadoop only)</td>
+</tr>
+</tbody>
+</table>
 <h3 id="read-options">Read options<a class="headerlink" href="#read-options" title="Permanent link">&para;</a></h3>
 <p>Spark read options are passed when configuring the DataFrameReader, like this:</p>
 <pre><code class="scala">// time travel
