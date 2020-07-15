@@ -582,9 +582,11 @@
 <h3 id="catalogs">Catalogs<a class="headerlink" href="#catalogs" title="Permanent link">&para;</a></h3>
 <p><a href="../spark#configuring-catalogs">Spark catalogs</a> are configured using Spark session properties.</p>
 <p>A catalog is created and named by adding a property <code>spark.sql.catalog.(catalog-name)</code> with an implementation class for its value.</p>
-<p>Iceberg supplies two implementations:
-* <code>org.apache.iceberg.spark.SparkCatalog</code> supports a Hive Metastore or a Hadoop warehouse as a catalog
-* <code>org.apache.iceberg.spark.SparkSessionCatalog</code> adds support for Iceberg tables to Spark&rsquo;s built-in catalog, and delegates to the built-in catalog for non-Iceberg tables</p>
+<p>Iceberg supplies two implementations:</p>
+<ul>
+<li><code>org.apache.iceberg.spark.SparkCatalog</code> supports a Hive Metastore or a Hadoop warehouse as a catalog</li>
+<li><code>org.apache.iceberg.spark.SparkSessionCatalog</code> adds support for Iceberg tables to Spark&rsquo;s built-in catalog, and delegates to the built-in catalog for non-Iceberg tables</li>
+</ul>
 <p>Both catalogs are configured using properties nested under the catalog name:</p>
 <table>
 <thead>
