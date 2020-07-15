@@ -382,7 +382,7 @@
 <h3 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h3>
 <p>Iceberg comes with <a href="../spark#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
 <p>This command creates a path-based catalog named <code>local</code> for tables under <code>$PWD/warehouse</code> and adds support for Iceberg tables to Spark&rsquo;s built-in catalog:</p>
-<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0 \
+<pre><code class="sh">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0 \
     --conf spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog \
     --conf spark.sql.catalog.spark_catalog.type=hive \
     --conf spark.sql.catalog.local=org.apache.iceberg.spark.SparkCatalog \
