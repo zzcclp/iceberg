@@ -795,10 +795,11 @@ WHERE ts &gt;= '2020-05-01 00:00:00' and ts &lt; '2020-06-01 00:00:00'
 </ul>
 </li>
 </ul>
+<p>The v1 DataFrame <code>write</code> API is still supported, but is not recommended.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>When writing with the v1 DataFrame API in Spark 3, use <code>saveAsTable</code> or <code>insertInto</code> to load tables with a catalog.
-Using <code>format("iceberg")</code> loads an isolated table reference that will not refresh tables used by queries.</p>
+Using <code>format("iceberg")</code> loads an isolated table reference that will not automatically refresh tables used by queries.</p>
 </div>
 <h3 id="appending-data">Appending data<a class="headerlink" href="#appending-data" title="Permanent link">&para;</a></h3>
 <p>To append a dataframe to an Iceberg table, use <code>append</code>:</p>
