@@ -726,6 +726,11 @@ spark.sql(&quot;&quot;&quot;select count(1) from table&quot;&quot;&quot;).show()
 <h3 id="insert-overwrite"><code>INSERT OVERWRITE</code><a class="headerlink" href="#insert-overwrite" title="Permanent link">&para;</a></h3>
 <p>To replace data in the table with the result of a query, use <code>INSERT OVERWRITE</code>. Overwrites are atomic operations for Iceberg tables.</p>
 <p>The partitions that will be replaced by <code>INSERT OVERWRITE</code> depends on Spark&rsquo;s partition overwrite mode and the partitioning of a table.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Spark 3.0.0 has a correctness bug that affects dynamic <code>INSERT OVERWRITE</code> with <a href="../partitioning">hidden partitioning</a>, <a href="https://issues.apache.org/jira/browse/SPARK-32168">SPARK-32168</a>.
+For tables with hidden partitions, wait for Spark 3.0.1.</p>
+</div>
 <h4 id="overwrite-behavior">Overwrite behavior<a class="headerlink" href="#overwrite-behavior" title="Permanent link">&para;</a></h4>
 <p>Spark&rsquo;s default overwrite mode is <strong>static</strong>, but <strong>dynamic overwrite mode is recommended when writing to Iceberg tables.</strong> Static overwrite mode determines which partitions to overwrite in a table by converting the <code>PARTITION</code> clause to a filter, but the <code>PARTITION</code> clause can only reference table columns.</p>
 <p>Dynamic overwrite mode is configured by setting <code>spark.sql.sources.partitionOverwriteMode=dynamic</code>.</p>
