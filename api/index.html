@@ -440,6 +440,18 @@ Iterable&lt;CombinedScanTask&gt; tasks = scan.planTasks();
 <li><code>rollback</code> &ndash; roll the table state back by pointing current to a specific snapshot</li>
 </ul>
 <h3 id="transactions">Transactions<a class="headerlink" href="#transactions" title="Permanent link">&para;</a></h3>
+<p>Transactions are used to commit multiple table changes in a single atomic operation. A transaction is used to create individual operations using factory methods, like <code>newAppend</code>, just like working with a <code>Table</code>. Operations created by a transaction are committed as a group when <code>commitTransaction</code> is called.</p>
+<p>For example, deleting and appending a file in the same transaction:</p>
+<pre><code class="java">Transaction t = table.newTrasaction();
+
+// commit operations to the transaction
+t.newDelete().deleteFromRowFilter(filter).commit();
+t.newAppend().appendFile(data).commit();
+
+// commit all the changes to the table
+t.commitTransaction();
+</code></pre>
+
 <h2 id="types">Types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h2>
 <p>Iceberg data types are located in the <a href="/javadoc/master/index.html?org/apache/iceberg/types/package-summary.html"><code>org.apache.iceberg.types</code> package</a>.</p>
 <h3 id="primitives">Primitives<a class="headerlink" href="#primitives" title="Permanent link">&para;</a></h3>
@@ -520,7 +532,8 @@ ListType list = ListType.ofRequired(1, IntegerType.get());
 </ul>
 <p>This project Iceberg also has modules for adding Iceberg support to processing engines:</p>
 <ul>
-<li><code>iceberg-spark</code> is an implementation of Spark&rsquo;s Datasource V2 API for Iceberg (use iceberg-runtime for a shaded version)</li>
+<li><code>iceberg-spark2</code> is an implementation of Spark&rsquo;s Datasource V2 API in 2.4 for Iceberg (use iceberg-spark-runtime for a shaded version)</li>
+<li><code>iceberg-spark3</code> is an implementation of Spark&rsquo;s Datasource V2 API in 3.0 for Iceberg (use iceberg-spark3-runtime for a shaded version)</li>
 <li><code>iceberg-data</code> is a client library used to read Iceberg tables from JVM applications</li>
 <li><code>iceberg-pig</code> is an implementation of Pig&rsquo;s LoadFunc API for Iceberg</li>
 <li><code>iceberg-runtime</code> generates a shaded runtime jar for Spark to integrate with iceberg tables</li>

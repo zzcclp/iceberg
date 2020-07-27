@@ -854,6 +854,10 @@ data.writeTo(&quot;prod.db.table&quot;).create()
 <h2 id="inspecting-tables">Inspecting tables<a class="headerlink" href="#inspecting-tables" title="Permanent link">&para;</a></h2>
 <p>To inspect a table&rsquo;s history, snapshots, and other metadata, Iceberg supports metadata tables.</p>
 <p>Metadata tables are identified by adding the metadata table name after the original table name. For example, history for <code>db.table</code> is read using <code>db.table.history</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of Spark 3.0, the format of the table name for inspection (<code>catalog.database.table.metadata</code>) doesn&rsquo;t work with Spark&rsquo;s default catalog (<code>spark_catalog</code>). If you&rsquo;ve replaced the default catalog, you may want to use DataFrameReader API to inspect the table. </p>
+</div>
 <h3 id="history">History<a class="headerlink" href="#history" title="Permanent link">&para;</a></h3>
 <p>To show table history, run:</p>
 <pre><code class="sql">SELECT * FROM prod.db.table.history
