@@ -370,24 +370,24 @@
 
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
 <h2 id="using-iceberg-in-spark-3">Using Iceberg in Spark 3<a class="headerlink" href="#using-iceberg-in-spark-3" title="Permanent link">&para;</a></h2>
-<p>The latest version of Iceberg is <a href="../releases">0.9.0</a>.</p>
+<p>The latest version of Iceberg is <a href="../releases">0.9.1</a>.</p>
 <p>To use Iceberg in a Spark shell, use the <code>--packages</code> option:</p>
-<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0
+<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.1
 </code></pre>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.9.0/iceberg-spark3-runtime-0.9.0.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
+<p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.9.1/iceberg-spark3-runtime-0.9.1.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
 </div>
 <h3 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h3>
 <p>Iceberg comes with <a href="../spark#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
 <p>This command creates a path-based catalog named <code>local</code> for tables under <code>$PWD/warehouse</code> and adds support for Iceberg tables to Spark&rsquo;s built-in catalog:</p>
-<pre><code class="sh">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.0 \
+<pre><code class="sh">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.1 \
     --conf spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog \
     --conf spark.sql.catalog.spark_catalog.type=hive \
     --conf spark.sql.catalog.local=org.apache.iceberg.spark.SparkCatalog \
     --conf spark.sql.catalog.local.type=hadoop \
-    --conf spark.sql.catalog.local.uri=$PWD/warehouse
+    --conf spark.sql.catalog.local.warehouse=$PWD/warehouse
 </code></pre>
 
 <h3 id="creating-a-table">Creating a table<a class="headerlink" href="#creating-a-table" title="Permanent link">&para;</a></h3>
