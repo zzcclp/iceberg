@@ -110,7 +110,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -128,7 +128,19 @@
                         
                             
 <li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../presto/">Presto</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Maintenance</a>
 </li>
 
                         
@@ -319,6 +331,16 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                    <li >
+                        <a rel="prev" href="../presto/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../configuration/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
             </ul>
         </div>
     </div>
@@ -447,7 +469,7 @@ Actions.forTable(table).rewriteDataFiles()
 <p>This example rewrites small manifests and groups data files by the first partition field.</p>
 <pre><code class="java">Table table = ...
 table.rewriteManifests()
-    .rewriteIf(file -&gt; file.length() &lt; 4 * 1024 * 1024) // 10 MB
+    .rewriteIf(file -&gt; file.length() &lt; 10 * 1024 * 1024) // 10 MB
     .clusterBy(file -&gt; file.partition().get(0, Integer.class))
     .commit();
 </code></pre>

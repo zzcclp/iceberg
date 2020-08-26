@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Why iceberg - Apache Iceberg</title>
+    <title>Spark Streaming - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -110,7 +110,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -127,8 +127,8 @@
 
                         
                             
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
+<li class="active">
+    <a href="./">Spark Streaming</a>
 </li>
 
                         
@@ -331,6 +331,16 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
+                    <li >
+                        <a rel="prev" href="../spark/">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="next" href="../presto/">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </li>
             </ul>
         </div>
     </div>
@@ -341,73 +351,119 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#why-iceberg">Why Iceberg?</a></li>
-            <li class="second-level"><a href="#goals">Goals</a></li>
+        <li class="first-level active"><a href="#spark-structured-streaming">Spark Structured Streaming</a></li>
+            <li class="second-level"><a href="#streaming-writes">Streaming Writes</a></li>
                 
-            <li class="second-level"><a href="#why-a-new-table-format">Why a new table format?</a></li>
+            <li class="second-level"><a href="#maintenance-for-streaming-tables">Maintenance for streaming tables</a></li>
                 
-            <li class="second-level"><a href="#other-design-goals">Other design goals</a></li>
+                <li class="third-level"><a href="#tune-the-rate-of-commits">Tune the rate of commits</a></li>
+                <li class="third-level"><a href="#expire-old-snapshots">Expire old snapshots</a></li>
+                <li class="third-level"><a href="#compacting-data-files">Compacting data files</a></li>
+                <li class="third-level"><a href="#rewrite-manifests">Rewrite manifests</a></li>
+            <li class="second-level"><a href="#appendix">Appendix</a></li>
                 
+                <li class="third-level"><a href="#retrieve-table-instance-in-hadoop-catalog">Retrieve Table instance in Hadoop catalog</a></li>
+                <li class="third-level"><a href="#retrieve-table-instance-in-hive-catalog">Retrieve Table instance in Hive catalog</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+ - Licensed to the Apache Software Foundation (ASF) under one or more
+ - contributor license agreements.  See the NOTICE file distributed with
+ - this work for additional information regarding copyright ownership.
+ - The ASF licenses this file to You under the Apache License, Version 2.0
+ - (the "License"); you may not use this file except in compliance with
+ - the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+ -->
 
-<h2 id="why-iceberg">Why Iceberg?<a class="headerlink" href="#why-iceberg" title="Permanent link">&para;</a></h2>
-<p>Iceberg was created because no other table format for provides a complete solution for SQL tables. Some improve atomicity guarantees, but no other format delivers both reliable operations and behavior that data engineers need.</p>
-<p>Iceberg tracks individual data files in a table instead of directories. This allows writers to create data files in-place and only adds files to the table in an explicit commit.</p>
-<p>Table state is maintained in metadata files. All changes to table state create a new metadata file and replace the old metadata with an atomic operation. The table metadata file tracks the table schema, partitioning config, other properties, and snapshots of the table contents.</p>
-<p>The atomic transitions from one table metadata file to the next provide snapshot isolation. Readers use the latest table state (snapshot) that was current when they load the table metadata and are not affected by changes until they refresh and pick up a new metadata location.</p>
-<p>A <em>snapshot</em> is a complete set of data files in the table at some point in time. Snapshots are listed in the metadata file, but the files in a snapshot are stored across a separate set of <em>manifest</em> files.</p>
-<p>Data files in snapshots are stored in one or more manifest files that contain a row for each data file in the table, its partition data, and its metrics. A snapshot is the union of all files in its manifests. Manifest files can be shared between snapshots to avoid rewriting metadata that is slow-changing.</p>
-<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
-<p>This also provides improved guarantees and performance:</p>
+<h1 id="spark-structured-streaming">Spark Structured Streaming<a class="headerlink" href="#spark-structured-streaming" title="Permanent link">&para;</a></h1>
+<p>Iceberg uses Apache Spark&rsquo;s DataSourceV2 API for data source and catalog implementations. Spark DSv2 is an evolving API
+with different levels of support in Spark versions.</p>
+<p>As of Spark 3.0, DataFrame reads and writes are supported.</p>
+<table>
+<thead>
+<tr>
+<th>Feature support</th>
+<th>Spark 3.0</th>
+<th>Spark 2.4</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#writing-with-streaming-query">DataFrame write</a></td>
+<td>✔</td>
+<td>✔</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="streaming-writes">Streaming Writes<a class="headerlink" href="#streaming-writes" title="Permanent link">&para;</a></h2>
+<p>To write values from streaming query to Iceberg table, use <code>DataStreamWriter</code>:</p>
+<pre><code class="scala">val tableIdentifier: String = ...
+data.writeStream
+    .format(&quot;iceberg&quot;)
+    .outputMode(&quot;append&quot;)
+    .trigger(Trigger.ProcessingTime(1, TimeUnit.MINUTES))
+    .option(&quot;path&quot;, tableIdentifier)
+    .option(&quot;checkpointLocation&quot;, checkpointPath)
+    .start()
+</code></pre>
+
+<p>The <code>tableIdentifier</code> can be:</p>
 <ul>
-<li><strong>Snapshot isolation</strong>: Readers always use a consistent snapshot of the table, without needing to hold a lock. All table updates are atomic.</li>
-<li><strong>O(1) RPCs to plan</strong>: Instead of listing O(n) directories in a table to plan a job, reading a snapshot requires O(1) RPC calls.</li>
-<li><strong>Distributed planning</strong>: File pruning and predicate push-down is distributed to jobs, removing the metastore as a bottleneck.</li>
-<li><strong>Version history and rollback</strong>: Table snapshots are kept as history and tables can roll back if a job produces bad data.</li>
-<li><strong>Finer granularity partitioning</strong>: Distributed planning and O(1) RPC calls remove the current barriers to finer-grained partitioning.</li>
-<li><strong>Safe file-level operations</strong>. By supporting atomic changes, Iceberg enables new use cases, like safely compacting small files and safely appending late data to tables.</li>
+<li>The fully-qualified path to a HDFS table, like <code>hdfs://nn:8020/path/to/table</code></li>
+<li>A table name if the table is tracked by a catalog, like <code>database.table_name</code></li>
 </ul>
-<h3 id="why-a-new-table-format">Why a new table format?<a class="headerlink" href="#why-a-new-table-format" title="Permanent link">&para;</a></h3>
-<p>The central metastore can be a scale bottleneck and the file system doesn&rsquo;t&mdash;and shouldn&rsquo;t&mdash;provide transactions to isolate concurrent reads and writes.</p>
-<p>There are several problems with the current format:</p>
+<p>Iceberg doesn&rsquo;t support &ldquo;continuous processing&rdquo;, as it doesn&rsquo;t provide the interface to &ldquo;commit&rdquo; the output.</p>
+<p>Iceberg supports <code>append</code> and <code>complete</code> output modes:</p>
 <ul>
-<li><strong>There is no specification</strong>: Implementations don’t handle all cases consistently. For example, bucketing in Hive and Spark use different hash functions and are not compatible. Hive uses a locking scheme to make cross-partition changes safe, but no other implementations use it.</li>
-<li><strong>Table data is tracked in two stores</strong>: a central metastore, for partitions, and the file system, for files. This makes atomic changes to a table’s contents impossible. It also requires job planning to make listing calls that are O(n) with the number of partitions. These listing calls are expensive, especially when using a remote object store.</li>
-<li><strong>Operations depend on file rename</strong>: Most output committers depend on rename operations to implement guarantees and reduce the amount of time tables only have partial data from a write. But rename is not a metadata-only operation in S3 and will copy data. The <a href="https://issues.apache.org/jira/browse/HADOOP-13786">new S3 committers</a> that use multipart upload make this better, but can’t entirely solve the problem and put a lot of load on the file system during job commit.</li>
+<li><code>append</code>: appends the rows of every micro-batch to the table</li>
+<li><code>complete</code>: replaces the table contents every micro-batch</li>
 </ul>
-<p>The current format&rsquo;s dependence on listing and rename cannot be changed, so a new format is needed.</p>
-<h3 id="other-design-goals">Other design goals<a class="headerlink" href="#other-design-goals" title="Permanent link">&para;</a></h3>
-<p>In addition to changes in how table contents are tracked, Iceberg&rsquo;s design improves a few other areas:</p>
-<ul>
-<li><strong>Reliable types</strong>: Iceberg provides a core set of types, tested to work consistently across all of the supported data formats. Types include date, timestamp, and decimal, as well as nested combinations of map, list, and struct.</li>
-<li><strong>Schema evolution</strong>: Columns are tracked by ID to fully support add, drop, and rename across all columns and nested fields.</li>
-<li><strong>Hidden partitioning</strong>: Partitioning is built into Iceberg as table configuration; it can plan efficient queries without extra partition predicates.</li>
-<li><strong>Stats-based split filtering</strong>: Stats for the columns in each data file are used to eliminate splits before creating tasks, boosting performance for highly selective queries.</li>
-<li><strong>Metrics</strong>: The format includes cost-based optimization metrics stored with data files for better job planning.</li>
-<li><strong>Unmodified partition data</strong>: The Hive layout stores partition data escaped in strings. Iceberg stores partition data without modification.</li>
-<li><strong>Portable spec</strong>: Tables are not tied to Java. Iceberg has a clear specification for other implementations.</li>
-</ul></div>
+<p>The table should be created in prior to start the streaming query. Refer <a href="/spark/#create-table">SQL create table</a>
+on Spark page to see how to create the Iceberg table.</p>
+<h2 id="maintenance-for-streaming-tables">Maintenance for streaming tables<a class="headerlink" href="#maintenance-for-streaming-tables" title="Permanent link">&para;</a></h2>
+<p>Streaming queries can create new table versions quickly, which creates lots of table metadata to track those versions.
+Maintaining metadata by tuning the rate of commits, expiring old snapshots, and automatically cleaning up metadata files
+is highly recommended.</p>
+<h3 id="tune-the-rate-of-commits">Tune the rate of commits<a class="headerlink" href="#tune-the-rate-of-commits" title="Permanent link">&para;</a></h3>
+<p>Having high rate of commits would produce lots of data files, manifests, and snapshots which leads the table hard
+to maintain. We encourage having trigger interval 1 minute at minimum, and increase the interval if needed.</p>
+<p>The triggers section in <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#triggers">Structured Streaming Programming Guide</a>
+documents how to configure the interval.</p>
+<h3 id="expire-old-snapshots">Expire old snapshots<a class="headerlink" href="#expire-old-snapshots" title="Permanent link">&para;</a></h3>
+<p>Each micro-batch written to a table produces a new snapshot, which are tracked in table metadata until they are expired to remove the metadata and any data files that are no longer needed. Snapshots accumulate quickly with frequent commits, so it is highly recommended that tables written by streaming queries are <a href="../maintenance#expire-snapshots">regularly maintained</a>.</p>
+<h3 id="compacting-data-files">Compacting data files<a class="headerlink" href="#compacting-data-files" title="Permanent link">&para;</a></h3>
+<p>The amount of data written in a micro batch is typically small, which can cause the table metadata to track lots of small files. Compacting small files into larger files reduces the metadata needed by the table, and increases query efficiency.</p>
+<h3 id="rewrite-manifests">Rewrite manifests<a class="headerlink" href="#rewrite-manifests" title="Permanent link">&para;</a></h3>
+<p>To optimize write latency on streaming workload, Iceberg may write the new snapshot with a &ldquo;fast&rdquo; append that does not automatically compact manifests.
+This could lead lots of small manifest files. Manifests can be <a href="../maintenance#rewrite-manifests">rewritten to optimize queries and to compact</a>.</p>
+<h2 id="appendix">Appendix<a class="headerlink" href="#appendix" title="Permanent link">&para;</a></h2>
+<h3 id="retrieve-table-instance-in-hadoop-catalog">Retrieve Table instance in Hadoop catalog<a class="headerlink" href="#retrieve-table-instance-in-hadoop-catalog" title="Permanent link">&para;</a></h3>
+<pre><code class="scala">// ... assume catalogName, dbName, tableName are present ...
+import org.apache.iceberg.hadoop.HadoopTables
+val warehousePath = spark.sparkContext.getConf.get(s&quot;spark.sql.catalog.$catalogName.warehouse&quot;)
+val hadoopTables = new HadoopTables(spark.sessionState.newHadoopConf)
+val table = hadoopTables.load(s&quot;$warehousePath/$dbName/$tableName&quot;)
+</code></pre>
+
+<h3 id="retrieve-table-instance-in-hive-catalog">Retrieve Table instance in Hive catalog<a class="headerlink" href="#retrieve-table-instance-in-hive-catalog" title="Permanent link">&para;</a></h3>
+<pre><code class="scala">// ... assume dbName, tableName are present ...
+import org.apache.iceberg.hive.HiveCatalog;
+
+val catalog = new HiveCatalog(spark.sessionState.newHadoopConf)
+val table = catalog.loadTable(TableIdentifier.of(dbName, tableName))
+</code></pre></div>
         
         
     </div>
