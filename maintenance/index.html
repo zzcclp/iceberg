@@ -383,6 +383,10 @@
  -->
 
 <h1 id="table-maintenance">Table Maintenance<a class="headerlink" href="#table-maintenance" title="Permanent link">&para;</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Maintenance operations require the <code>Table</code> instance. Please refer <a href="/java-api-quickstart/#create-a-table">Java API quickstart</a> page to refer how to load an existing table.</p>
+</div>
 <h2 id="recommended-maintenance">Recommended Maintenance<a class="headerlink" href="#recommended-maintenance" title="Permanent link">&para;</a></h2>
 <h3 id="expire-snapshots">Expire Snapshots<a class="headerlink" href="#expire-snapshots" title="Permanent link">&para;</a></h3>
 <p>Each write to an Iceberg table creates a new <em>snapshot</em>, or version, of a table. Snapshots can be used for time-travel queries, or the table can be rolled back to any valid snapshot.</p>

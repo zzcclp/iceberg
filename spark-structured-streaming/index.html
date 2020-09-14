@@ -360,10 +360,6 @@
                 <li class="third-level"><a href="#expire-old-snapshots">Expire old snapshots</a></li>
                 <li class="third-level"><a href="#compacting-data-files">Compacting data files</a></li>
                 <li class="third-level"><a href="#rewrite-manifests">Rewrite manifests</a></li>
-            <li class="second-level"><a href="#appendix">Appendix</a></li>
-                
-                <li class="third-level"><a href="#retrieve-table-instance-in-hadoop-catalog">Retrieve Table instance in Hadoop catalog</a></li>
-                <li class="third-level"><a href="#retrieve-table-instance-in-hive-catalog">Retrieve Table instance in Hive catalog</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -444,26 +440,10 @@ documents how to configure the interval.</p>
 <h3 id="expire-old-snapshots">Expire old snapshots<a class="headerlink" href="#expire-old-snapshots" title="Permanent link">&para;</a></h3>
 <p>Each micro-batch written to a table produces a new snapshot, which are tracked in table metadata until they are expired to remove the metadata and any data files that are no longer needed. Snapshots accumulate quickly with frequent commits, so it is highly recommended that tables written by streaming queries are <a href="../maintenance#expire-snapshots">regularly maintained</a>.</p>
 <h3 id="compacting-data-files">Compacting data files<a class="headerlink" href="#compacting-data-files" title="Permanent link">&para;</a></h3>
-<p>The amount of data written in a micro batch is typically small, which can cause the table metadata to track lots of small files. Compacting small files into larger files reduces the metadata needed by the table, and increases query efficiency.</p>
+<p>The amount of data written in a micro batch is typically small, which can cause the table metadata to track lots of small files. <a href="../maintenance#compact-data-files">Compacting small files into larger files</a> reduces the metadata needed by the table, and increases query efficiency.</p>
 <h3 id="rewrite-manifests">Rewrite manifests<a class="headerlink" href="#rewrite-manifests" title="Permanent link">&para;</a></h3>
 <p>To optimize write latency on streaming workload, Iceberg may write the new snapshot with a &ldquo;fast&rdquo; append that does not automatically compact manifests.
-This could lead lots of small manifest files. Manifests can be <a href="../maintenance#rewrite-manifests">rewritten to optimize queries and to compact</a>.</p>
-<h2 id="appendix">Appendix<a class="headerlink" href="#appendix" title="Permanent link">&para;</a></h2>
-<h3 id="retrieve-table-instance-in-hadoop-catalog">Retrieve Table instance in Hadoop catalog<a class="headerlink" href="#retrieve-table-instance-in-hadoop-catalog" title="Permanent link">&para;</a></h3>
-<pre><code class="scala">// ... assume catalogName, dbName, tableName are present ...
-import org.apache.iceberg.hadoop.HadoopTables
-val warehousePath = spark.sparkContext.getConf.get(s&quot;spark.sql.catalog.$catalogName.warehouse&quot;)
-val hadoopTables = new HadoopTables(spark.sessionState.newHadoopConf)
-val table = hadoopTables.load(s&quot;$warehousePath/$dbName/$tableName&quot;)
-</code></pre>
-
-<h3 id="retrieve-table-instance-in-hive-catalog">Retrieve Table instance in Hive catalog<a class="headerlink" href="#retrieve-table-instance-in-hive-catalog" title="Permanent link">&para;</a></h3>
-<pre><code class="scala">// ... assume dbName, tableName are present ...
-import org.apache.iceberg.hive.HiveCatalog;
-
-val catalog = new HiveCatalog(spark.sessionState.newHadoopConf)
-val table = catalog.loadTable(TableIdentifier.of(dbName, tableName))
-</code></pre></div>
+This could lead lots of small manifest files. Manifests can be <a href="../maintenance#rewrite-manifests">rewritten to optimize queries and to compact</a>.</p></div>
         
         
     </div>

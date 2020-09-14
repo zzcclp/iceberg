@@ -404,6 +404,9 @@ import org.apache.iceberg.catalog.TableIdentifier;
 
 TableIdentifier name = TableIdentifier.of(&quot;logging&quot;, &quot;logs&quot;);
 Table table = catalog.createTable(name, schema, spec);
+
+// or to load an existing table, use the following line
+// Table table = catalog.loadTable(name);
 </code></pre>
 
 <p>The logs <a href="#create-a-schema">schema</a> and <a href="#create-a-partition-spec">partition spec</a> are created below.</p>
@@ -424,6 +427,9 @@ import org.apache.iceberg.catalog.TableIdentifier;
 
 TableIdentifier name = TableIdentifier.of(&quot;logging&quot;, &quot;logs&quot;);
 Table table = catalog.createTable(name, schema, spec);
+
+// or to load an existing table, use the following line
+// Table table = catalog.loadTable(name);
 </code></pre>
 
 <p>The logs <a href="#create-a-schema">schema</a> and <a href="#create-a-partition-spec">partition spec</a> are created below.</p>
@@ -437,6 +443,9 @@ import org.apache.iceberg.Table;
 Configuration conf = new Configuration():
 HadoopTables tables = new HadoopTables(conf);
 Table table = tables.create(schema, spec, table_location);
+
+// or to load an existing table, use the following line
+// Table table = tables.load(table_location);
 </code></pre>
 
 <div class="admonition warning">
