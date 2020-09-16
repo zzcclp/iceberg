@@ -452,6 +452,14 @@ Actions.forTable(table)
 <p>It is dangerous to remove orphan files with a retention interval shorter than the time expected for any write to complete because it
 might corrupt the table if in-progress files are considered orphaned and are deleted. The default interval is 3 days.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Iceberg uses the string representations of paths when determining which files need to be removed. On some file systems,
+the path can change over time, but it still represents the same file. For example, if you change authorities for an HDFS cluster, 
+none of the old path urls used during creation will match those that appear in a current listing. <em>This will lead to data loss when 
+RemoveOrphanFiles is run</em>. Please be sure the entries in your MetadataTables match those listed by the Hadoop
+FileSystem API to avoid unintentional deletion. </p>
+</div>
 <h2 id="optional-maintenance">Optional Maintenance<a class="headerlink" href="#optional-maintenance" title="Permanent link">&para;</a></h2>
 <p>Some tables require additional maintenance. For example, streaming queries may produce small data files that should be <a href="#compact-data-files">compacted into larger files</a>. And some tables can benefit from <a href="#rewrite-manifests">rewriting manifest files</a> to make locating data for queries much faster.</p>
 <h3 id="compact-data-files">Compact data files<a class="headerlink" href="#compact-data-files" title="Permanent link">&para;</a></h3>

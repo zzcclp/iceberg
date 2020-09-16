@@ -684,15 +684,9 @@ ALTER TABLE prod.db.sample DROP COLUMN point.z
 <pre><code class="scala">val df = spark.table(&quot;prod.db.table&quot;)
 </code></pre>
 
-<p>To configure the <code>DataFrameReader</code>, use a reader directly:</p>
-<pre><code class="sql">val df = spark.read
-    .option(&quot;split-size&quot;, &quot;268435456&quot;)
-    .table(&quot;prod.db.table&quot;)
-</code></pre>
-
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>When reading with DataFrames in Spark 3, use <code>table</code> to load a table by name from a catalog.
+<p>When reading with DataFrames in Spark 3, use <code>table</code> to load a table by name from a catalog unless <code>option</code> is also required.
 Using <code>format("iceberg")</code> loads an isolated table reference that is not refreshed when other queries update the table.</p>
 </div>
 <h3 id="time-travel">Time travel<a class="headerlink" href="#time-travel" title="Permanent link">&para;</a></h3>
@@ -704,18 +698,26 @@ Using <code>format("iceberg")</code> loads an isolated table reference that is n
 <pre><code class="scala">// time travel to October 26, 1986 at 01:21:00
 spark.read
     .option(&quot;as-of-timestamp&quot;, &quot;499162860000&quot;)
-    .table(&quot;prod.db.table&quot;)
+    .format(&quot;iceberg&quot;)
+    .load(&quot;path/to/table&quot;)
 </code></pre>
 
 <pre><code class="scala">// time travel to snapshot with ID 10963874102873L
 spark.read
     .option(&quot;snapshot-id&quot;, 10963874102873L)
-    .table(&quot;prod.db.table&quot;)
+    .format(&quot;iceberg&quot;)
+    .load(&quot;path/to/table&quot;)
 </code></pre>
 
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Spark does not currently support using <code>option</code> with <code>table</code> in DataFrameReader commands. All options will be silently 
+ignored. Do not use <code>table</code> when attempting to time-travel or use other options. Options will be supported with <code>table</code>
+in <a href="https://issues.apache.org/jira/browse/SPARK-32592">Spark 3.1 - SPARK-32592</a>.</p>
+</div>
 <p>Time travel is not yet supported by Spark&rsquo;s SQL syntax.</p>
 <h3 id="spark-24">Spark 2.4<a class="headerlink" href="#spark-24" title="Permanent link">&para;</a></h3>
-<p>Spark 2.4 requires using the DataFrame reader with <code>iceberg</code> as a format, becuase 2.4 does not support catalogs:</p>
+<p>Spark 2.4 requires using the DataFrame reader with <code>iceberg</code> as a format, because 2.4 does not support catalogs:</p>
 <pre><code class="scala">// named metastore table
 spark.read.format(&quot;iceberg&quot;).load(&quot;db.table&quot;)
 // Hadoop path table
