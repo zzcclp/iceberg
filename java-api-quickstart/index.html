@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Quickstart - Apache Iceberg</title>
+    <title>Java Quickstart - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -111,38 +111,8 @@
                 
                 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li >
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li >
     <a href="../reliability/">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li class="active">
-    <a href="./">Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -221,40 +224,37 @@
                         
                             
 <li >
-    <a href="../custom-catalog/">Custom Catalog</a>
+    <a href="../api/">Java API intro</a>
 </li>
 
                         
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
                             
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+<li class="active">
+    <a href="./">Java Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../custom-catalog/">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-api-intro/">Python API Intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -332,12 +332,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../reliability/">
+                        <a rel="prev" href="../api/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../api/">
+                        <a rel="next" href="../custom-catalog/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -389,7 +389,7 @@
 
 <h1 id="java-api-quickstart">Java API Quickstart<a class="headerlink" href="#java-api-quickstart" title="Permanent link">&para;</a></h1>
 <h2 id="create-a-table">Create a table<a class="headerlink" href="#create-a-table" title="Permanent link">&para;</a></h2>
-<p>Tables are created using either a <a href="/javadoc/master/index.html?org/apache/iceberg/catalog/Catalog.html"><code>Catalog</code></a> or an implementation of the <a href="/javadoc/master/index.html?org/apache/iceberg/Tables.html"><code>Tables</code></a> interface.</p>
+<p>Tables are created using either a <a href="../javadoc/master/?org/apache/iceberg/catalog/Catalog.html"><code>Catalog</code></a> or an implementation of the <a href="../javadoc/master/?org/apache/iceberg/Tables.html"><code>Tables</code></a> interface.</p>
 <h3 id="using-a-hive-catalog">Using a Hive catalog<a class="headerlink" href="#using-a-hive-catalog" title="Permanent link">&para;</a></h3>
 <p>The Hive catalog connects to a Hive MetaStore to keep track of Iceberg tables. This example uses Spark&rsquo;s Hadoop configuration to get a Hive catalog:</p>
 <pre><code class="java">import org.apache.iceberg.hive.HiveCatalog;
@@ -456,9 +456,9 @@ Table table = tables.create(schema, spec, table_location);
 <p>Spark uses both <code>HiveCatalog</code> and <code>HadoopTables</code> to load tables. Hive is used when the identifier passed to <code>load</code> or <code>save</code> is not a path, otherwise Spark assumes it is a path-based table.</p>
 <p>To read and write to tables from Spark see:</p>
 <ul>
-<li><a href="../spark#reading-an-iceberg-table">Reading a table in Spark</a></li>
-<li><a href="../spark#appending-data">Appending to a table in Spark</a></li>
-<li><a href="../spark#overwriting-data">Overwriting data in a table in Spark</a></li>
+<li><a href="../spark/#reading-an-iceberg-table">Reading a table in Spark</a></li>
+<li><a href="../spark/#appending-data">Appending to a table in Spark</a></li>
+<li><a href="../spark/#overwriting-data">Overwriting data in a table in Spark</a></li>
 </ul>
 <h2 id="schemas">Schemas<a class="headerlink" href="#schemas" title="Permanent link">&para;</a></h2>
 <h3 id="create-a-schema">Create a schema<a class="headerlink" href="#create-a-schema" title="Permanent link">&para;</a></h3>
@@ -505,7 +505,7 @@ PartitionSpec spec = PartitionSpec.builderFor(schema)
       .build();
 </code></pre>
 
-<p>For more information on the different partition transforms that Iceberg offers, visit <a href="../spec#partitioning">this page</a>.</p></div>
+<p>For more information on the different partition transforms that Iceberg offers, visit <a href="../spec/#partitioning">this page</a>.</p></div>
         
         
     </div>

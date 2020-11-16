@@ -110,39 +110,9 @@
                 
                 
                 
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li class="active">
-    <a href="./">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li >
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li >
     <a href="../reliability/">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li class="active">
+    <a href="./">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -221,40 +224,37 @@
                         
                             
 <li >
-    <a href="../custom-catalog/">Custom Catalog</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+    <a href="../api/">Java API intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Java Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../custom-catalog/">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-api-intro/">Python API Intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -332,7 +332,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../how-to-release/">
+                        <a rel="prev" href="../reliability/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -382,19 +382,19 @@
 
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
 <h2 id="using-iceberg-in-spark-3">Using Iceberg in Spark 3<a class="headerlink" href="#using-iceberg-in-spark-3" title="Permanent link">&para;</a></h2>
-<p>The latest version of Iceberg is <a href="../releases">0.9.1</a>.</p>
+<p>The latest version of Iceberg is <a href="../releases/">0.10.0</a>.</p>
 <p>To use Iceberg in a Spark shell, use the <code>--packages</code> option:</p>
-<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.1
+<pre><code class="sh">spark-shell --packages org.apache.iceberg:iceberg-spark3-runtime:0.10.0
 </code></pre>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.9.1/iceberg-spark3-runtime-0.9.1.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
+<p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.10.0/iceberg-spark3-runtime-0.10.0.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
 </div>
 <h3 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h3>
-<p>Iceberg comes with <a href="../spark#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
+<p>Iceberg comes with <a href="../spark/#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
 <p>This command creates a path-based catalog named <code>local</code> for tables under <code>$PWD/warehouse</code> and adds support for Iceberg tables to Spark&rsquo;s built-in catalog:</p>
-<pre><code class="sh">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.9.1 \
+<pre><code class="sh">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.10.0 \
     --conf spark.sql.catalog.spark_catalog=org.apache.iceberg.spark.SparkSessionCatalog \
     --conf spark.sql.catalog.spark_catalog.type=hive \
     --conf spark.sql.catalog.local=org.apache.iceberg.spark.SparkCatalog \
@@ -403,25 +403,25 @@
 </code></pre>
 
 <h3 id="creating-a-table">Creating a table<a class="headerlink" href="#creating-a-table" title="Permanent link">&para;</a></h3>
-<p>To create your first Iceberg table in Spark, use the <code>spark-sql</code> shell or <code>spark.sql(...)</code> to run a <a href="../spark#create-table"><code>CREATE TABLE</code></a> command:</p>
+<p>To create your first Iceberg table in Spark, use the <code>spark-sql</code> shell or <code>spark.sql(...)</code> to run a <a href="../spark/#create-table"><code>CREATE TABLE</code></a> command:</p>
 <pre><code class="sql">-- local is the path-based catalog defined above
 CREATE TABLE local.db.table (id bigint, data string) USING iceberg
 </code></pre>
 
 <p>Iceberg catalogs support the full range of SQL DDL commands, including:</p>
 <ul>
-<li><a href="../spark#create-table"><code>CREATE TABLE ... PARTITIONED BY</code></a></li>
-<li><a href="../spark#create-table-as-select"><code>CREATE TABLE ... AS SELECT</code></a></li>
-<li><a href="../spark#alter-table"><code>ALTER TABLE</code></a></li>
-<li><a href="../spark#drop-table"><code>DROP TABLE</code></a></li>
+<li><a href="../spark/#create-table"><code>CREATE TABLE ... PARTITIONED BY</code></a></li>
+<li><a href="../spark/#create-table-as-select"><code>CREATE TABLE ... AS SELECT</code></a></li>
+<li><a href="../spark/#alter-table"><code>ALTER TABLE</code></a></li>
+<li><a href="../spark/#drop-table"><code>DROP TABLE</code></a></li>
 </ul>
 <h3 id="writing">Writing<a class="headerlink" href="#writing" title="Permanent link">&para;</a></h3>
-<p>Once your table is created, insert data using <a href="../spark#insert-into"><code>INSERT INTO</code></a>:</p>
+<p>Once your table is created, insert data using <a href="../spark/#insert-into"><code>INSERT INTO</code></a>:</p>
 <pre><code class="sql">INSERT INTO local.db.table VALUES (1, 'a'), (2, 'b'), (3, 'c');
 INSERT INTO local.db.table SELECT id, data FROM source WHERE length(data) = 1;
 </code></pre>
 
-<p>Iceberg supports writing DataFrames using the new <a href="../spark#writing-with-dataframes">v2 DataFrame write API</a>:</p>
+<p>Iceberg supports writing DataFrames using the new <a href="../spark/#writing-with-dataframes">v2 DataFrame write API</a>:</p>
 <pre><code class="scala">spark.table(&quot;source&quot;).select(&quot;id&quot;, &quot;data&quot;)
      .writeTo(&quot;local.db.table&quot;).append()
 </code></pre>
@@ -434,7 +434,7 @@ FROM local.db.table
 GROUP BY data
 </code></pre>
 
-<p>SQL is also the recommended way to <a href="../spark#inspecting-tables">inspect tables</a>. To view all of the snapshots in a table, use the <code>snapshots</code> metadata table:</p>
+<p>SQL is also the recommended way to <a href="../spark/#inspecting-tables">inspect tables</a>. To view all of the snapshots in a table, use the <code>snapshots</code> metadata table:</p>
 <pre><code class="sql">SELECT * FROM local.db.table.snapshots
 </code></pre>
 
@@ -448,13 +448,13 @@ GROUP BY data
 +-------------------------+----------------+-----------+-----------+----------------------------------------------------+-----+
 </code></pre>
 
-<p><a href="../spark#querying-with-dataframes">DataFrame reads</a> are supported and can now reference tables by name using <code>spark.table</code>:</p>
+<p><a href="../spark/#querying-with-dataframes">DataFrame reads</a> are supported and can now reference tables by name using <code>spark.table</code>:</p>
 <pre><code class="scala">val df = spark.table(&quot;local.db.table&quot;)
 df.count()
 </code></pre>
 
 <h3 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
-<p>Next, you can learn more about <a href="../spark">Iceberg tables in Spark</a>, or about the <a href="../api">Iceberg Table API</a>.</p></div>
+<p>Next, you can learn more about <a href="../spark/">Iceberg tables in Spark</a>, or about the <a href="../api/">Iceberg Table API</a>.</p></div>
         
         
     </div>

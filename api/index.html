@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>API intro - Apache Iceberg</title>
+    <title>Java API intro - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -111,38 +111,8 @@
                 
                 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li >
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li >
     <a href="../reliability/">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
-</li>
-
-                        
-                            
-<li class="active">
-    <a href="./">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -220,41 +223,38 @@
 
                         
                             
-<li >
-    <a href="../custom-catalog/">Custom Catalog</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+<li class="active">
+    <a href="./">Java API intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Java Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../custom-catalog/">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-api-intro/">Python API Intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -332,12 +332,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../java-api-quickstart/">
+                        <a rel="prev" href="../hive/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../custom-catalog/">
+                        <a rel="next" href="../java-api-quickstart/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -394,11 +394,11 @@
 <p>The main purpose of the Iceberg API is to manage table metadata, like schema, partition spec, metadata, and data files that store table data.</p>
 <p>Table metadata and operations are accessed through the <code>Table</code> interface. This interface will return table information, </p>
 <h3 id="table-metadata">Table metadata<a class="headerlink" href="#table-metadata" title="Permanent link">&para;</a></h3>
-<p>The <a href="/javadoc/master/index.html?org/apache/iceberg/Table.html"><code>Table</code> interface</a> provides access table metadata:</p>
+<p>The <a href="../javadoc/master/?org/apache/iceberg/Table.html"><code>Table</code> interface</a> provides access table metadata:</p>
 <ul>
-<li><code>schema</code> returns the current table <a href="../schemas">schema</a></li>
+<li><code>schema</code> returns the current table <a href="../schemas/">schema</a></li>
 <li><code>spec</code> returns the current table partition spec</li>
-<li><code>properties</code> returns a map of key-value <a href="../configuration">properties</a></li>
+<li><code>properties</code> returns a map of key-value <a href="../configuration/">properties</a></li>
 <li><code>currentSnapshot</code> returns the current table snapshot</li>
 <li><code>snapshots</code> returns all valid snapshots for the table</li>
 <li><code>snapshot(id)</code> returns a specific snapshot by ID</li>
@@ -430,7 +430,7 @@ Iterable&lt;CombinedScanTask&gt; tasks = scan.planTasks();
 
 <p>Use <code>asOfTime</code> or <code>useSnapshot</code> to configure the table snapshot for time travel queries.</p>
 <h3 id="update-operations">Update operations<a class="headerlink" href="#update-operations" title="Permanent link">&para;</a></h3>
-<p><code>Table</code> also exposes operations that update the table. These operations use a builder pattern, <a href="/javadoc/master/index.html?org/apache/iceberg/PendingUpdate.html"><code>PendingUpdate</code></a>, that commits when <code>PendingUpdate#commit</code> is called.</p>
+<p><code>Table</code> also exposes operations that update the table. These operations use a builder pattern, <a href="../javadoc/master/?org/apache/iceberg/PendingUpdate.html"><code>PendingUpdate</code></a>, that commits when <code>PendingUpdate#commit</code> is called.</p>
 <p>For example, updating the table schema is done by calling <code>updateSchema</code>, adding updates to the builder, and finally calling <code>commit</code> to commit the pending changes to the table:</p>
 <pre><code class="java">table.updateSchema()
     .addColumn(&quot;count&quot;, Types.LongType.get())
@@ -465,7 +465,7 @@ t.commitTransaction();
 </code></pre>
 
 <h2 id="types">Types<a class="headerlink" href="#types" title="Permanent link">&para;</a></h2>
-<p>Iceberg data types are located in the <a href="/javadoc/master/index.html?org/apache/iceberg/types/package-summary.html"><code>org.apache.iceberg.types</code> package</a>.</p>
+<p>Iceberg data types are located in the <a href="../javadoc/master/?org/apache/iceberg/types/package-summary.html"><code>org.apache.iceberg.types</code> package</a>.</p>
 <h3 id="primitives">Primitives<a class="headerlink" href="#primitives" title="Permanent link">&para;</a></h3>
 <p>Primitive type instances are available from static methods in each type class. Types without parameters use <code>get</code>, and types like <code>decimal</code> use factory methods:</p>
 <pre><code class="java">Types.IntegerType.get()    // int
@@ -475,7 +475,7 @@ Types.DecimalType.of(9, 2) // decimal(9, 2)
 
 <h3 id="nested-types">Nested types<a class="headerlink" href="#nested-types" title="Permanent link">&para;</a></h3>
 <p>Structs, maps, and lists are created using factory methods in type classes.</p>
-<p>Like struct fields, map keys or values and list elements are tracked as nested fields. Nested fields track <a href="../evolution#correctness">field IDs</a> and nullability.</p>
+<p>Like struct fields, map keys or values and list elements are tracked as nested fields. Nested fields track <a href="../evolution/#correctness">field IDs</a> and nullability.</p>
 <p>Struct fields are created using <code>NestedField.optional</code> or <code>NestedField.required</code>. Map value and list element nullability is set in the map and list factory methods.</p>
 <pre><code class="java">// struct&lt;1 id: int, 2 data: optional string&gt;
 StructType struct = Struct.of(
@@ -496,7 +496,7 @@ ListType list = ListType.ofRequired(1, IntegerType.get());
 </code></pre>
 
 <h2 id="expressions">Expressions<a class="headerlink" href="#expressions" title="Permanent link">&para;</a></h2>
-<p>Iceberg&rsquo;s expressions are used to configure table scans. To create expressions, use the factory methods in <a href="/javadoc/master/index.html?org/apache/iceberg/expressions/Expressions.html"><code>Expressions</code></a>.</p>
+<p>Iceberg&rsquo;s expressions are used to configure table scans. To create expressions, use the factory methods in <a href="../javadoc/master/?org/apache/iceberg/expressions/Expressions.html"><code>Expressions</code></a>.</p>
 <p>Supported predicate expressions are:</p>
 <ul>
 <li><code>isNull</code></li>

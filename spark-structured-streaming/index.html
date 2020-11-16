@@ -110,39 +110,9 @@
                 
                 
                 
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li class="active">
-    <a href="./">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li >
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li >
     <a href="../reliability/">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -221,40 +224,37 @@
                         
                             
 <li >
-    <a href="../custom-catalog/">Custom Catalog</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+    <a href="../api/">Java API intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Java Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../custom-catalog/">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-api-intro/">Python API Intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -337,7 +337,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../presto/">
+                        <a rel="next" href="../flink/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -438,12 +438,12 @@ to maintain. We encourage having trigger interval 1 minute at minimum, and incre
 <p>The triggers section in <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#triggers">Structured Streaming Programming Guide</a>
 documents how to configure the interval.</p>
 <h3 id="expire-old-snapshots">Expire old snapshots<a class="headerlink" href="#expire-old-snapshots" title="Permanent link">&para;</a></h3>
-<p>Each micro-batch written to a table produces a new snapshot, which are tracked in table metadata until they are expired to remove the metadata and any data files that are no longer needed. Snapshots accumulate quickly with frequent commits, so it is highly recommended that tables written by streaming queries are <a href="../maintenance#expire-snapshots">regularly maintained</a>.</p>
+<p>Each micro-batch written to a table produces a new snapshot, which are tracked in table metadata until they are expired to remove the metadata and any data files that are no longer needed. Snapshots accumulate quickly with frequent commits, so it is highly recommended that tables written by streaming queries are <a href="../maintenance/#expire-snapshots">regularly maintained</a>.</p>
 <h3 id="compacting-data-files">Compacting data files<a class="headerlink" href="#compacting-data-files" title="Permanent link">&para;</a></h3>
-<p>The amount of data written in a micro batch is typically small, which can cause the table metadata to track lots of small files. <a href="../maintenance#compact-data-files">Compacting small files into larger files</a> reduces the metadata needed by the table, and increases query efficiency.</p>
+<p>The amount of data written in a micro batch is typically small, which can cause the table metadata to track lots of small files. <a href="../maintenance/#compact-data-files">Compacting small files into larger files</a> reduces the metadata needed by the table, and increases query efficiency.</p>
 <h3 id="rewrite-manifests">Rewrite manifests<a class="headerlink" href="#rewrite-manifests" title="Permanent link">&para;</a></h3>
 <p>To optimize write latency on streaming workload, Iceberg may write the new snapshot with a &ldquo;fast&rdquo; append that does not automatically compact manifests.
-This could lead lots of small manifest files. Manifests can be <a href="../maintenance#rewrite-manifests">rewritten to optimize queries and to compact</a>.</p></div>
+This could lead lots of small manifest files. Manifests can be <a href="../maintenance/#rewrite-manifests">rewritten to optimize queries and to compact</a>.</p></div>
         
         
     </div>

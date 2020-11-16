@@ -111,38 +111,8 @@
                 
                 
                     <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li class="active">
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li >
     <a href="../reliability/">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -221,40 +224,37 @@
                         
                             
 <li >
-    <a href="../custom-catalog/">Custom Catalog</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+    <a href="../api/">Java API intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Java Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../custom-catalog/">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-api-intro/">Python API Intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -332,7 +332,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../maintenance/">
+                        <a rel="prev" href="../how-to-release/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -352,6 +352,8 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#configuration">Configuration</a></li>
+            <li class="second-level"><a href="#catalog-properties">Catalog properties</a></li>
+                
             <li class="second-level"><a href="#table-properties">Table properties</a></li>
                 
                 <li class="third-level"><a href="#read-properties">Read properties</a></li>
@@ -387,6 +389,49 @@
  -->
 
 <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
+<h2 id="catalog-properties">Catalog properties<a class="headerlink" href="#catalog-properties" title="Permanent link">&para;</a></h2>
+<p>Iceberg catalogs support using catalog properties to configure catalog behaviors. Here is a list of commonly used catalog properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>catalog-impl</td>
+<td>null</td>
+<td>a custom <code>Catalog</code> implementation to use by an engine</td>
+</tr>
+<tr>
+<td>io-impl</td>
+<td>null</td>
+<td>a custom <code>FileIO</code> implementation to use in a catalog</td>
+</tr>
+<tr>
+<td>warehouse</td>
+<td>null</td>
+<td>the root path of the data warehouse</td>
+</tr>
+<tr>
+<td>uri</td>
+<td>null</td>
+<td>(Hive catalog only) the Hive metastore URI</td>
+</tr>
+<tr>
+<td>clients</td>
+<td>2</td>
+<td>(Hive catalog only) the Hive client pool size</td>
+</tr>
+</tbody>
+</table>
+<p><code>HadoopCatalog</code> and <code>HiveCatalog</code> can access the properties in their constructors.
+Any other custom catalog can access the properties by implementing <code>Catalog.initialize(catalogName, catalogProperties)</code>.
+The properties can be manually constructed or passed in from a compute engine like Spark or Flink.
+Spark uses its session properties as catalog properties, see more details in the <a href="#spark-configuration">Spark configuration</a> section.
+Flink passes in catalog properties through <code>CREATE CATALOG</code> statement, see more details in the <a href="../flink/#creating-catalogs-and-using-catalogs">Flink</a> section.</p>
 <h2 id="table-properties">Table properties<a class="headerlink" href="#table-properties" title="Permanent link">&para;</a></h2>
 <p>Iceberg tables support table properties to configure table behavior, like the default split size for readers.</p>
 <h3 id="read-properties">Read properties<a class="headerlink" href="#read-properties" title="Permanent link">&para;</a></h3>
@@ -434,7 +479,7 @@
 <tr>
 <td>write.format.default</td>
 <td>parquet</td>
-<td>Default file format for the table; parquet or avro</td>
+<td>Default file format for the table; parquet, avro, or orc</td>
 </tr>
 <tr>
 <td>write.parquet.row-group-size-bytes</td>
@@ -467,6 +512,11 @@
 <td>Avro compression codec</td>
 </tr>
 <tr>
+<td>write.location-provider.impl</td>
+<td>null</td>
+<td>Optional custom implemention for LocationProvider</td>
+</tr>
+<tr>
 <td>write.metadata.compression-codec</td>
 <td>none</td>
 <td>Metadata compression codec; none or gzip</td>
@@ -490,6 +540,11 @@
 <td>write.wap.enabled</td>
 <td>false</td>
 <td>Enables write-audit-publish writes</td>
+</tr>
+<tr>
+<td>write.summary.partition-limit</td>
+<td>0</td>
+<td>Includes partition-level summary stats in snapshot summaries if the changed partition count is less than this limit</td>
 </tr>
 <tr>
 <td>write.metadata.delete-after-commit.enabled</td>
@@ -592,7 +647,7 @@
 </table>
 <h2 id="spark-configuration">Spark configuration<a class="headerlink" href="#spark-configuration" title="Permanent link">&para;</a></h2>
 <h3 id="catalogs">Catalogs<a class="headerlink" href="#catalogs" title="Permanent link">&para;</a></h3>
-<p><a href="../spark#configuring-catalogs">Spark catalogs</a> are configured using Spark session properties.</p>
+<p><a href="../spark/#configuring-catalogs">Spark catalogs</a> are configured using Spark session properties.</p>
 <p>A catalog is created and named by adding a property <code>spark.sql.catalog.(catalog-name)</code> with an implementation class for its value.</p>
 <p>Iceberg supplies two implementations:</p>
 <ul>
@@ -611,8 +666,13 @@
 <tbody>
 <tr>
 <td>spark.sql.catalog.<em>catalog-name</em>.type</td>
-<td>hive or hadoop</td>
-<td>The underlying Iceberg catalog implementation</td>
+<td><code>hive</code> or <code>hadoop</code></td>
+<td>The underlying Iceberg catalog implementation, <code>HiveCatalog</code> or <code>HadoopCatalog</code></td>
+</tr>
+<tr>
+<td>spark.sql.catalog.<em>catalog-name</em>.catalog-impl</td>
+<td></td>
+<td>The underlying Iceberg catalog implementation. When set, the value of <code>type</code> property is ignored</td>
 </tr>
 <tr>
 <td>spark.sql.catalog.<em>catalog-name</em>.default-namespace</td>
@@ -695,7 +755,7 @@ df.write
 <tr>
 <td>write-format</td>
 <td>Table write.format.default</td>
-<td>File format to use for this write operation; parquet or avro</td>
+<td>File format to use for this write operation; parquet, avro, or orc</td>
 </tr>
 <tr>
 <td>target-file-size-bytes</td>

@@ -111,38 +111,8 @@
                 
                 
                     <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li >
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li class="active">
     <a href="./">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -221,40 +224,37 @@
                         
                             
 <li >
-    <a href="../custom-catalog/">Custom Catalog</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+    <a href="../api/">Java API intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../java-api-quickstart/">Java Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../custom-catalog/">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-api-intro/">Python API Intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -337,7 +337,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../java-api-quickstart/">
+                        <a rel="next" href="../getting-started/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -382,7 +382,7 @@
 <h1 id="reliability">Reliability<a class="headerlink" href="#reliability" title="Permanent link">&para;</a></h1>
 <p>Iceberg was designed to solve correctness problems that affect Hive tables running in S3.</p>
 <p>Hive tables track data files using both a central metastore for partitions and a file system for individual files. This makes atomic changes to a table&rsquo;s contents impossible, and eventually consistent stores like S3 may return incorrect results due to the use of listing files to reconstruct the state of a table. It also requires job planning to make many slow listing calls: O(n) with the number of partitions.</p>
-<p>Iceberg tracks the complete list of data files in each <a href="../terms#snapshot">snapshot</a> using a persistent tree structure. Every write or delete produces a new snapshot that reuses as much of the previous snapshot&rsquo;s metadata tree as possible to avoid high write volumes.</p>
+<p>Iceberg tracks the complete list of data files in each <a href="../terms/#snapshot">snapshot</a> using a persistent tree structure. Every write or delete produces a new snapshot that reuses as much of the previous snapshot&rsquo;s metadata tree as possible to avoid high write volumes.</p>
 <p>Valid snapshots in an Iceberg table are stored in the table metadata file, along with a reference to the current snapshot. Commits replace the path of the current table metadata file using an atomic operation. This ensures that all updates to table data and metadata are atomic, and is the basis for <a href="https://en.wikipedia.org/wiki/Isolation_(database_systems)#Serializable">serializable isolation</a>.</p>
 <p>This results in improved reliability guarantees:</p>
 <ul>

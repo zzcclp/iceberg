@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Custom Catalog - Apache Iceberg</title>
+    <title>Java Custom Catalog - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -111,38 +111,8 @@
                 
                 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User docs <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark/">Spark</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../presto/">Presto</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
                         
                             
 <li >
@@ -170,6 +140,12 @@
                         
                             
 <li >
+    <a href="../maintenance/">Maintenance</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../performance/">Performance</a>
 </li>
 
@@ -177,6 +153,33 @@
                             
 <li >
     <a href="../reliability/">Reliability</a>
+</li>
+
+                        
+                        </ul>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../getting-started/">Getting Started</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark/">Spark SQL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Spark Streaming</a>
 </li>
 
                         
@@ -191,27 +194,27 @@
                 
                 
                 
+                    <li >
+                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../flink/">Flink</a>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Java <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg">Git Repo</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">API intro</a>
-</li>
-
                         
                             
 <li >
@@ -220,41 +223,38 @@
 
                         
                             
+<li >
+    <a href="../api/">Java API intro</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../java-api-quickstart/">Java Quickstart</a>
+</li>
+
+                        
+                            
 <li class="active">
-    <a href="./">Custom Catalog</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Python <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://github.com/apache/iceberg/tree/master/python">Git Repo</a>
+    <a href="./">Java Custom Catalog</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-quickstart/">Quickstart</a>
+    <a href="../python-quickstart/">Python Quickstart</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-api-intro/">API Intro</a>
+    <a href="../python-api-intro/">Python API Intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="../python-feature-support/">Feature Support</a>
+    <a href="../python-feature-support/">Python Feature Support</a>
 </li>
 
                         
@@ -285,7 +285,7 @@
                 
                 
                     <li >
-                        <a href="https://github.com/apache/iceberg">Iceberg on GitHub</a>
+                        <a href="https://github.com/apache/iceberg">GitHub</a>
                     </li>
                 
                 
@@ -332,7 +332,7 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../api/">
+                        <a rel="prev" href="../java-api-quickstart/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
@@ -354,7 +354,11 @@
         <li class="first-level active"><a href="#custom-catalog-implementation">Custom Catalog Implementation</a></li>
             <li class="second-level"><a href="#custom-table-operations-implementation">Custom table operations implementation</a></li>
                 
-            <li class="second-level"><a href="#custom-table-implementation">Custom table implementation</a></li>
+            <li class="second-level"><a href="#custom-catalog-implementation_1">Custom catalog implementation</a></li>
+                
+            <li class="second-level"><a href="#custom-file-io-implementation">Custom file IO implementation</a></li>
+                
+            <li class="second-level"><a href="#custom-location-provider-implementation">Custom location provider implementation</a></li>
                 
             <li class="second-level"><a href="#custom-icebergsource">Custom IcebergSource</a></li>
                 
@@ -383,7 +387,9 @@
 <p>It&rsquo;s possible to read an iceberg table either from an hdfs path or from a hive table. It&rsquo;s also possible to use a custom metastore in place of hive. The steps to do that are as follows.</p>
 <ul>
 <li><a href="#custom-table-operations-implementation">Custom TableOperations</a></li>
-<li><a href="#custom-table-implementation">Custom Catalog</a></li>
+<li><a href="#custom-catalog-implementation">Custom Catalog</a></li>
+<li><a href="#custom-file-io-implementation">Custom FileIO</a></li>
+<li><a href="#custom-location-provider-implementation">Custom LocationProvider</a></li>
 <li><a href="#custom-icebergsource">Custom IcebergSource</a></li>
 </ul>
 <h3 id="custom-table-operations-implementation">Custom table operations implementation<a class="headerlink" href="#custom-table-operations-implementation" title="Permanent link">&para;</a></h3>
@@ -437,12 +443,19 @@
 }
 </code></pre>
 
-<h3 id="custom-table-implementation">Custom table implementation<a class="headerlink" href="#custom-table-implementation" title="Permanent link">&para;</a></h3>
+<p>A <code>TableOperations</code> instance is usually obtained by calling <code>Catalog.newTableOps(TableIdentifier)</code>.
+See the next section about implementing and loading a custom catalog.</p>
+<h3 id="custom-catalog-implementation_1">Custom catalog implementation<a class="headerlink" href="#custom-catalog-implementation_1" title="Permanent link">&para;</a></h3>
 <p>Extend <code>BaseMetastoreCatalog</code> to provide default warehouse locations and instantiate <code>CustomTableOperations</code></p>
 <p>Example:</p>
 <pre><code class="java">public class CustomCatalog extends BaseMetastoreCatalog {
 
   private Configuration configuration;
+
+  // must have a no-arg constructor to be dynamically loaded
+  // initialize(String name, Map&lt;String, String&gt; properties) will be called to complete initialization
+  public CustomCatalog() {
+  }
 
   public CustomCatalog(Configuration configuration) {
     this.configuration = configuration;
@@ -486,7 +499,99 @@
     // Example service to rename table
     CustomService.renameTable(from.namepsace().level(0), from.name(), to.name());
   }
+
+  // implement this method to read catalog name and properties during initialization
+  public void initialize(String name, Map&lt;String, String&gt; properties) {
+  }
 }
+</code></pre>
+
+<p>Catalog implementations can be dynamically loaded in most compute engines.
+For Spark and Flink, you can specify the <code>catalog-impl</code> catalog property to load it.
+Read the <a href="../configuration/#catalog-properties">Configuration</a> section for more details.
+For MapReduce, implement <code>org.apache.iceberg.mr.CatalogLoader</code> and set Hadoop property <code>iceberg.mr.catalog.loader.class</code> to load it.
+If your catalog must read Hadoop configuration to access certain environment properties, make your catalog implement <code>org.apache.hadoop.conf.Configurable</code>.</p>
+<h3 id="custom-file-io-implementation">Custom file IO implementation<a class="headerlink" href="#custom-file-io-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>FileIO</code> and provide implementation to read and write data files</p>
+<p>Example:</p>
+<pre><code class="java">public class CustomFileIO implements FileIO {
+
+  // must have a no-arg constructor to be dynamically loaded
+  // initialize(Map&lt;String, String&gt; properties) will be called to complete initialization
+  public CustomFileIO() {
+  }
+
+  @Override
+  public InputFile newInputFile(String s) {
+    // you also need to implement the InputFile interface for a custom input file
+    return new CustomInputFile(s);
+  }
+
+  @Override
+  public OutputFile newOutputFile(String s) {
+    // you also need to implement the OutputFile interface for a custom output file
+    return new CustomOutputFile(s);
+  }
+
+  @Override
+  public void deleteFile(String path) {
+    Path toDelete = new Path(path);
+    FileSystem fs = Util.getFs(toDelete);
+    try {
+        fs.delete(toDelete, false /* not recursive */);
+    } catch (IOException e) {
+        throw new RuntimeIOException(e, &quot;Failed to delete file: %s&quot;, path);
+    }
+  }
+
+  // implement this method to read catalog properties during initialization
+  public void initialize(Map&lt;String, String&gt; properties) {
+  }
+}
+</code></pre>
+
+<p>If you are already implementing your own catalog, you can implement <code>TableOperations.io()</code> to use your custom <code>FileIO</code>.
+In addition, custom <code>FileIO</code> implementations can also be dynamically loaded in <code>HadoopCatalog</code> and <code>HiveCatalog</code> by specifying the <code>io-impl</code> catalog property.
+Read the <a href="../configuration/#catalog-properties">Configuration</a> section for more details.
+If your <code>FileIO</code> must read Hadoop configuration to access certain environment properties, make your <code>FileIO</code> implement <code>org.apache.hadoop.conf.Configurable</code>.</p>
+<h3 id="custom-location-provider-implementation">Custom location provider implementation<a class="headerlink" href="#custom-location-provider-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>LocationProvider</code> and provide implementation to determine the file path to write data</p>
+<p>Example:</p>
+<pre><code class="java">public class CustomLocationProvider implements LocationProvider {
+
+  private String tableLocation;
+
+  // must have a 2-arg constructor like this, or a no-arg constructor
+  public CustomLocationProvider(String tableLocation, Map&lt;String, String&gt; properties) {
+    this.tableLocation = tableLocation;
+  }
+
+  @Override
+  public String newDataLocation(String filename) {
+    // can use any custom method to generate a file path given a file name
+    return String.format(&quot;%s/%s/%s&quot;, tableLocation, UUID.randomUUID().toString(), filename);
+  }
+
+  @Override
+  public String newDataLocation(PartitionSpec spec, StructLike partitionData, String filename) {
+    // can use any custom method to generate a file path given a partition info and file name
+    return newDataLocation(filename);
+  }
+}
+</code></pre>
+
+<p>If you are already implementing your own catalog, you can override <code>TableOperations.locationProvider()</code> to use your custom default <code>LocationProvider</code>.
+To use a different custom location provider for a specific table, specify the implementation when creating the table using table property <code>write.location-provider.impl</code></p>
+<p>Example:</p>
+<pre><code class="sql">CREATE TABLE hive.default.my_table (
+  id bigint,
+  data string,
+  category string)
+USING iceberg
+OPTIONS (
+  'write.location-provider.impl'='com.my.CustomLocationProvider'
+)
+PARTITIONED BY (category);
 </code></pre>
 
 <h3 id="custom-icebergsource">Custom IcebergSource<a class="headerlink" href="#custom-icebergsource" title="Permanent link">&para;</a></h3>
