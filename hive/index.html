@@ -404,6 +404,35 @@ LOCATION 'hdfs://some_bucket/some_path/table_a';
 <pre><code class="sql">SELECT * from table_a;
 </code></pre>
 
+<h4 id="using-hive-catalog">Using Hive Catalog<a class="headerlink" href="#using-hive-catalog" title="Permanent link">&para;</a></h4>
+<p>Iceberg tables created using <code>HiveCatalog</code> are automatically registered with Hive.</p>
+<h5 id="create-an-iceberg-table_1">Create an Iceberg table<a class="headerlink" href="#create-an-iceberg-table_1" title="Permanent link">&para;</a></h5>
+<p>The first step is to create an Iceberg table using the Spark/Java/Python API and <code>HiveCatalog</code>. For the purposes of this documentation we will assume that the table is called <code>table_b</code> and that the table location is <code>s3://some_path/table_b</code>. In order for Iceberg to correctly set up the Hive table for querying some configuration values need to be set, the two options for this are described below - you can use either or the other depending on your use case.</p>
+<h5 id="hive-configuration">Hive Configuration<a class="headerlink" href="#hive-configuration" title="Permanent link">&para;</a></h5>
+<p>The value <code>iceberg.engine.hive.enabled</code> needs to be set to <code>true</code> and added to the Hive configuration file on the classpath of the application creating the table. This can be done by modifying the relevant <code>hive-site.xml</code>. Alternatively this can done programatically like so:</p>
+<pre><code class="java">Configuration hadoopConfiguration = spark.sparkContext().hadoopConfiguration();
+hadoopConfiguration.set(ConfigProperties.ENGINE_HIVE_ENABLED, &quot;true&quot;); //iceberg.engine.hive.enabled=true
+HiveCatalog catalog = new HiveCatalog(hadoopConfiguration);
+...
+catalog.createTable(tableId, schema, spec);
+</code></pre>
+
+<h5 id="table-property-configuration">Table Property Configuration<a class="headerlink" href="#table-property-configuration" title="Permanent link">&para;</a></h5>
+<p>The property <code>engine.hive.enabled</code> needs to be set to <code>true</code> and added to the table properties when creating the Iceberg table. This can be done like so:</p>
+<pre><code class="java">    Map&lt;String, String&gt; tableProperties = new HashMap&lt;String, String&gt;();
+    tableProperties.put(TableProperties.ENGINE_HIVE_ENABLED, &quot;true&quot;); //engine.hive.enabled=true
+    catalog.createTable(tableId, schema, spec, tableProperties);
+</code></pre>
+
+<h4 id="query-the-iceberg-table-via-hive_1">Query the Iceberg table via Hive<a class="headerlink" href="#query-the-iceberg-table-via-hive_1" title="Permanent link">&para;</a></h4>
+<p>In order to query a Hive table created by either of the HiveCatalog methods described above you need to first set a Hive configuration value like so:</p>
+<pre><code class="sql">SET iceberg.mr.catalog=hive;
+</code></pre>
+
+<p>You should now be able to issue Hive SQL <code>SELECT</code> queries using the above table and see the results returned from the underlying Iceberg table. Both the Map Reduce and Tez query execution engines are supported.</p>
+<pre><code class="sql">SELECT * from table_b;
+</code></pre>
+
 <h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
 <h4 id="predicate-pushdown">Predicate pushdown<a class="headerlink" href="#predicate-pushdown" title="Permanent link">&para;</a></h4>
 <p>Pushdown of the Hive SQL <code>WHERE</code> clause has been implemented so that these filters are used at the Iceberg TableScan level as well as by the Parquet and ORC Readers.</p></div>
