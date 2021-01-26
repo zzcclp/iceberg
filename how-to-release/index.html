@@ -493,6 +493,21 @@ Please vote in the next 72 hours.
 [ ] -1 Do not release this because...
 </code></pre>
 
+<p>When a candidate is passed or rejected, reply with the voting result:</p>
+<pre><code class="text">Subject: [RESULT][VOTE] Release Apache Iceberg &lt;VERSION&gt; RC&lt;NUM&gt;
+</code></pre>
+
+<pre><code class="text">Thanks everyone who participated in the vote for Release Apache Iceberg &lt;VERSION&gt; RC&lt;NUM&gt;.
+
+The vote result is:
+
++1: 3 (binding), 5 (non-binding)
++0: 0 (binding), 0 (non-binding)
+-1: 0 (binding), 0 (non-binding)
+
+Therefore, the release candidate is passed/rejected.
+</code></pre>
+
 <h3 id="finishing-the-release">Finishing the release<a class="headerlink" href="#finishing-the-release" title="Permanent link">&para;</a></h3>
 <p>After the release vote has passed, you need to release the last candidate&rsquo;s artifacts.</p>
 <p>First, copy the source release directory to releases:</p>
