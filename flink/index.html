@@ -71,15 +71,15 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li >
-                        <a href="..">About</a>
-                    </li>
-                
-                
-                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="..">About</a>
+</li>
+
                         
                             
 <li >
@@ -195,7 +195,7 @@
                 
                 
                     <li >
-                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
                     </li>
                 
                 
@@ -208,6 +208,21 @@
                 
                     <li >
                         <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../aws/">AWS</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
@@ -364,22 +379,29 @@
                 <li class="third-level"><a href="#create-database">CREATE DATABASE</a></li>
                 <li class="third-level"><a href="#create-table">CREATE TABLE</a></li>
                 <li class="third-level"><a href="#partitioned-by">PARTITIONED BY</a></li>
+                <li class="third-level"><a href="#create-table-like">CREATE TABLE LIKE</a></li>
                 <li class="third-level"><a href="#alter-table">ALTER TABLE</a></li>
                 <li class="third-level"><a href="#alter-table-rename-to">ALTER TABLE .. RENAME TO</a></li>
                 <li class="third-level"><a href="#drop-table">DROP TABLE</a></li>
             <li class="second-level"><a href="#querying-with-sql">Querying with SQL</a></li>
                 
+                <li class="third-level"><a href="#flink-batch-read">Flink batch read</a></li>
+                <li class="third-level"><a href="#flink-streaming-read">Flink streaming read</a></li>
             <li class="second-level"><a href="#writing-with-sql">Writing with SQL</a></li>
                 
                 <li class="third-level"><a href="#insert-into">INSERT INTO</a></li>
                 <li class="third-level"><a href="#insert-overwrite">INSERT OVERWRITE</a></li>
             <li class="second-level"><a href="#reading-with-datastream">Reading with DataStream</a></li>
                 
+                <li class="third-level"><a href="#batch-read">Batch Read</a></li>
+                <li class="third-level"><a href="#streaming-read">Streaming read</a></li>
             <li class="second-level"><a href="#writing-with-datastream">Writing with DataStream</a></li>
                 
                 <li class="third-level"><a href="#appending-data">Appending data.</a></li>
                 <li class="third-level"><a href="#overwrite-data">Overwrite data</a></li>
             <li class="second-level"><a href="#inspecting-tables">Inspecting tables.</a></li>
+                
+            <li class="second-level"><a href="#rewrite-files-action">Rewrite files action.</a></li>
                 
             <li class="second-level"><a href="#future-improvement">Future improvement.</a></li>
                 
@@ -432,6 +454,11 @@ we only integrate iceberg with apache flink 1.11.x .</p>
 <td></td>
 </tr>
 <tr>
+<td><a href="#create-table-like">SQL create table like</a></td>
+<td>✔️</td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#alter-table">SQL alter table</a></td>
 <td>✔️</td>
 <td>Only support altering table properties, Columns/PartitionKey changes are not supported now</td>
@@ -444,7 +471,7 @@ we only integrate iceberg with apache flink 1.11.x .</p>
 <tr>
 <td><a href="#querying-with-sql">SQL select</a></td>
 <td>✔️</td>
-<td>Only support batch mode now.</td>
+<td>Support both streaming and batch mode</td>
 </tr>
 <tr>
 <td><a href="#insert-into">SQL insert into</a></td>
@@ -474,6 +501,11 @@ we only integrate iceberg with apache flink 1.11.x .</p>
 <tr>
 <td><a href="#inspecting-tables">Metadata tables</a></td>
 <td>️</td>
+<td>Support Java API but does not support Flink SQL</td>
+</tr>
+<tr>
+<td><a href="#rewrite-files-action">Rewrite files action</a></td>
+<td>✔️ ️</td>
 <td></td>
 </tr>
 </tbody>
@@ -502,7 +534,7 @@ export HADOOP_CLASSPATH=`$HADOOP_HOME/bin/hadoop classpath`
 ./bin/sql-client.sh embedded -j &lt;flink-runtime-directory&gt;/iceberg-flink-runtime-xxx.jar shell
 </code></pre>
 
-<p>By default, iceberg has included hadoop jars for hadoop catalog. If we want to use hive catalog, we will need to load the hive jars when opening the flink sql client. Fortunately, apache flink has provided a <a href="https://ci.apache.org/projects/flink/flink-docs-stable/dev/table/hive/#using-bundled-hive-jar">bundled hive jar</a> for sql client. So we could open the sql client
+<p>By default, iceberg has included hadoop jars for hadoop catalog. If we want to use hive catalog, we will need to load the hive jars when opening the flink sql client. Fortunately, apache flink has provided a <a href="https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-hive-2.3.6_2.11/1.11.0/flink-sql-connector-hive-2.3.6_2.11-1.11.0.jar">bundled hive jar</a> for sql client. So we could open the sql client
 as the following:</p>
 <pre><code class="bash"># HADOOP_HOME is your hadoop root directory after unpack the binary package.
 export HADOOP_CLASSPATH=`$HADOOP_HOME/bin/hadoop classpath`
@@ -593,6 +625,17 @@ USE iceberg_db;
 </code></pre>
 
 <p>Apache Iceberg support hidden partition but apache flink don&rsquo;t support partitioning by a function on columns, so we&rsquo;ve no way to support hidden partition in flink DDL now, we will improve apache flink DDL in future.</p>
+<h3 id="create-table-like"><code>CREATE TABLE LIKE</code><a class="headerlink" href="#create-table-like" title="Permanent link">&para;</a></h3>
+<p>To create a table with the same schema, partitioning, and table properties as another table, use <code>CREATE TABLE LIKE</code>.</p>
+<pre><code class="sql">CREATE TABLE hive_catalog.default.sample (
+    id BIGINT COMMENT 'unique id',
+    data STRING
+);
+
+CREATE TABLE  hive_catalog.default.sample_like LIKE hive_catalog.default.sample;
+</code></pre>
+
+<p>For more details, refer to the <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.11/dev/table/sql/create.html#create-table">Flink <code>CREATE TABLE</code> documentation</a>.</p>
 <h3 id="alter-table"><code>ALTER TABLE</code><a class="headerlink" href="#alter-table" title="Permanent link">&para;</a></h3>
 <p>Iceberg only support altering table properties in flink 1.11 now.</p>
 <pre><code class="sql">ALTER TABLE hive_catalog.default.sample SET ('write.format.default'='avro')
@@ -608,13 +651,7 @@ USE iceberg_db;
 </code></pre>
 
 <h2 id="querying-with-sql">Querying with SQL<a class="headerlink" href="#querying-with-sql" title="Permanent link">&para;</a></h2>
-<p>Iceberg does not support streaming read in flink now, it&rsquo;s still working in-progress. But it support batch read to scan the existing records in iceberg table.</p>
-<pre><code class="sql">-- Execute the flink job in streaming mode for current session context
-SET execution.type = batch ;
-SELECT * FROM sample       ;
-</code></pre>
-
-<p>Notice: we could execute the following sql command to switch the execute type from &lsquo;streaming&rsquo; mode to &lsquo;batch&rsquo; mode, and vice versa:</p>
+<p>Iceberg support both streaming and batch read in flink now. we could execute the following sql command to switch the execute type from &lsquo;streaming&rsquo; mode to &lsquo;batch&rsquo; mode, and vice versa:</p>
 <pre><code class="sql">-- Execute the flink job in streaming mode for current session context
 SET execution.type = streaming
 
@@ -622,6 +659,33 @@ SET execution.type = streaming
 SET execution.type = batch
 </code></pre>
 
+<h3 id="flink-batch-read">Flink batch read<a class="headerlink" href="#flink-batch-read" title="Permanent link">&para;</a></h3>
+<p>If want to check all the rows in iceberg table by submitting a flink <strong>batch</strong> job, you could execute the following sentences:</p>
+<pre><code class="sql">-- Execute the flink job in batch mode for current session context
+SET execution.type = batch ;
+SELECT * FROM sample       ;
+</code></pre>
+
+<h3 id="flink-streaming-read">Flink streaming read<a class="headerlink" href="#flink-streaming-read" title="Permanent link">&para;</a></h3>
+<p>Iceberg supports processing incremental data in flink streaming jobs which starts from a historical snapshot-id:</p>
+<pre><code class="sql">-- Submit the flink job in streaming mode for current session.
+SET execution.type = streaming ;
+
+-- Enable this switch because streaming read SQL will provide few job options in flink SQL hint options.
+SET table.dynamic-table-options.enabled=true;
+
+-- Read all the records from the iceberg current snapshot, and then read incremental data starting from that snapshot.
+SELECT * FROM sample /*+ OPTIONS('streaming'='true', 'monitor-interval'='1s')*/ ;
+
+-- Read all incremental data starting from the snapshot-id '3821550127947089987' (records from this snapshot will be excluded).
+SELECT * FROM sample /*+ OPTIONS('streaming'='true', 'monitor-interval'='1s', 'start-snapshot-id'='3821550127947089987')*/ ;
+</code></pre>
+
+<p>Those are the options that could be set in flink SQL hint options for streaming job:</p>
+<ul>
+<li>monitor-interval: time interval for consecutively monitoring newly committed data files (default value: &lsquo;1s&rsquo;).</li>
+<li>start-snapshot-id: the snapshot id that streaming job starts from.</li>
+</ul>
 <h2 id="writing-with-sql">Writing with SQL<a class="headerlink" href="#writing-with-sql" title="Permanent link">&para;</a></h2>
 <p>Iceberg support both <code>INSERT INTO</code> and <code>INSERT OVERWRITE</code> in flink 1.11 now.</p>
 <h3 id="insert-into"><code>INSERT INTO</code><a class="headerlink" href="#insert-into" title="Permanent link">&para;</a></h3>
@@ -643,11 +707,47 @@ INSERT INTO hive_catalog.default.sample SELECT id, data from other_kafka_table;
 <p>For a partitioned iceberg table, when all the partition columns are set a value in <code>PARTITION</code> clause, it is inserting into a static partition, otherwise if partial partition columns (prefix part of all partition columns) are set a value in <code>PARTITION</code> clause, it is writing the query result into a dynamic partition.
 For an unpartitioned iceberg table, its data will be completely overwritten by <code>INSERT OVERWRITE</code>.</p>
 <h2 id="reading-with-datastream">Reading with DataStream<a class="headerlink" href="#reading-with-datastream" title="Permanent link">&para;</a></h2>
-<p>Iceberg does not support streaming or batch read now, but it&rsquo;s working in-progress.</p>
+<p>Iceberg support streaming or batch read in Java API now.</p>
+<h3 id="batch-read">Batch Read<a class="headerlink" href="#batch-read" title="Permanent link">&para;</a></h3>
+<p>This example will read all records from iceberg table and then print to the stdout console in flink batch job:</p>
+<pre><code class="java">StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
+TableLoader tableLoader = TableLoader.fromHadooptable(&quot;hdfs://nn:8020/warehouse/path&quot;);
+DataStream&lt;RowData&gt; batch = FlinkSource.forRowData()
+     .env(env)
+     .tableLoader(loader)
+     .streaming(false)
+     .build();
+
+// Print all records to stdout.
+batch.print();
+
+// Submit and execute this batch read job.
+env.execute(&quot;Test Iceberg Batch Read&quot;);
+</code></pre>
+
+<h3 id="streaming-read">Streaming read<a class="headerlink" href="#streaming-read" title="Permanent link">&para;</a></h3>
+<p>This example will read incremental records which start from snapshot-id &lsquo;3821550127947089987&rsquo; and print to stdout console in flink streaming job:</p>
+<pre><code class="java">StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
+TableLoader tableLoader = TableLoader.fromHadooptable(&quot;hdfs://nn:8020/warehouse/path&quot;);
+DataStream&lt;RowData&gt; stream = FlinkSource.forRowData()
+     .env(env)
+     .tableLoader(loader)
+     .streaming(true)
+     .startSnapshotId(3821550127947089987)
+     .build();
+
+// Print all records to stdout.
+stream.print();
+
+// Submit and execute this streaming read job.
+env.execute(&quot;Test Iceberg Batch Read&quot;);
+</code></pre>
+
+<p>There are other options that we could set by Java API, please see the <a href="./javadoc/master/org/apache/iceberg/flink/source/FlinkSource.html">FlinkSource#Builder</a>.</p>
 <h2 id="writing-with-datastream">Writing with DataStream<a class="headerlink" href="#writing-with-datastream" title="Permanent link">&para;</a></h2>
 <p>Iceberg support writing to iceberg table from different DataStream input.</p>
 <h3 id="appending-data">Appending data.<a class="headerlink" href="#appending-data" title="Permanent link">&para;</a></h3>
-<p>we have supported writing <code>DataStream&lt;RowData&gt;</code> and <code>DataStream&lt;Row</code> to the sink iceberg table natively.</p>
+<p>we have supported writing <code>DataStream&lt;RowData&gt;</code> and <code>DataStream&lt;Row&gt;</code> to the sink iceberg table natively.</p>
 <pre><code class="java">StreamExecutionEnvironment env = ...;
 
 DataStream&lt;RowData&gt; input = ... ;
@@ -682,6 +782,18 @@ env.execute(&quot;Test Iceberg DataStream&quot;);
 
 <h2 id="inspecting-tables">Inspecting tables.<a class="headerlink" href="#inspecting-tables" title="Permanent link">&para;</a></h2>
 <p>Iceberg does not support inspecting table in flink sql now, we need to use <a href="../api/">iceberg&rsquo;s Java API</a> to read iceberg&rsquo;s meta data to get those table information.</p>
+<h2 id="rewrite-files-action">Rewrite files action.<a class="headerlink" href="#rewrite-files-action" title="Permanent link">&para;</a></h2>
+<p>Iceberg provides API to rewrite small files into large files by submitting flink batch job. The behavior of this flink action is the same as the spark&rsquo;s <a href="./maintenance/#compact-data-files">rewriteDataFiles</a>.</p>
+<pre><code class="java">import org.apache.iceberg.flink.actions.Actions;
+
+TableLoader tableLoader = TableLoader.fromHadooptable(&quot;hdfs://nn:8020/warehouse/path&quot;);
+Table table = tableLoader.loadTable();
+RewriteDataFilesActionResult result = Actions.forTable(table)
+        .rewriteDataFiles()
+        .execute();
+</code></pre>
+
+<p>For more doc about options of the rewrite files action, please see <a href="./javadoc/master/org/apache/iceberg/flink/actions/RewriteDataFilesAction.html">RewriteDataFilesAction</a></p>
 <h2 id="future-improvement">Future improvement.<a class="headerlink" href="#future-improvement" title="Permanent link">&para;</a></h2>
 <p>There are some features that we do not yet support in the current flink iceberg integration work:</p>
 <ul>
@@ -689,7 +801,6 @@ env.execute(&quot;Test Iceberg DataStream&quot;);
 <li>Don&rsquo;t support creating iceberg table with computed column.</li>
 <li>Don&rsquo;t support creating iceberg table with watermark.</li>
 <li>Don&rsquo;t support adding columns, removing columns, renaming columns, changing columns. <a href="https://issues.apache.org/jira/browse/FLINK-19062">FLINK-19062</a> is tracking this.</li>
-<li>Don&rsquo;t support flink read iceberg table in streaming mode. <a href="https://github.com/apache/iceberg/issues/1383">#1383</a> is tracking this.</li>
 </ul></div>
         
         
@@ -699,7 +810,7 @@ env.execute(&quot;Test Iceberg DataStream&quot;);
         
         <hr>
         <p>
-        <small>Copyright 2018-2020 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
+        <small>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 

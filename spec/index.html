@@ -71,15 +71,15 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li >
-                        <a href="..">About</a>
-                    </li>
-                
-                
-                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="..">About</a>
+</li>
+
                         
                             
 <li >
@@ -195,7 +195,7 @@
                 
                 
                     <li >
-                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
                     </li>
                 
                 
@@ -208,6 +208,21 @@
                 
                     <li >
                         <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../aws/">AWS</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
@@ -369,6 +384,7 @@
                 <li class="third-level"><a href="#terms">Terms</a></li>
                 <li class="third-level"><a href="#schemas-and-data-types">Schemas and Data Types</a></li>
                 <li class="third-level"><a href="#partitioning">Partitioning</a></li>
+                <li class="third-level"><a href="#sorting">Sorting</a></li>
                 <li class="third-level"><a href="#manifests">Manifests</a></li>
                 <li class="third-level"><a href="#snapshots">Snapshots</a></li>
                 <li class="third-level"><a href="#table-metadata">Table Metadata</a></li>
@@ -384,6 +400,7 @@
                 
                 <li class="third-level"><a href="#schemas">Schemas</a></li>
                 <li class="third-level"><a href="#partition-specs">Partition Specs</a></li>
+                <li class="third-level"><a href="#sort-orders">Sort Orders</a></li>
                 <li class="third-level"><a href="#table-metadata-and-snapshots">Table Metadata and Snapshots</a></li>
             <li class="second-level"><a href="#appendix-d-single-value-serialization">Appendix D: Single-value serialization</a></li>
                 
@@ -744,6 +761,18 @@
 <li>The remainder, <code>v % W</code>, must be positive. For languages where <code>%</code> can produce negative values, the correct truncate function is: <code>v - (((v % W) + W) % W)</code></li>
 <li>The width, <code>W</code>, used to truncate decimal values is applied using the scale of the decimal column to avoid additional (and potentially conflicting) parameters.</li>
 </ol>
+<h3 id="sorting">Sorting<a class="headerlink" href="#sorting" title="Permanent link">&para;</a></h3>
+<p>Users can sort their data within partitions by columns to gain performance. The information on how the data is sorted can be declared per data or delete file, by a <strong>sort order</strong>.</p>
+<p>A sort order is defined by an sort order id and a list of sort fields. The order of the sort fields within the list defines the order in which the sort is applied to the data. Each sort field consists of:</p>
+<ul>
+<li>A <strong>source column id</strong> from the table&rsquo;s schema</li>
+<li>A <strong>transform</strong> that is used to produce values to be sorted on from the source column. This is the same transform as described in <a href="#partition-transforms">partition transforms</a>.</li>
+<li>A <strong>sort direction</strong>, that can only be either <code>asc</code> or <code>desc</code></li>
+<li>A <strong>null order</strong> that describes the order of null values when sorted. Can only be either <code>nulls-first</code> or <code>nulls-last</code></li>
+</ul>
+<p>Order id <code>0</code> is reserved for the unsorted order. </p>
+<p>Sorting floating-point numbers should produce the following behavior: <code>-NaN</code> &lt; <code>-Infinity</code> &lt; <code>-value</code> &lt; <code>-0</code> &lt; <code>0</code> &lt; <code>value</code> &lt; <code>Infinity</code> &lt; <code>NaN</code>. This aligns with the implementation of Java floating-point types comparisons. </p>
+<p>A data or delete file is associated with a sort order by the sort order&rsquo;s id within <a href="#manifests">a manifest</a>. Therefore, the table must declare all the sort orders for lookup. A table could also be configured with a default sort order id, indicating how the new data should be sorted by default. Writers should use this default sort order to sort the data on write, but are not required to if the default order is prohibitively expensive, as it would be for streaming writes.</p>
 <h3 id="manifests">Manifests<a class="headerlink" href="#manifests" title="Permanent link">&para;</a></h3>
 <p>A manifest is an immutable Avro file that lists data files or delete files, along with each file’s partition data tuple, metrics, and tracking information. One or more manifest files are used to store a <a href="#snapshots">snapshot</a>, which tracks all of the files in a table at some point in time. Manifests are tracked by a <a href="#manifest-lists">manifest list</a> for each table snapshot.</p>
 <p>A manifest is a valid Iceberg data file: files must use valid Iceberg formats, schemas, and column projection.</p>
@@ -921,7 +950,7 @@
 <td><em>optional</em></td>
 <td><strong><code>109  value_counts</code></strong></td>
 <td><code>map&lt;119: int, 120: long&gt;</code></td>
-<td>Map from column id to number of values in the column (including null values)</td>
+<td>Map from column id to number of values in the column (including null and NaN values)</td>
 </tr>
 <tr>
 <td><em>optional</em></td>
@@ -929,6 +958,13 @@
 <td><strong><code>110  null_value_counts</code></strong></td>
 <td><code>map&lt;121: int, 122: long&gt;</code></td>
 <td>Map from column id to number of null values in the column</td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
+<td><strong><code>137  nan_value_counts</code></strong></td>
+<td><code>map&lt;138: int, 139: long&gt;</code></td>
+<td>Map from column id to number of NaN values in the column</td>
 </tr>
 <tr>
 <td><em>optional</em></td>
@@ -942,14 +978,14 @@
 <td><em>optional</em></td>
 <td><strong><code>125  lower_bounds</code></strong></td>
 <td><code>map&lt;126: int, 127: binary&gt;</code></td>
-<td>Map from column id to lower bound in the column serialized as binary [1]. Each value must be less than or equal to all values in the column for the file</td>
+<td>Map from column id to lower bound in the column serialized as binary [1]. Each value must be less than or equal to all non-null, non-NaN values in the column for the file [2]</td>
 </tr>
 <tr>
 <td><em>optional</em></td>
 <td><em>optional</em></td>
 <td><strong><code>128  upper_bounds</code></strong></td>
 <td><code>map&lt;129: int, 130: binary&gt;</code></td>
-<td>Map from column id to upper bound in the column serialized as binary [1]. Each value must be greater than or equal to all values in the column for the file</td>
+<td>Map from column id to upper bound in the column serialized as binary [1]. Each value must be greater than or equal to all non-null, non-Nan values in the column for the file [2]</td>
 </tr>
 <tr>
 <td><em>optional</em></td>
@@ -972,11 +1008,20 @@
 <td><code>list&lt;136: int&gt;</code></td>
 <td>Field ids used to determine row equality in equality delete files. Required when <code>content=2</code> and should be null otherwise. Fields with ids listed in this column must be present in the delete file</td>
 </tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
+<td><strong><code>140  sort_order_id</code></strong></td>
+<td><code>int</code></td>
+<td>ID representing sort order for this file [3].</td>
+</tr>
 </tbody>
 </table>
 <p>Notes:</p>
 <ol>
 <li>Single-value serialization for lower and upper bounds is detailed in Appendix D.</li>
+<li>For <code>float</code> and <code>double</code>, the value <code>-0.0</code> must precede <code>+0.0</code>, as in the IEEE 754 <code>totalOrder</code> predicate.</li>
+<li>If sort order ID is missing or unknown, then the order is assumed to be unsorted. Only data files and equality delete files should be written with a non-null order id. <a href="#position-delete-files">Position deletes</a> are required to be sorted by file and position, not a table order, and should set sort order id to null. Readers must ignore sort order id for position delete files.</li>
 </ol>
 <p>The <code>partition</code> struct stores the tuple of partition values for each file. Its type is derived from the partition fields of the partition spec used to write the manifest file. In v2, the partition struct&rsquo;s field ids must match the ids from the partition spec.</p>
 <p>The column metrics maps are used when filtering to select both data and delete files. For delete files, the metrics must store bounds and counts for all deleted rows, or must be omitted. Storing metrics for deleted rows ensures that the values can be used during job planning to find delete files that must be merged during a scan.</p>
@@ -1208,20 +1253,21 @@
 <td><em>optional</em></td>
 <td><strong><code>510 lower_bound</code></strong></td>
 <td><code>bytes</code>   [1]</td>
-<td>Lower bound for the non-null values in the partition field, or null if all values are null</td>
+<td>Lower bound for the non-null, non-NaN values in the partition field, or null if all values are null or NaN [2]</td>
 </tr>
 <tr>
 <td><em>optional</em></td>
 <td><em>optional</em></td>
 <td><strong><code>511 upper_bound</code></strong></td>
 <td><code>bytes</code>   [1]</td>
-<td>Upper bound for the non-null values in the partition field, or null if all values are null</td>
+<td>Upper bound for the non-null, non-NaN values in the partition field, or null if all values are null or NaN [2]</td>
 </tr>
 </tbody>
 </table>
 <p>Notes:</p>
 <ol>
 <li>Lower and upper bounds are serialized to bytes using the single-object serialization in Appendix D. The type of used to encode the value is the type of the partition field data.</li>
+<li>If -0.0 is a value of the partition field, the <code>lower_bound</code> must not be +0.0, and if +0.0 is a value of the partition field, the <code>upper_bound</code> must not be -0.0.</li>
 </ol>
 <h4 id="scan-planning">Scan Planning<a class="headerlink" href="#scan-planning" title="Permanent link">&para;</a></h4>
 <p>Scans are planned by reading the manifest files for the current snapshot. Deleted entries in data and delete manifests are not used in a scan.</p>
@@ -1352,6 +1398,18 @@
 <td><em>optional</em></td>
 <td><strong><code>snapshot-log</code></strong></td>
 <td>A list (optional) of timestamp and snapshot ID pairs that encodes changes to the current snapshot for the table. Each time the current-snapshot-id is changed, a new entry should be added with the last-updated-ms and the new current-snapshot-id. When snapshots are expired from the list of valid snapshots, all entries before a snapshot that has expired should be removed.</td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>required</em></td>
+<td><strong><code>sort-orders</code></strong></td>
+<td>A list of sort orders, stored as full sort order objects.</td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>required</em></td>
+<td><strong><code>default-sort-order-id</code></strong></td>
+<td>Default sort order id of the table. Note that this could be used by writers, but is not used when reading because reads use the specs stored in manifest files.</td>
 </tr>
 </tbody>
 </table>
@@ -2175,6 +2233,68 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 </tbody>
 </table>
 <p>In some cases partition specs are stored using only the field list instead of the object format that includes the spec ID, like the deprecated <code>partition-spec</code> field in table metadata. The object format should be used unless otherwise noted in this spec.</p>
+<h3 id="sort-orders">Sort Orders<a class="headerlink" href="#sort-orders" title="Permanent link">&para;</a></h3>
+<p>Sort orders are serialized as a list of JSON object, each of which contains the following fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>JSON representation</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>order-id</code></strong></td>
+<td><code>JSON int</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><strong><code>fields</code></strong></td>
+<td><code>JSON list: [</code><br />&nbsp;&nbsp;<code>&lt;sort field JSON&gt;,</code><br />&nbsp;&nbsp;<code>...</code><br /><code>]</code></td>
+<td><code>[ {</code><br />&nbsp;&nbsp;<code>"transform": "identity",</code><br />&nbsp;&nbsp;<code>"source-id": 2,</code><br />&nbsp;&nbsp;<code>"direction": "asc",</code><br />&nbsp;&nbsp;<code>"null-order": "nulls-first"</code><br />&nbsp;&nbsp;<code>}, {</code><br />&nbsp;&nbsp;<code>"transform": "bucket[4]",</code><br />&nbsp;&nbsp;<code>"source-id": 3,</code><br />&nbsp;&nbsp;<code>"direction": "desc",</code><br />&nbsp;&nbsp;<code>"null-order": "nulls-last"</code><br /><code>} ]</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each sort field in the fields list is stored as an object with the following properties:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>JSON representation</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>Sort Field</code></strong></td>
+<td><code>JSON object: {</code><br />&nbsp;&nbsp;<code>"transform": &lt;transform JSON&gt;,</code><br />&nbsp;&nbsp;<code>"source-id": &lt;source id int&gt;,</code><br />&nbsp;&nbsp;<code>"direction": &lt;direction string&gt;,</code><br />&nbsp;&nbsp;<code>"null-order": &lt;null-order string&gt;</code><br /><code>}</code></td>
+<td><code>{</code><br />&nbsp;&nbsp;<code>"transform": "bucket[4]",</code><br />&nbsp;&nbsp;<code>"source-id": 3,</code><br />&nbsp;&nbsp;<code>"direction": "desc",</code><br />&nbsp;&nbsp;<code>"null-order": "nulls-last"</code><br /><code>}</code></td>
+</tr>
+</tbody>
+</table>
+<p>The following table describes the possible values for the some of the field within sort field: </p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>JSON representation</th>
+<th>Possible values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>direction</code></strong></td>
+<td><code>JSON string</code></td>
+<td><code>"asc", "desc"</code></td>
+</tr>
+<tr>
+<td><strong><code>null-order</code></strong></td>
+<td><code>JSON string</code></td>
+<td><code>"nulls-first", "nulls-last"</code></td>
+</tr>
+</tbody>
+</table>
 <h3 id="table-metadata-and-snapshots">Table Metadata and Snapshots<a class="headerlink" href="#table-metadata-and-snapshots" title="Permanent link">&para;</a></h3>
 <p>Table metadata is serialized as a JSON object according to the following table. Snapshots are not serialized separately. Instead, they are stored in the table metadata JSON.</p>
 <table>
@@ -2250,6 +2370,16 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <td><strong><code>snapshot-log</code></strong></td>
 <td><code>JSON list of objects: [</code><br />&nbsp;&nbsp;<code>{</code><br />&nbsp;&nbsp;<code>"snapshot-id": ,</code><br />&nbsp;&nbsp;<code>"timestamp-ms":</code><br />&nbsp;&nbsp;<code>},</code><br />&nbsp;&nbsp;<code>...</code><br /><code>]</code></td>
 <td><code>[ {</code><br />&nbsp;&nbsp;<code>"snapshot-id": 30517296...,</code><br />&nbsp;&nbsp;<code>"timestamp-ms": 1515100...</code><br /><code>} ]</code></td>
+</tr>
+<tr>
+<td><strong><code>sort-orders</code></strong></td>
+<td><code>JSON sort orders (list of sort field object)</code></td>
+<td><code>See above</code></td>
+</tr>
+<tr>
+<td><strong><code>default-sort-order-id</code></strong></td>
+<td><code>JSON int</code></td>
+<td><code>0</code></td>
 </tr>
 </tbody>
 </table>
@@ -2355,6 +2485,8 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <li>Snapshot added required field field <code>sequence-number</code>.</li>
 <li>Snapshot now requires field <code>manifest-list</code>.</li>
 <li>Snapshot field <code>manifests</code> is no longer allowed.</li>
+<li>Table metadata now requires field <code>sort-orders</code>.</li>
+<li>Table metadata now requires field <code>default-sort-order-id</code>.</li>
 </ul>
 <p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p></div>
         
@@ -2365,7 +2497,7 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
         
         <hr>
         <p>
-        <small>Copyright 2018-2020 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
+        <small>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 

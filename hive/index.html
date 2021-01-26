@@ -71,15 +71,15 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li >
-                        <a href="..">About</a>
-                    </li>
-                
-                
-                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="..">About</a>
+</li>
+
                         
                             
 <li >
@@ -195,7 +195,7 @@
                 
                 
                     <li >
-                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
                     </li>
                 
                 
@@ -208,6 +208,21 @@
                 
                     <li class="active">
                         <a href="./">Hive</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../aws/">AWS</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
@@ -337,7 +352,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../api/">
+                        <a rel="next" href="../aws/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -387,9 +402,9 @@
 <pre><code class="sql">add jar /path/to/iceberg-hive-runtime.jar;
 </code></pre>
 
-<p>There are many others ways to achieve this including adding the jar file to Hive&rsquo;s auxillary classpath (so it is available by default) - please refer to Hive&rsquo;s documentation for more information.</p>
+<p>There are many others ways to achieve this including adding the jar file to Hive&rsquo;s auxiliary classpath (so it is available by default) - please refer to Hive&rsquo;s documentation for more information.</p>
 <h4 id="using-hadoop-tables">Using Hadoop Tables<a class="headerlink" href="#using-hadoop-tables" title="Permanent link">&para;</a></h4>
-<p>Iceberg tables created using <code>HadoopTables</code> are stored entirely in a directory in a filesytem like HDFS. </p>
+<p>Iceberg tables created using <code>HadoopTables</code> are stored entirely in a directory in a filesystem like HDFS.</p>
 <h5 id="create-an-iceberg-table">Create an Iceberg table<a class="headerlink" href="#create-an-iceberg-table" title="Permanent link">&para;</a></h5>
 <p>The first step is to create an Iceberg table using the Spark/Java/Python API and <code>HadoopTables</code>. For the purposes of this documentation we will assume that the table is called <code>table_a</code> and that the table location is <code>hdfs://some_path/table_a</code>.</p>
 <h5 id="create-a-hive-table">Create a Hive table<a class="headerlink" href="#create-a-hive-table" title="Permanent link">&para;</a></h5>
@@ -400,7 +415,7 @@ LOCATION 'hdfs://some_bucket/some_path/table_a';
 </code></pre>
 
 <h4 id="query-the-iceberg-table-via-hive">Query the Iceberg table via Hive<a class="headerlink" href="#query-the-iceberg-table-via-hive" title="Permanent link">&para;</a></h4>
-<p>You should now be able to issue Hive SQL <code>SELECT</code> queries using the above table and see the results returned from the underlying Iceberg table. Both the Map Reduce and Tez query execution engines are supported.</p>
+<p>You should now be able to issue Hive SQL <code>SELECT</code> queries using the above table and see the results returned from the underlying Iceberg table.</p>
 <pre><code class="sql">SELECT * from table_a;
 </code></pre>
 
@@ -409,7 +424,7 @@ LOCATION 'hdfs://some_bucket/some_path/table_a';
 <h5 id="create-an-iceberg-table_1">Create an Iceberg table<a class="headerlink" href="#create-an-iceberg-table_1" title="Permanent link">&para;</a></h5>
 <p>The first step is to create an Iceberg table using the Spark/Java/Python API and <code>HiveCatalog</code>. For the purposes of this documentation we will assume that the table is called <code>table_b</code> and that the table location is <code>s3://some_path/table_b</code>. In order for Iceberg to correctly set up the Hive table for querying some configuration values need to be set, the two options for this are described below - you can use either or the other depending on your use case.</p>
 <h5 id="hive-configuration">Hive Configuration<a class="headerlink" href="#hive-configuration" title="Permanent link">&para;</a></h5>
-<p>The value <code>iceberg.engine.hive.enabled</code> needs to be set to <code>true</code> and added to the Hive configuration file on the classpath of the application creating the table. This can be done by modifying the relevant <code>hive-site.xml</code>. Alternatively this can done programatically like so:</p>
+<p>The value <code>iceberg.engine.hive.enabled</code> needs to be set to <code>true</code> and added to the Hive configuration file on the classpath of the application creating or modifying (altering, inserting etc.) the table. This can be done by modifying the relevant <code>hive-site.xml</code>. Alternatively this can be done programmatically like so:</p>
 <pre><code class="java">Configuration hadoopConfiguration = spark.sparkContext().hadoopConfiguration();
 hadoopConfiguration.set(ConfigProperties.ENGINE_HIVE_ENABLED, &quot;true&quot;); //iceberg.engine.hive.enabled=true
 HiveCatalog catalog = new HiveCatalog(hadoopConfiguration);
@@ -429,13 +444,39 @@ catalog.createTable(tableId, schema, spec);
 <pre><code class="sql">SET iceberg.mr.catalog=hive;
 </code></pre>
 
-<p>You should now be able to issue Hive SQL <code>SELECT</code> queries using the above table and see the results returned from the underlying Iceberg table. Both the Map Reduce and Tez query execution engines are supported.</p>
+<p>You should now be able to issue Hive SQL <code>SELECT</code> queries using the above table and see the results returned from the underlying Iceberg table.</p>
 <pre><code class="sql">SELECT * from table_b;
+</code></pre>
+
+<h4 id="using-hadoop-catalog">Using Hadoop Catalog<a class="headerlink" href="#using-hadoop-catalog" title="Permanent link">&para;</a></h4>
+<p>Iceberg tables created using <code>HadoopCatalog</code> are stored entirely in a directory in a filesystem like HDFS.</p>
+<h5 id="create-an-iceberg-table_2">Create an Iceberg table<a class="headerlink" href="#create-an-iceberg-table_2" title="Permanent link">&para;</a></h5>
+<p>The first step is to create an Iceberg table using the Spark/Java/Python API and <code>HadoopCatalog</code>. For the purposes of this documentation we will assume that the fully qualified table identifier is <code>database_a.table_c</code> and that the Hadoop Catalog warehouse location is <code>hdfs://some_bucket/path_to_hadoop_warehouse</code>. Iceberg will therefore create the table at the location <code>hdfs://some_bucket/path_to_hadoop_warehouse/database_a/table_c</code>.</p>
+<h5 id="create-a-hive-table_1">Create a Hive table<a class="headerlink" href="#create-a-hive-table_1" title="Permanent link">&para;</a></h5>
+<p>Now overlay a Hive table on top of this Iceberg table by issuing Hive DDL like so:</p>
+<pre><code class="sql">CREATE EXTERNAL TABLE database_a.table_c 
+STORED BY 'org.apache.iceberg.mr.hive.HiveIcebergStorageHandler' 
+LOCATION 'hdfs://some_bucket/path_to_hadoop_warehouse/database_a/table_c'
+TBLPROPERTIES (
+  'iceberg.mr.catalog'='hadoop', 
+  'iceberg.mr.catalog.hadoop.warehouse.location'='hdfs://some_bucket/path_to_hadoop_warehouse')
+;
+</code></pre>
+
+<p>Note that the Hive database and table name <em>must</em> match the values used in the Iceberg <code>TableIdentifier</code> when the table was created. </p>
+<p>It is possible to omit either or both of the table properties but instead you will then need to set these when reading from the table. Generally it is recommended to set them at table creation time so you can query tables created by different catalogs. </p>
+<h4 id="query-the-iceberg-table-via-hive_2">Query the Iceberg table via Hive<a class="headerlink" href="#query-the-iceberg-table-via-hive_2" title="Permanent link">&para;</a></h4>
+<p>You should now be able to issue Hive SQL <code>SELECT</code> queries using the above table and see the results returned from the underlying Iceberg table.</p>
+<pre><code class="sql">SELECT * from database_a.table_c;
 </code></pre>
 
 <h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
 <h4 id="predicate-pushdown">Predicate pushdown<a class="headerlink" href="#predicate-pushdown" title="Permanent link">&para;</a></h4>
-<p>Pushdown of the Hive SQL <code>WHERE</code> clause has been implemented so that these filters are used at the Iceberg TableScan level as well as by the Parquet and ORC Readers.</p></div>
+<p>Pushdown of the Hive SQL <code>WHERE</code> clause has been implemented so that these filters are used at the Iceberg TableScan level as well as by the Parquet and ORC Readers.</p>
+<h4 id="column-projection">Column Projection<a class="headerlink" href="#column-projection" title="Permanent link">&para;</a></h4>
+<p>Columns from the Hive SQL <code>SELECT</code> clause are projected down to the Iceberg readers to reduce the number of columns read.</p>
+<h4 id="hive-query-engines">Hive Query Engines<a class="headerlink" href="#hive-query-engines" title="Permanent link">&para;</a></h4>
+<p>Both the Map Reduce and Tez query execution engines are supported.</p></div>
         
         
     </div>
@@ -444,7 +485,7 @@ catalog.createTable(tableId, schema, spec);
         
         <hr>
         <p>
-        <small>Copyright 2018-2020 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
+        <small>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 

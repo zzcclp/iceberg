@@ -71,15 +71,15 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li >
-                        <a href="..">About</a>
-                    </li>
-                
-                
-                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="..">About</a>
+</li>
+
                         
                             
 <li >
@@ -195,7 +195,7 @@
                 
                 
                     <li >
-                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
                     </li>
                 
                 
@@ -208,6 +208,21 @@
                 
                     <li >
                         <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../aws/">AWS</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
@@ -354,6 +369,7 @@
         <li class="first-level active"><a href="#spark-structured-streaming">Spark Structured Streaming</a></li>
             <li class="second-level"><a href="#streaming-writes">Streaming Writes</a></li>
                 
+                <li class="third-level"><a href="#writing-against-partitioned-table">Writing against partitioned table</a></li>
             <li class="second-level"><a href="#maintenance-for-streaming-tables">Maintenance for streaming tables</a></li>
                 
                 <li class="third-level"><a href="#tune-the-rate-of-commits">Tune the rate of commits</a></li>
@@ -428,6 +444,25 @@ data.writeStream
 </ul>
 <p>The table should be created in prior to start the streaming query. Refer <a href="/spark/#create-table">SQL create table</a>
 on Spark page to see how to create the Iceberg table.</p>
+<h3 id="writing-against-partitioned-table">Writing against partitioned table<a class="headerlink" href="#writing-against-partitioned-table" title="Permanent link">&para;</a></h3>
+<p>Iceberg requires the data to be sorted according to the partition spec per task (Spark partition) in prior to write
+against partitioned table. For batch queries you&rsquo;re encouraged to do explicit sort to fulfill the requirement
+(see <a href="/spark/#writing-against-partitioned-table">here</a>), but the approach would bring additional latency as
+repartition and sort are considered as heavy operations for streaming workload. To avoid additional latency, you can
+enable fanout writer to eliminate the requirement.</p>
+<pre><code class="scala">val tableIdentifier: String = ...
+data.writeStream
+    .format(&quot;iceberg&quot;)
+    .outputMode(&quot;append&quot;)
+    .trigger(Trigger.ProcessingTime(1, TimeUnit.MINUTES))
+    .option(&quot;path&quot;, tableIdentifier)
+    .option(&quot;fanout-enabled&quot;, &quot;true&quot;)
+    .option(&quot;checkpointLocation&quot;, checkpointPath)
+    .start()
+</code></pre>
+
+<p>Fanout writer opens the files per partition value and doesn&rsquo;t close these files till write task is finished.
+This functionality is discouraged for batch query, as explicit sort against output rows isn&rsquo;t expensive for batch workload.</p>
 <h2 id="maintenance-for-streaming-tables">Maintenance for streaming tables<a class="headerlink" href="#maintenance-for-streaming-tables" title="Permanent link">&para;</a></h2>
 <p>Streaming queries can create new table versions quickly, which creates lots of table metadata to track those versions.
 Maintaining metadata by tuning the rate of commits, expiring old snapshots, and automatically cleaning up metadata files
@@ -452,7 +487,7 @@ This could lead lots of small manifest files. Manifests can be <a href="../maint
         
         <hr>
         <p>
-        <small>Copyright 2018-2020 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
+        <small>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 

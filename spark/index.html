@@ -71,15 +71,15 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li >
-                        <a href="..">About</a>
-                    </li>
-                
-                
-                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="..">About</a>
+</li>
+
                         
                             
 <li >
@@ -195,7 +195,7 @@
                 
                 
                     <li >
-                        <a href="https://prestosql.io/docs/current/connector/iceberg.html">Presto</a>
+                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
                     </li>
                 
                 
@@ -208,6 +208,21 @@
                 
                     <li >
                         <a href="../hive/">Hive</a>
+                    </li>
+                
+                
+                
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        
+                            
+<li >
+    <a href="../aws/">AWS</a>
+</li>
+
+                        
+                        </ul>
                     </li>
                 
                 
@@ -369,12 +384,16 @@
                 <li class="third-level"><a href="#alter-table-rename-column">ALTER TABLE ... RENAME COLUMN</a></li>
                 <li class="third-level"><a href="#alter-table-alter-column">ALTER TABLE ... ALTER COLUMN</a></li>
                 <li class="third-level"><a href="#alter-table-drop-column">ALTER TABLE ... DROP COLUMN</a></li>
+                <li class="third-level"><a href="#alter-table-add-partition-field">ALTER TABLE ... ADD PARTITION FIELD</a></li>
+                <li class="third-level"><a href="#alter-table-drop-partition-field">ALTER TABLE ... DROP PARTITION FIELD</a></li>
+                <li class="third-level"><a href="#alter-table-write-ordered-by">ALTER TABLE ... WRITE ORDERED BY</a></li>
                 <li class="third-level"><a href="#drop-table">DROP TABLE</a></li>
             <li class="second-level"><a href="#querying-with-sql">Querying with SQL</a></li>
                 
             <li class="second-level"><a href="#querying-with-dataframes">Querying with DataFrames</a></li>
                 
                 <li class="third-level"><a href="#time-travel">Time travel</a></li>
+                <li class="third-level"><a href="#table-names-and-paths">Table names and paths</a></li>
                 <li class="third-level"><a href="#spark-24">Spark 2.4</a></li>
             <li class="second-level"><a href="#writing-with-sql">Writing with SQL</a></li>
                 
@@ -399,6 +418,18 @@
                 
                 <li class="third-level"><a href="#spark-type-to-iceberg-type">Spark type to Iceberg type</a></li>
                 <li class="third-level"><a href="#iceberg-type-to-spark-type">Iceberg type to Spark type</a></li>
+            <li class="second-level"><a href="#procedures">Procedures</a></li>
+                
+                <li class="third-level"><a href="#general-usage">General Usage</a></li>
+                <li class="third-level"><a href="#cherrypick-snapshot-procedure">Cherrypick Snapshot Procedure</a></li>
+                <li class="third-level"><a href="#expire-snapshots-procedure">Expire Snapshots Procedure</a></li>
+                <li class="third-level"><a href="#migrate-table-procedure">Migrate Table Procedure</a></li>
+                <li class="third-level"><a href="#remove-orphan-files-procedure">Remove Orphan Files Procedure</a></li>
+                <li class="third-level"><a href="#rewrite-manifests-procedure">Rewrite Manifests Procedure</a></li>
+                <li class="third-level"><a href="#rollback-to-snapshot-procedure">Rollback to Snapshot Procedure</a></li>
+                <li class="third-level"><a href="#rollback-to-timestamp-procedure">Rollback to Timestamp Procedure</a></li>
+                <li class="third-level"><a href="#set-current-snapshot-procedure">Set Current Snapshot Procedure</a></li>
+                <li class="third-level"><a href="#snapshot-table-procedure">Snapshot Table Procedure</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -454,7 +485,7 @@
 <td><a href="#alter-table">SQL alter table</a></td>
 <td>✔️</td>
 <td></td>
-<td></td>
+<td>⚠ requires extensions enabled to update partition field and sort order</td>
 </tr>
 <tr>
 <td><a href="#drop-table">SQL drop table</a></td>
@@ -479,6 +510,12 @@
 <td>✔️</td>
 <td></td>
 <td></td>
+</tr>
+<tr>
+<td><a href="#procedures">SQL procedures</a></td>
+<td>✔️</td>
+<td></td>
+<td>⚠ Requires extensions enabled</td>
 </tr>
 <tr>
 <td><a href="#querying-with-dataframes">DataFrame reads</a></td>
@@ -512,6 +549,7 @@
 </tr>
 </tbody>
 </table>
+<p>To enable Iceberg SQL extensions, set Spark configuration <code>spark.sql.extensions</code> as <code>org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions</code>. </p>
 <h2 id="configuring-catalogs">Configuring catalogs<a class="headerlink" href="#configuring-catalogs" title="Permanent link">&para;</a></h2>
 <p>Spark 3.0 adds an API to plug in table catalogs that are used to load, create, and manage Iceberg tables. Spark catalogs are configured by setting <a href="../configuration/#catalogs">Spark properties</a> under <code>spark.sql.catalog</code>.</p>
 <p>This creates an Iceberg catalog named <code>hive_prod</code> that loads tables from a Hive metastore:</p>
@@ -681,6 +719,41 @@ ALTER TABLE prod.db.sample ALTER COLUMN id COMMENT 'unique id'
 ALTER TABLE prod.db.sample DROP COLUMN point.z
 </code></pre>
 
+<h3 id="alter-table-add-partition-field"><code>ALTER TABLE ... ADD PARTITION FIELD</code><a class="headerlink" href="#alter-table-add-partition-field" title="Permanent link">&para;</a></h3>
+<pre><code class="sql">ALTER TABLE prod.db.sample ADD PARTITION FIELD catalog -- identity transform
+ALTER TABLE prod.db.sample ADD PARTITION FIELD bucket(16, id)
+ALTER TABLE prod.db.sample ADD PARTITION FIELD truncate(data, 4)
+ALTER TABLE prod.db.sample ADD PARTITION FIELD years(ts)
+-- use optional AS keyword to specify a custom name for the partition field 
+ALTER TABLE prod.db.sample ADD PARTITION FIELD bucket(16, id) AS shard
+</code></pre>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Changing partitioning will change the behavior of dynamic writes, which overwrite any partition that is written to. 
+For example, if you partition by days and move to partitioning by hours, overwrites will overwrite hourly partitions but not days anymore.</p>
+</div>
+<h3 id="alter-table-drop-partition-field"><code>ALTER TABLE ... DROP PARTITION FIELD</code><a class="headerlink" href="#alter-table-drop-partition-field" title="Permanent link">&para;</a></h3>
+<pre><code class="sql">ALTER TABLE prod.db.sample DROP PARTITION FIELD catalog
+ALTER TABLE prod.db.sample DROP PARTITION FIELD bucket(16, id)
+ALTER TABLE prod.db.sample DROP PARTITION FIELD truncate(data, 4)
+ALTER TABLE prod.db.sample DROP PARTITION FIELD years(ts)
+ALTER TABLE prod.db.sample DROP PARTITION FIELD shard
+</code></pre>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Changing partitioning will change the behavior of dynamic writes, which overwrite any partition that is written to. 
+For example, if you partition by days and move to partitioning by hours, overwrites will overwrite hourly partitions but not days anymore.</p>
+</div>
+<h3 id="alter-table-write-ordered-by"><code>ALTER TABLE ... WRITE ORDERED BY</code><a class="headerlink" href="#alter-table-write-ordered-by" title="Permanent link">&para;</a></h3>
+<pre><code class="sql">ALTER TABLE prod.db.sample WRITE ORDERED BY category, id
+-- use optional ASC/DEC keyword to specify sort order of each field (default ASC)
+ALTER TABLE prod.db.sample WRITE ORDERED BY category ASC, id DESC
+-- use optional NULLS FIRST/NULLS LAST keyword to specify null order of each field (default FIRST)
+ALTER TABLE prod.db.sample WRITE ORDERED BY category ASC NULLS LAST, id DESC NULLS FIRST
+</code></pre>
+
 <h3 id="drop-table"><code>DROP TABLE</code><a class="headerlink" href="#drop-table" title="Permanent link">&para;</a></h3>
 <p>To delete a table, run:</p>
 <pre><code class="sql">DROP TABLE prod.db.sample
@@ -733,6 +806,19 @@ ignored. Do not use <code>table</code> when attempting to time-travel or use oth
 in <a href="https://issues.apache.org/jira/browse/SPARK-32592">Spark 3.1 - SPARK-32592</a>.</p>
 </div>
 <p>Time travel is not yet supported by Spark&rsquo;s SQL syntax.</p>
+<h3 id="table-names-and-paths">Table names and paths<a class="headerlink" href="#table-names-and-paths" title="Permanent link">&para;</a></h3>
+<p>Paths and table names can be loaded from the Spark3 dataframe interface. How paths/tables are loaded depends on how
+the identifier is specified. When using <code>spark.read().format("iceberg").path(table)</code> or <code>spark.table(table)</code> the <code>table</code>
+variable can take a number of forms as listed below:</p>
+<ul>
+<li><code>file:/path/to/table</code> -&gt; loads a HadoopTable at given path</li>
+<li><code>tablename</code> -&gt; loads <code>currentCatalog.currentNamespace.tablename</code></li>
+<li><code>catalog.tablename</code> -&gt; load <code>tablename</code> from the specified catalog.</li>
+<li><code>namespace.tablename</code> -&gt; load <code>namespace.tablename</code> from current catalog</li>
+<li><code>catalog.namespace.tablename</code> -&gt; load <code>namespace.tablename</code> from the specified catalog.</li>
+<li><code>namespace1.namespace2.tablename</code> -&gt; load <code>namespace1.namespace2.tablename</code> from current catalog</li>
+</ul>
+<p>The above list is in order of priority. For example: a matching catalog will take priority over any namespace resolution.</p>
 <h3 id="spark-24">Spark 2.4<a class="headerlink" href="#spark-24" title="Permanent link">&para;</a></h3>
 <p>Spark 2.4 requires using the DataFrame reader with <code>iceberg</code> as a format, because 2.4 does not support catalogs:</p>
 <pre><code class="scala">// named metastore table
@@ -1263,7 +1349,588 @@ so you may want to understand the type conversion in Iceberg in prior to design 
 <td></td>
 </tr>
 </tbody>
-</table></div>
+</table>
+<h2 id="procedures">Procedures<a class="headerlink" href="#procedures" title="Permanent link">&para;</a></h2>
+<p>In Spark 3 Iceberg provides an SQL API for accomplishing <a href="../maintenance/">maintenance actions</a>. Support for
+stored procedures is tied to the DataSourceV2 catalog and requires that the Iceberg Extensions are enabled for the
+Spark Session.</p>
+<h3 id="general-usage">General Usage<a class="headerlink" href="#general-usage" title="Permanent link">&para;</a></h3>
+<p>To call an Iceberg stored procedure, execute a <code>CALL</code> command against the Iceberg catalog. All procedures are added to
+the <code>system</code> keyspace. Procedures can take positional or named arguments.</p>
+<h4 id="generic-call-with-positional-arguments">Generic Call with Positional Arguments<a class="headerlink" href="#generic-call-with-positional-arguments" title="Permanent link">&para;</a></h4>
+<pre><code class="sql">    CALL catalog_name.system.procedure_name(arg_1, arg_2, ... arg_n)
+</code></pre>
+
+<h4 id="generic-call-with-named-arguments">Generic Call with Named Arguments<a class="headerlink" href="#generic-call-with-named-arguments" title="Permanent link">&para;</a></h4>
+<pre><code class="sql">    CALL catalog_name.system.procedure_name(arg_name_2 =&gt; arg_2, arg_name_1 =&gt; arg_1)
+</code></pre>
+
+<h3 id="cherrypick-snapshot-procedure">Cherrypick Snapshot Procedure<a class="headerlink" href="#cherrypick-snapshot-procedure" title="Permanent link">&para;</a></h3>
+<p>A procedure that applies changes in a given snapshot and creates a new snapshot which will
+be set as the current snapshot in a table.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to perform the cherrypick on</td>
+</tr>
+<tr>
+<td>snapshot_id</td>
+<td>✔️</td>
+<td>Long</td>
+<td>The snapshot ID to cherrypick</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output">Output<a class="headerlink" href="#output" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>source_snapshot_id</td>
+<td>Long</td>
+<td>The snapshot before applying the cherrypick</td>
+</tr>
+<tr>
+<td>current_snapshot_id</td>
+<td>Long</td>
+<td>The current snapshot ID now that the cherrypick has been applied</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<p>Cherrypick Snapshot 1</p>
+<pre><code class="sql">    CALL catalog_name hive_prod.system.cherrypick_snapshot('my_table', 1)
+</code></pre>
+
+<p>Cherrypick Snapshot 1 with named args</p>
+<pre><code class="sql">    CALL catalog_name hive_prod.system.cherrypick_snapshot(snapshot_id =&gt; 1, table =&gt; 'my_table' )
+</code></pre>
+
+<h3 id="expire-snapshots-procedure">Expire Snapshots Procedure<a class="headerlink" href="#expire-snapshots-procedure" title="Permanent link">&para;</a></h3>
+<p>Each write/update/delete/upsert/compaction in Iceberg produces a new snapshot while keeping the old data and metadata
+around for snapshot isolation and time travel. The <code>expire_snapshots</code> procedure can be used to remove older snapshots
+and their files which are no longer needed.</p>
+<p>This procedure will remove old snapshots and data files which are uniquely required by those old snapshots. This means
+the <code>expire_snapshots</code> procedure will never remove files which are still required by a non-expired snapshot.</p>
+<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to expire snapshots from</td>
+</tr>
+<tr>
+<td>older_than</td>
+<td>️</td>
+<td>Timestamp</td>
+<td>Remove snapshots which were created before this timestamp (Defaults to 5 days ago)</td>
+</tr>
+<tr>
+<td>retain_last</td>
+<td></td>
+<td>Int</td>
+<td>Length of history to preserve regardless of older_than target (defaults to 1)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_1">Output<a class="headerlink" href="#output_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deleted_data_files_count</td>
+<td>Long</td>
+<td>Number of data files deleted by this operation</td>
+</tr>
+<tr>
+<td>deleted_manifest_files_count</td>
+<td>Long</td>
+<td>Number of manifest files deleted by this operation</td>
+</tr>
+<tr>
+<td>deleted_manifest_lists_count</td>
+<td>Long</td>
+<td>Number of manifest List files deleted by this operation</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<p>Remove snapshots older than 10 days ago, but retain the last 100 Snapshots.</p>
+<pre><code class="sql">    CALL hive_prod.system.expire_snapshots('db.sample', date_sub(current_date(), 10), 100)
+</code></pre>
+
+<p>Erase all snapshots older than the current timestamp but retain the last 5 snapshots made.</p>
+<pre><code class="sql">    CALL hive_prod.system.expire_snapshots(table =&gt; 'db.sample', retain_last =&gt; 5)
+</code></pre>
+
+<h3 id="migrate-table-procedure">Migrate Table Procedure<a class="headerlink" href="#migrate-table-procedure" title="Permanent link">&para;</a></h3>
+<p>Converts a table known to Spark in this catalog into an Iceberg table. This is mainly for taking
+Hive tables and fully converting them into Iceberg tables but can be used with most Spark Session V1
+tables as well. The migrated table will preserve all properties set on the original table. Once migrated, all 
+Iceberg operations are valid.</p>
+<p>If you would like to leave the original table intact and untouched and create new table which shares source
+data files and schema, use the <a href="#snapshot-table-procedure">snapshot procedure</a>.</p>
+<h4 id="usage_2">Usage<a class="headerlink" href="#usage_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Table to be migrated to Iceberg</td>
+</tr>
+<tr>
+<td>properties</td>
+<td>️</td>
+<td>Map<String, String></td>
+<td>Table properties to add to the table</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_2">Output<a class="headerlink" href="#output_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>migrated_files_count</td>
+<td>Long</td>
+<td>Number of files migrated to Iceberg</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<p>Migrate the table <code>db.sample</code> to an Iceberg table and add a property &lsquo;foo&rsquo; set to &lsquo;bar&rsquo;:</p>
+<pre><code class="sql">    CALL catalog_name hive_prod.system.migrate('db.sample', map('foo', 'bar'))
+</code></pre>
+
+<p>Migrate the table <code>db.sample</code> to an Iceberg table without adding any additional properties.</p>
+<pre><code class="sql">    CALL catalog_name hive_prod.system.migrate('db.sample')
+</code></pre>
+
+<h3 id="remove-orphan-files-procedure">Remove Orphan Files Procedure<a class="headerlink" href="#remove-orphan-files-procedure" title="Permanent link">&para;</a></h3>
+<p>Used for removing files which are no longer
+required by an Iceberg table as they are no longer referenced in any metadata files and can thus be considered &ldquo;orphaned&rdquo;.</p>
+<h4 id="usage_3">Usage<a class="headerlink" href="#usage_3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to remove files from</td>
+</tr>
+<tr>
+<td>older_than</td>
+<td>️</td>
+<td>Timestamp</td>
+<td>Remove orphan files created before this timestamp (Defaults to 3 days ago)</td>
+</tr>
+<tr>
+<td>location</td>
+<td></td>
+<td>String</td>
+<td>Directory to look for files in (defaults to the table&rsquo;s location)</td>
+</tr>
+<tr>
+<td>dry_run</td>
+<td></td>
+<td>Boolean</td>
+<td>When true, don&rsquo;t actually remove files (defaults to false)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_3">Output<a class="headerlink" href="#output_3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>orphan_file_location</td>
+<td>String</td>
+<td>The path to each file determined to be an orphan by this command</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
+<p>Remove any files in the <code>tablelocation/data</code> folder which are not known to the table <code>db.sample</code> and have a timestamp
+older than the current timestamp.</p>
+<pre><code class="sql">   CALL hive_prod.system.remove_orphan_files(table =&gt; 'db.sample', older_than =&gt; now(), location =&gt; 'tablelocation/data')
+</code></pre>
+
+<p>List all the files that are candidates for removal by performing a dry run of the <code>remove_orphan_files</code> command on this table without actually removing them.</p>
+<pre><code class="sql">   CALL hive_prod.system.remove_orphan_files(table =&gt; 'db.sample', dry_run =&gt; true)
+</code></pre>
+
+<h3 id="rewrite-manifests-procedure">Rewrite Manifests Procedure<a class="headerlink" href="#rewrite-manifests-procedure" title="Permanent link">&para;</a></h3>
+<p>A procedure that rewrites manifests in a table and co-locates metadata for partitions. This procedure 
+is an optimization which can be used if the number of Manifest files is causing a performance degradation on read. 
+Smaller manifest files will be combined into larger ones reducing cost of opening new file handles when performing 
+reads.</p>
+<p>See the <a href="./javadoc/master/org/apache/iceberg/actions/RewriteManifestsAction.html"><code>RewriteManifestsAction</code> Javadoc</a>
+to see more configuration options.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_4">Usage<a class="headerlink" href="#usage_4" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to rewrite manifests for</td>
+</tr>
+<tr>
+<td>use_caching</td>
+<td>️</td>
+<td>Boolean</td>
+<td>Use Spark caching during operation (defaults to true)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_4">Output<a class="headerlink" href="#output_4" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rewritten_manifests_count</td>
+<td>Int</td>
+<td>Number of manifests which were re-written by this command</td>
+</tr>
+<tr>
+<td>added_mainfests_count</td>
+<td>Int</td>
+<td>Number of new manifest files which were written by this command</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_4">Examples<a class="headerlink" href="#examples_4" title="Permanent link">&para;</a></h4>
+<p>Rewrite the manifests in table <code>db.sample</code> and align manifest files with table partitioning.</p>
+<pre><code class="sql">   CALL hive_prod.system.rewrite_manifests('db.sample')
+</code></pre>
+
+<p>Rewrite the manifests in table <code>db.sample</code> and disable the use of Spark caching. This could be done to
+avoid memory issues on executors.</p>
+<pre><code class="sql">   CALL hive_prod.system.rewrite_manifests('db.sample', false)
+</code></pre>
+
+<h3 id="rollback-to-snapshot-procedure">Rollback to Snapshot Procedure<a class="headerlink" href="#rollback-to-snapshot-procedure" title="Permanent link">&para;</a></h3>
+<p>A procedure that rolls a table back to a specific snapshot id. For rolling the table back based on time see
+<a href="#rollback-to-timestamp-procedure">rollback_to_timestamp</a>.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_5">Usage<a class="headerlink" href="#usage_5" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to rollback</td>
+</tr>
+<tr>
+<td>snapshot_id</td>
+<td>✔️</td>
+<td>Long</td>
+<td>The snapshot ID to rollback to</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_5">Output<a class="headerlink" href="#output_5" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>previous_snapshot_id</td>
+<td>Long</td>
+<td>The current snapshot ID before the rollback</td>
+</tr>
+<tr>
+<td>current_snapshot_id</td>
+<td>Long</td>
+<td>The new current snapshot ID</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
+<p>Rollback <code>db.sample</code> to snapshot <code>1</code></p>
+<pre><code class="sql">   CALL hive_prod.system.rollback_to_snapshot('db.sample', 1)
+</code></pre>
+
+<h3 id="rollback-to-timestamp-procedure">Rollback to Timestamp Procedure<a class="headerlink" href="#rollback-to-timestamp-procedure" title="Permanent link">&para;</a></h3>
+<p>A procedure that rolls a table back to a certain point in time.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_6">Usage<a class="headerlink" href="#usage_6" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to perform rollback on</td>
+</tr>
+<tr>
+<td>timestamp</td>
+<td>✔️</td>
+<td>Timestamp</td>
+<td>The time to rollback to</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_6">Output<a class="headerlink" href="#output_6" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>previous_snapshot_id</td>
+<td>Long</td>
+<td>The current snapshot before rollback</td>
+</tr>
+<tr>
+<td>current_snapshot_id</td>
+<td>Long</td>
+<td>The new current snapshot ID</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
+<p>Rollback <code>db.sample</code> to a day ago</p>
+<pre><code class="sql">    CALL hive_prod.system.rollback_to_timestamp('db.sample', date_sub(current_date(), 1))
+</code></pre>
+
+<h3 id="set-current-snapshot-procedure">Set Current Snapshot Procedure<a class="headerlink" href="#set-current-snapshot-procedure" title="Permanent link">&para;</a></h3>
+<p>Sets the current snapshot for a table to a different snapshot.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_7">Usage<a class="headerlink" href="#usage_7" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of table to change</td>
+</tr>
+<tr>
+<td>snapshot_id</td>
+<td>✔️</td>
+<td>Long</td>
+<td>The snapshot ID to use as current</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_7">Output<a class="headerlink" href="#output_7" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>previous_snapshot_id</td>
+<td>Long</td>
+<td>The snapshot ID before this change</td>
+</tr>
+<tr>
+<td>current_snapshot_id</td>
+<td>Long</td>
+<td>The new current snapshot ID</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h4>
+<p>Set the current snapshot for <code>db.sample</code> to 1</p>
+<pre><code class="sql">    CALL hive_prod.system.set_current_snapshot('db.sample', 1)
+</code></pre>
+
+<h3 id="snapshot-table-procedure">Snapshot Table Procedure<a class="headerlink" href="#snapshot-table-procedure" title="Permanent link">&para;</a></h3>
+<p>Creates an Iceberg version of a given table without adjusting the underlying table. The newly created table can
+be adjusted or written to without adjusting the underlying table. This procedure could be used to Snapshot a Hive
+production table and produce an Iceberg table referencing the same files. This new table can be used for testing before 
+a full migration to Iceberg, or just to see if certain queries would benefit from Iceberg&rsquo;s optimizations. When 
+INSERTS/DELETES and other statements are run on the snapshot, they will create new files in the Snapshot&rsquo;s location
+rather than the original table location.</p>
+<p><strong>Note</strong> Because tables created by <code>snapshot</code> are not the sole owners of their data files, they are prohibited from
+actions like <code>expire_snapshots</code> which would physically delete data files. Iceberg deletes, which only effect metadata,
+are still allowed. In addition, any operations which affect the original data files will disrupt the Snapshot&rsquo;s 
+integrity. DELETE statements executed against the original Hive table will remove original data files and the
+<code>snapshot</code> table will no longer be able to access them.</p>
+<p>See also <a href="#migrate-table-procedure">migrate table</a> which can be used without disrupting users of the original table.</p>
+<h4 id="usage_8">Usage<a class="headerlink" href="#usage_8" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>source_table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Source table for making the Iceberg table</td>
+</tr>
+<tr>
+<td>table</td>
+<td>✔️</td>
+<td>String</td>
+<td>Name of the new Iceberg table to create</td>
+</tr>
+<tr>
+<td>location</td>
+<td></td>
+<td>String</td>
+<td>Table location for the new table (defaults to the catalog&rsquo;s default location)</td>
+</tr>
+<tr>
+<td>properties</td>
+<td>️</td>
+<td>Map<String, String></td>
+<td>Properties to add to the newly created table</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_8">Output<a class="headerlink" href="#output_8" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>imported_files_count</td>
+<td>Long</td>
+<td>Number of files referenced by the new table</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_5">Examples<a class="headerlink" href="#examples_5" title="Permanent link">&para;</a></h4>
+<p>Make an isolated Iceberg table which references table <code>db.sample</code> named <code>db.snap</code> at the
+catalog&rsquo;s default location for <code>db.snap</code>.</p>
+<pre><code class="sql">    CALL hive_prod.system.snapshot('db.sample', 'db.snap')
+</code></pre>
+
+<p>Migrate an isolated Iceberg table which references table <code>db.sample</code> named <code>db.snap</code> at
+a manually specified location <code>/tmp/temptable/</code>.</p>
+<pre><code class="sql">    CALL hive_prod.system.snapshot('db.sample', 'db.snap', '/tmp/temptable/')
+</code></pre></div>
         
         
     </div>
@@ -1272,7 +1939,7 @@ so you may want to understand the type conversion in Iceberg in prior to design 
         
         <hr>
         <p>
-        <small>Copyright 2018-2020 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
+        <small>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.<br></small>
         
         <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p></small>
 
