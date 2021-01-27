@@ -395,16 +395,18 @@
                 
                 <li class="third-level"><a href="#named-arguments">Named arguments</a></li>
                 <li class="third-level"><a href="#positional-arguments">Positional arguments</a></li>
-            <li class="second-level"><a href="#maintenance-procedures">Maintenance Procedures</a></li>
+            <li class="second-level"><a href="#snapshot-management">Snapshot management</a></li>
                 
-                <li class="third-level"><a href="#expire_snapshots">expire_snapshots</a></li>
-                <li class="third-level"><a href="#remove_orphan_files">remove_orphan_files</a></li>
-                <li class="third-level"><a href="#rewrite_manifests">rewrite_manifests</a></li>
                 <li class="third-level"><a href="#rollback_to_snapshot">rollback_to_snapshot</a></li>
                 <li class="third-level"><a href="#rollback_to_timestamp">rollback_to_timestamp</a></li>
                 <li class="third-level"><a href="#set_current_snapshot">set_current_snapshot</a></li>
                 <li class="third-level"><a href="#cherrypick_snapshot">cherrypick_snapshot</a></li>
-            <li class="second-level"><a href="#table-migration-procedures">Table migration procedures</a></li>
+            <li class="second-level"><a href="#metadata-management">Metadata management</a></li>
+                
+                <li class="third-level"><a href="#expire_snapshots">expire_snapshots</a></li>
+                <li class="third-level"><a href="#remove_orphan_files">remove_orphan_files</a></li>
+                <li class="third-level"><a href="#rewrite_manifests">rewrite_manifests</a></li>
+            <li class="second-level"><a href="#table-migration">Table migration</a></li>
                 
                 <li class="third-level"><a href="#snapshot">snapshot</a></li>
                 <li class="third-level"><a href="#migrate">migrate</a></li>
@@ -444,7 +446,236 @@
 <pre><code class="sql">CALL catalog_name.system.procedure_name(arg_1, arg_2, ... arg_n)
 </code></pre>
 
-<h2 id="maintenance-procedures">Maintenance Procedures<a class="headerlink" href="#maintenance-procedures" title="Permanent link">&para;</a></h2>
+<h2 id="snapshot-management">Snapshot management<a class="headerlink" href="#snapshot-management" title="Permanent link">&para;</a></h2>
+<h3 id="rollback_to_snapshot"><code>rollback_to_snapshot</code><a class="headerlink" href="#rollback_to_snapshot" title="Permanent link">&para;</a></h3>
+<p>Roll back a table to a specific snapshot ID.</p>
+<p>To roll back to a specific time, use <a href="#rollback_to_timestamp"><code>rollback_to_timestamp</code></a>.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Name of the table to update</td>
+</tr>
+<tr>
+<td><code>snapshot_id</code></td>
+<td>✔️</td>
+<td>long</td>
+<td>Snapshot ID to rollback to</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output">Output<a class="headerlink" href="#output" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>previous_snapshot_id</code></td>
+<td>long</td>
+<td>The current snapshot ID before the rollback</td>
+</tr>
+<tr>
+<td><code>current_snapshot_id</code></td>
+<td>long</td>
+<td>The new current snapshot ID</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
+<p>Roll back table <code>db.sample</code> to snapshot ID <code>1</code>:</p>
+<pre><code class="sql">CALL catalog_name.system.rollback_to_snapshot('db.sample', 1)
+</code></pre>
+
+<h3 id="rollback_to_timestamp"><code>rollback_to_timestamp</code><a class="headerlink" href="#rollback_to_timestamp" title="Permanent link">&para;</a></h3>
+<p>Roll back a table to the snapshot that was current at some time.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_2">Usage<a class="headerlink" href="#usage_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Name of the table to update</td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>✔️</td>
+<td>timestamp</td>
+<td>A timestamp to rollback to</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_1">Output<a class="headerlink" href="#output_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>previous_snapshot_id</code></td>
+<td>long</td>
+<td>The current snapshot ID before the rollback</td>
+</tr>
+<tr>
+<td><code>current_snapshot_id</code></td>
+<td>long</td>
+<td>The new current snapshot ID</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
+<p>Roll back <code>db.sample</code> to a day ago</p>
+<pre><code class="sql">CALL catalog_name.system.rollback_to_timestamp('db.sample', date_sub(current_date(), 1))
+</code></pre>
+
+<h3 id="set_current_snapshot"><code>set_current_snapshot</code><a class="headerlink" href="#set_current_snapshot" title="Permanent link">&para;</a></h3>
+<p>Sets the current snapshot ID for a table.</p>
+<p>Unlike rollback, the snapshot is not required to be an ancestor of the current table state.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_3">Usage<a class="headerlink" href="#usage_3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Name of the table to update</td>
+</tr>
+<tr>
+<td><code>snapshot_id</code></td>
+<td>✔️</td>
+<td>long</td>
+<td>Snapshot ID to set as current</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_2">Output<a class="headerlink" href="#output_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>previous_snapshot_id</code></td>
+<td>long</td>
+<td>The current snapshot ID before the rollback</td>
+</tr>
+<tr>
+<td><code>current_snapshot_id</code></td>
+<td>long</td>
+<td>The new current snapshot ID</td>
+</tr>
+</tbody>
+</table>
+<h4 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h4>
+<p>Set the current snapshot for <code>db.sample</code> to 1:</p>
+<pre><code class="sql">CALL catalog_name.system.set_current_snapshot('db.sample', 1)
+</code></pre>
+
+<h3 id="cherrypick_snapshot"><code>cherrypick_snapshot</code><a class="headerlink" href="#cherrypick_snapshot" title="Permanent link">&para;</a></h3>
+<p>Cherry-picks changes from a snapshot into the current table state.</p>
+<p>Cherry-picking creates a new snapshot from an existing snapshot without altering or removing the original.</p>
+<p>Only append and dynamic overwrite snapshots can be cherry-picked.</p>
+<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
+<h4 id="usage_4">Usage<a class="headerlink" href="#usage_4" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Name of the table to update</td>
+</tr>
+<tr>
+<td><code>snapshot_id</code></td>
+<td>✔️</td>
+<td>long</td>
+<td>The snapshot ID to cherry-pick</td>
+</tr>
+</tbody>
+</table>
+<h4 id="output_3">Output<a class="headerlink" href="#output_3" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_snapshot_id</code></td>
+<td>long</td>
+<td>The table&rsquo;s current snapshot before the cherry-pick</td>
+</tr>
+<tr>
+<td><code>current_snapshot_id</code></td>
+<td>long</td>
+<td>The snapshot ID created by applying the cherry-pick</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<p>Cherry-pick snapshot 1</p>
+<pre><code class="sql">CALL catalog_name.system.cherrypick_snapshot('my_table', 1)
+</code></pre>
+
+<p>Cherry-pick snapshot 1 with named args</p>
+<pre><code class="sql">CALL catalog_name.system.cherrypick_snapshot(snapshot_id =&gt; 1, table =&gt; 'my_table' )
+</code></pre>
+
+<h2 id="metadata-management">Metadata management<a class="headerlink" href="#metadata-management" title="Permanent link">&para;</a></h2>
 <p>Many <a href="../maintenance/">maintenance actions</a> can be performed using Iceberg stored procedures.</p>
 <h3 id="expire_snapshots"><code>expire_snapshots</code><a class="headerlink" href="#expire_snapshots" title="Permanent link">&para;</a></h3>
 <p>Each write/update/delete/upsert/compaction in Iceberg produces a new snapshot while keeping the old data and metadata
@@ -452,7 +683,7 @@ around for snapshot isolation and time travel. The <code>expire_snapshots</code>
 and their files which are no longer needed.</p>
 <p>This procedure will remove old snapshots and data files which are uniquely required by those old snapshots. This means
 the <code>expire_snapshots</code> procedure will never remove files which are still required by a non-expired snapshot.</p>
-<h4 id="usage_1">Usage<a class="headerlink" href="#usage_1" title="Permanent link">&para;</a></h4>
+<h4 id="usage_5">Usage<a class="headerlink" href="#usage_5" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -483,7 +714,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 </tr>
 </tbody>
 </table>
-<h4 id="output">Output<a class="headerlink" href="#output" title="Permanent link">&para;</a></h4>
+<h4 id="output_4">Output<a class="headerlink" href="#output_4" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -510,7 +741,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 </tr>
 </tbody>
 </table>
-<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
+<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <p>Remove snapshots older than 10 days ago, but retain the last 100 snapshots:</p>
 <pre><code class="sql">CALL hive_prod.system.expire_snapshots('db.sample', date_sub(current_date(), 10), 100)
 </code></pre>
@@ -521,7 +752,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 
 <h3 id="remove_orphan_files"><code>remove_orphan_files</code><a class="headerlink" href="#remove_orphan_files" title="Permanent link">&para;</a></h3>
 <p>Used to remove files which are not referenced in any metadata files of an Iceberg table and can thus be considered &ldquo;orphaned&rdquo;.</p>
-<h4 id="usage_2">Usage<a class="headerlink" href="#usage_2" title="Permanent link">&para;</a></h4>
+<h4 id="usage_6">Usage<a class="headerlink" href="#usage_6" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -558,7 +789,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 </tr>
 </tbody>
 </table>
-<h4 id="output_1">Output<a class="headerlink" href="#output_1" title="Permanent link">&para;</a></h4>
+<h4 id="output_5">Output<a class="headerlink" href="#output_5" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -575,7 +806,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 </tr>
 </tbody>
 </table>
-<h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
+<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
 <p>List all the files that are candidates for removal by performing a dry run of the <code>remove_orphan_files</code> command on this table without actually removing them:</p>
 <pre><code class="sql">CALL catalog_name.system.remove_orphan_files(table =&gt; 'db.sample', dry_run =&gt; true)
 </code></pre>
@@ -590,7 +821,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 <p>See the <a href="./javadoc/master/org/apache/iceberg/actions/RewriteManifestsAction.html"><code>RewriteManifestsAction</code> Javadoc</a>
 to see more configuration options.</p>
 <p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
-<h4 id="usage_3">Usage<a class="headerlink" href="#usage_3" title="Permanent link">&para;</a></h4>
+<h4 id="usage_7">Usage<a class="headerlink" href="#usage_7" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -615,7 +846,7 @@ to see more configuration options.</p>
 </tr>
 </tbody>
 </table>
-<h4 id="output_2">Output<a class="headerlink" href="#output_2" title="Permanent link">&para;</a></h4>
+<h4 id="output_6">Output<a class="headerlink" href="#output_6" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -637,7 +868,7 @@ to see more configuration options.</p>
 </tr>
 </tbody>
 </table>
-<h4 id="examples_2">Examples<a class="headerlink" href="#examples_2" title="Permanent link">&para;</a></h4>
+<h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
 <p>Rewrite the manifests in table <code>db.sample</code> and align manifest files with table partitioning.</p>
 <pre><code class="sql">CALL catalog_name.system.rewrite_manifests('db.sample')
 </code></pre>
@@ -646,235 +877,7 @@ to see more configuration options.</p>
 <pre><code class="sql">CALL catalog_name.system.rewrite_manifests('db.sample', false)
 </code></pre>
 
-<h3 id="rollback_to_snapshot"><code>rollback_to_snapshot</code><a class="headerlink" href="#rollback_to_snapshot" title="Permanent link">&para;</a></h3>
-<p>Roll back a table to a specific snapshot ID.</p>
-<p>To roll back to a specific time, use <a href="#rollback_to_timestamp"><code>rollback_to_timestamp</code></a>.</p>
-<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
-<h4 id="usage_4">Usage<a class="headerlink" href="#usage_4" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Argument Name</th>
-<th>Required?</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>table</code></td>
-<td>✔️</td>
-<td>string</td>
-<td>Name of the table to update</td>
-</tr>
-<tr>
-<td><code>snapshot_id</code></td>
-<td>✔️</td>
-<td>long</td>
-<td>Snapshot ID to rollback to</td>
-</tr>
-</tbody>
-</table>
-<h4 id="output_3">Output<a class="headerlink" href="#output_3" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Output Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>previous_snapshot_id</code></td>
-<td>long</td>
-<td>The current snapshot ID before the rollback</td>
-</tr>
-<tr>
-<td><code>current_snapshot_id</code></td>
-<td>long</td>
-<td>The new current snapshot ID</td>
-</tr>
-</tbody>
-</table>
-<h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
-<p>Roll back table <code>db.sample</code> to snapshot ID <code>1</code>:</p>
-<pre><code class="sql">CALL catalog_name.system.rollback_to_snapshot('db.sample', 1)
-</code></pre>
-
-<h3 id="rollback_to_timestamp"><code>rollback_to_timestamp</code><a class="headerlink" href="#rollback_to_timestamp" title="Permanent link">&para;</a></h3>
-<p>Roll back a table to the snapshot that was current at some time.</p>
-<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
-<h4 id="usage_5">Usage<a class="headerlink" href="#usage_5" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Argument Name</th>
-<th>Required?</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>table</code></td>
-<td>✔️</td>
-<td>string</td>
-<td>Name of the table to update</td>
-</tr>
-<tr>
-<td><code>timestamp</code></td>
-<td>✔️</td>
-<td>timestamp</td>
-<td>A timestamp to rollback to</td>
-</tr>
-</tbody>
-</table>
-<h4 id="output_4">Output<a class="headerlink" href="#output_4" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Output Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>previous_snapshot_id</code></td>
-<td>long</td>
-<td>The current snapshot ID before the rollback</td>
-</tr>
-<tr>
-<td><code>current_snapshot_id</code></td>
-<td>long</td>
-<td>The new current snapshot ID</td>
-</tr>
-</tbody>
-</table>
-<h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
-<p>Roll back <code>db.sample</code> to a day ago</p>
-<pre><code class="sql">CALL catalog_name.system.rollback_to_timestamp('db.sample', date_sub(current_date(), 1))
-</code></pre>
-
-<h3 id="set_current_snapshot"><code>set_current_snapshot</code><a class="headerlink" href="#set_current_snapshot" title="Permanent link">&para;</a></h3>
-<p>Sets the current snapshot ID for a table.</p>
-<p>Unlike rollback, the snapshot is not required to be an ancestor of the current table state.</p>
-<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
-<h4 id="usage_6">Usage<a class="headerlink" href="#usage_6" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Argument Name</th>
-<th>Required?</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>table</code></td>
-<td>✔️</td>
-<td>string</td>
-<td>Name of the table to update</td>
-</tr>
-<tr>
-<td><code>snapshot_id</code></td>
-<td>✔️</td>
-<td>long</td>
-<td>Snapshot ID to set as current</td>
-</tr>
-</tbody>
-</table>
-<h4 id="output_5">Output<a class="headerlink" href="#output_5" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Output Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>previous_snapshot_id</code></td>
-<td>long</td>
-<td>The current snapshot ID before the rollback</td>
-</tr>
-<tr>
-<td><code>current_snapshot_id</code></td>
-<td>long</td>
-<td>The new current snapshot ID</td>
-</tr>
-</tbody>
-</table>
-<h4 id="example_2">Example<a class="headerlink" href="#example_2" title="Permanent link">&para;</a></h4>
-<p>Set the current snapshot for <code>db.sample</code> to 1:</p>
-<pre><code class="sql">CALL catalog_name.system.set_current_snapshot('db.sample', 1)
-</code></pre>
-
-<h3 id="cherrypick_snapshot"><code>cherrypick_snapshot</code><a class="headerlink" href="#cherrypick_snapshot" title="Permanent link">&para;</a></h3>
-<p>Cherry-picks changes from a snapshot into the current table state.</p>
-<p>Cherry-picking creates a new snapshot from an existing snapshot without altering or removing the original.</p>
-<p>Only append and dynamic overwrite snapshots can be cherry-picked.</p>
-<p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
-<h4 id="usage_7">Usage<a class="headerlink" href="#usage_7" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Argument Name</th>
-<th>Required?</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>table</code></td>
-<td>✔️</td>
-<td>string</td>
-<td>Name of the table to update</td>
-</tr>
-<tr>
-<td><code>snapshot_id</code></td>
-<td>✔️</td>
-<td>long</td>
-<td>The snapshot ID to cherry-pick</td>
-</tr>
-</tbody>
-</table>
-<h4 id="output_6">Output<a class="headerlink" href="#output_6" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Output Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>source_snapshot_id</code></td>
-<td>long</td>
-<td>The table&rsquo;s current snapshot before the cherry-pick</td>
-</tr>
-<tr>
-<td><code>current_snapshot_id</code></td>
-<td>long</td>
-<td>The snapshot ID created by applying the cherry-pick</td>
-</tr>
-</tbody>
-</table>
-<h4 id="examples_3">Examples<a class="headerlink" href="#examples_3" title="Permanent link">&para;</a></h4>
-<p>Cherry-pick snapshot 1</p>
-<pre><code class="sql">CALL catalog_name.system.cherrypick_snapshot('my_table', 1)
-</code></pre>
-
-<p>Cherry-pick snapshot 1 with named args</p>
-<pre><code class="sql">CALL catalog_name.system.cherrypick_snapshot(snapshot_id =&gt; 1, table =&gt; 'my_table' )
-</code></pre>
-
-<h2 id="table-migration-procedures">Table migration procedures<a class="headerlink" href="#table-migration-procedures" title="Permanent link">&para;</a></h2>
+<h2 id="table-migration">Table migration<a class="headerlink" href="#table-migration" title="Permanent link">&para;</a></h2>
 <p>The <code>snapshot</code> and <code>migrate</code> procedures help test and migrate existing Hive or Spark tables to Iceberg.</p>
 <h3 id="snapshot"><code>snapshot</code><a class="headerlink" href="#snapshot" title="Permanent link">&para;</a></h3>
 <p>Create a light-weight temporary copy of a table for testing, without changing the source table.</p>
