@@ -173,13 +173,37 @@
                         
                             
 <li >
-    <a href="../spark/">Spark SQL</a>
+    <a href="../spark-configuration/">Configuration</a>
 </li>
 
                         
                             
 <li >
-    <a href="../spark-structured-streaming/">Spark Streaming</a>
+    <a href="../spark-ddl/">DDL</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-queries/">Queries</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-writes/">Writes</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-procedures/">Maintenance Procedures</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../spark-structured-streaming/">Structured Streaming</a>
 </li>
 
                         
@@ -367,22 +391,17 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#configuration">Configuration</a></li>
-            <li class="second-level"><a href="#catalog-properties">Catalog properties</a></li>
-                
-                <li class="third-level"><a href="#lock-catalog-properties">Lock catalog properties</a></li>
             <li class="second-level"><a href="#table-properties">Table properties</a></li>
                 
                 <li class="third-level"><a href="#read-properties">Read properties</a></li>
                 <li class="third-level"><a href="#write-properties">Write properties</a></li>
                 <li class="third-level"><a href="#table-behavior-properties">Table behavior properties</a></li>
                 <li class="third-level"><a href="#compatibility-flags">Compatibility flags</a></li>
+            <li class="second-level"><a href="#catalog-properties">Catalog properties</a></li>
+                
+                <li class="third-level"><a href="#lock-catalog-properties">Lock catalog properties</a></li>
             <li class="second-level"><a href="#hadoop-configuration">Hadoop configuration</a></li>
                 
-            <li class="second-level"><a href="#spark-configuration">Spark configuration</a></li>
-                
-                <li class="third-level"><a href="#catalogs">Catalogs</a></li>
-                <li class="third-level"><a href="#read-options">Read options</a></li>
-                <li class="third-level"><a href="#write-options">Write options</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -405,92 +424,6 @@
  -->
 
 <h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
-<h2 id="catalog-properties">Catalog properties<a class="headerlink" href="#catalog-properties" title="Permanent link">&para;</a></h2>
-<p>Iceberg catalogs support using catalog properties to configure catalog behaviors. Here is a list of commonly used catalog properties:</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>catalog-impl</td>
-<td>null</td>
-<td>a custom <code>Catalog</code> implementation to use by an engine</td>
-</tr>
-<tr>
-<td>io-impl</td>
-<td>null</td>
-<td>a custom <code>FileIO</code> implementation to use in a catalog</td>
-</tr>
-<tr>
-<td>warehouse</td>
-<td>null</td>
-<td>the root path of the data warehouse</td>
-</tr>
-<tr>
-<td>uri</td>
-<td>null</td>
-<td>a URI string, such as Hive metastore URI</td>
-</tr>
-<tr>
-<td>clients</td>
-<td>2</td>
-<td>client pool size</td>
-</tr>
-</tbody>
-</table>
-<p><code>HadoopCatalog</code> and <code>HiveCatalog</code> can access the properties in their constructors.
-Any other custom catalog can access the properties by implementing <code>Catalog.initialize(catalogName, catalogProperties)</code>.
-The properties can be manually constructed or passed in from a compute engine like Spark or Flink.
-Spark uses its session properties as catalog properties, see more details in the <a href="#spark-configuration">Spark configuration</a> section.
-Flink passes in catalog properties through <code>CREATE CATALOG</code> statement, see more details in the <a href="../flink/#creating-catalogs-and-using-catalogs">Flink</a> section.</p>
-<h3 id="lock-catalog-properties">Lock catalog properties<a class="headerlink" href="#lock-catalog-properties" title="Permanent link">&para;</a></h3>
-<p>Here are the catalog properties related to locking. They are used by some catalog implementations to control the locking behavior during commits.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>lock-impl</td>
-<td>null</td>
-<td>a custom implementation of the lock manager, the actual interface depends on the catalog used</td>
-</tr>
-<tr>
-<td>lock.table</td>
-<td>null</td>
-<td>an auxiliary table for locking, such as in <a href="../aws/#dynamodb-for-commit-locking">AWS DynamoDB lock manager</a></td>
-</tr>
-<tr>
-<td>lock.acquire-interval-ms</td>
-<td>5 seconds</td>
-<td>the interval to wait between each attempt to acquire a lock</td>
-</tr>
-<tr>
-<td>lock.acquire-timeout-ms</td>
-<td>3 minutes</td>
-<td>the maximum time to try acquiring a lock</td>
-</tr>
-<tr>
-<td>lock.heartbeat-interval-ms</td>
-<td>3 seconds</td>
-<td>the interval to wait between each heartbeat after acquiring a lock</td>
-</tr>
-<tr>
-<td>lock.heartbeat-timeout-ms</td>
-<td>15 seconds</td>
-<td>the maximum time without a heartbeat to consider a lock expired</td>
-</tr>
-</tbody>
-</table>
 <h2 id="table-properties">Table properties<a class="headerlink" href="#table-properties" title="Permanent link">&para;</a></h2>
 <p>Iceberg tables support table properties to configure table behavior, like the default split size for readers.</p>
 <h3 id="read-properties">Read properties<a class="headerlink" href="#read-properties" title="Permanent link">&para;</a></h3>
@@ -701,6 +634,92 @@ Flink passes in catalog properties through <code>CREATE CATALOG</code> statement
 </tr>
 </tbody>
 </table>
+<h2 id="catalog-properties">Catalog properties<a class="headerlink" href="#catalog-properties" title="Permanent link">&para;</a></h2>
+<p>Iceberg catalogs support using catalog properties to configure catalog behaviors. Here is a list of commonly used catalog properties:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>catalog-impl</td>
+<td>null</td>
+<td>a custom <code>Catalog</code> implementation to use by an engine</td>
+</tr>
+<tr>
+<td>io-impl</td>
+<td>null</td>
+<td>a custom <code>FileIO</code> implementation to use in a catalog</td>
+</tr>
+<tr>
+<td>warehouse</td>
+<td>null</td>
+<td>the root path of the data warehouse</td>
+</tr>
+<tr>
+<td>uri</td>
+<td>null</td>
+<td>a URI string, such as Hive metastore URI</td>
+</tr>
+<tr>
+<td>clients</td>
+<td>2</td>
+<td>client pool size</td>
+</tr>
+</tbody>
+</table>
+<p><code>HadoopCatalog</code> and <code>HiveCatalog</code> can access the properties in their constructors.
+Any other custom catalog can access the properties by implementing <code>Catalog.initialize(catalogName, catalogProperties)</code>.
+The properties can be manually constructed or passed in from a compute engine like Spark or Flink.
+Spark uses its session properties as catalog properties, see more details in the <a href="../spark-configuration/#catalog-configuration">Spark configuration</a> section.
+Flink passes in catalog properties through <code>CREATE CATALOG</code> statement, see more details in the <a href="../flink/#creating-catalogs-and-using-catalogs">Flink</a> section.</p>
+<h3 id="lock-catalog-properties">Lock catalog properties<a class="headerlink" href="#lock-catalog-properties" title="Permanent link">&para;</a></h3>
+<p>Here are the catalog properties related to locking. They are used by some catalog implementations to control the locking behavior during commits.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lock-impl</td>
+<td>null</td>
+<td>a custom implementation of the lock manager, the actual interface depends on the catalog used</td>
+</tr>
+<tr>
+<td>lock.table</td>
+<td>null</td>
+<td>an auxiliary table for locking, such as in <a href="../aws/#dynamodb-for-commit-locking">AWS DynamoDB lock manager</a></td>
+</tr>
+<tr>
+<td>lock.acquire-interval-ms</td>
+<td>5 seconds</td>
+<td>the interval to wait between each attempt to acquire a lock</td>
+</tr>
+<tr>
+<td>lock.acquire-timeout-ms</td>
+<td>3 minutes</td>
+<td>the maximum time to try acquiring a lock</td>
+</tr>
+<tr>
+<td>lock.heartbeat-interval-ms</td>
+<td>3 seconds</td>
+<td>the interval to wait between each heartbeat after acquiring a lock</td>
+</tr>
+<tr>
+<td>lock.heartbeat-timeout-ms</td>
+<td>15 seconds</td>
+<td>the maximum time without a heartbeat to consider a lock expired</td>
+</tr>
+</tbody>
+</table>
 <h2 id="hadoop-configuration">Hadoop configuration<a class="headerlink" href="#hadoop-configuration" title="Permanent link">&para;</a></h2>
 <p>The following properties from the Hadoop configuration are used by the Hive Metastore connector.</p>
 <table>
@@ -736,157 +755,7 @@ Flink passes in catalog properties through <code>CREATE CATALOG</code> statement
 </table>
 <p>Note: <code>iceberg.hive.lock-check-max-wait-ms</code> should be less than the <a href="https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-hive.txn.timeout">transaction timeout</a> 
 of the Hive Metastore (<code>hive.txn.timeout</code> or <code>metastore.txn.timeout</code> in the newer versions). Otherwise, the heartbeats on the lock (which happens during the lock checks) would end up expiring in the 
-Hive Metastore before the lock is retried from Iceberg.</p>
-<h2 id="spark-configuration">Spark configuration<a class="headerlink" href="#spark-configuration" title="Permanent link">&para;</a></h2>
-<h3 id="catalogs">Catalogs<a class="headerlink" href="#catalogs" title="Permanent link">&para;</a></h3>
-<p><a href="../spark/#configuring-catalogs">Spark catalogs</a> are configured using Spark session properties.</p>
-<p>A catalog is created and named by adding a property <code>spark.sql.catalog.(catalog-name)</code> with an implementation class for its value.</p>
-<p>Iceberg supplies two implementations:</p>
-<ul>
-<li><code>org.apache.iceberg.spark.SparkCatalog</code> supports a Hive Metastore or a Hadoop warehouse as a catalog</li>
-<li><code>org.apache.iceberg.spark.SparkSessionCatalog</code> adds support for Iceberg tables to Spark&rsquo;s built-in catalog, and delegates to the built-in catalog for non-Iceberg tables</li>
-</ul>
-<p>Both catalogs are configured using properties nested under the catalog name:</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Values</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>spark.sql.catalog.<em>catalog-name</em>.type</td>
-<td><code>hive</code> or <code>hadoop</code></td>
-<td>The underlying Iceberg catalog implementation, <code>HiveCatalog</code> or <code>HadoopCatalog</code></td>
-</tr>
-<tr>
-<td>spark.sql.catalog.<em>catalog-name</em>.catalog-impl</td>
-<td></td>
-<td>The underlying Iceberg catalog implementation. When set, the value of <code>type</code> property is ignored</td>
-</tr>
-<tr>
-<td>spark.sql.catalog.<em>catalog-name</em>.default-namespace</td>
-<td>default</td>
-<td>The default current namespace for the catalog</td>
-</tr>
-<tr>
-<td>spark.sql.catalog.<em>catalog-name</em>.uri</td>
-<td>thrift://host:port</td>
-<td>URI for the Hive Metastore; default from <code>hive-site.xml</code> (Hive only)</td>
-</tr>
-<tr>
-<td>spark.sql.catalog.<em>catalog-name</em>.warehouse</td>
-<td>hdfs://nn:8020/warehouse/path</td>
-<td>Base path for the warehouse directory (Hadoop only)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="read-options">Read options<a class="headerlink" href="#read-options" title="Permanent link">&para;</a></h3>
-<p>Spark read options are passed when configuring the DataFrameReader, like this:</p>
-<pre><code class="scala">// time travel
-spark.read
-    .option(&quot;snapshot-id&quot;, 10963874102873L)
-    .table(&quot;catalog.db.table&quot;)
-</code></pre>
-
-<table>
-<thead>
-<tr>
-<th>Spark option</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>snapshot-id</td>
-<td>(latest)</td>
-<td>Snapshot ID of the table snapshot to read</td>
-</tr>
-<tr>
-<td>as-of-timestamp</td>
-<td>(latest)</td>
-<td>A timestamp in milliseconds; the snapshot used will be the snapshot current at this time.</td>
-</tr>
-<tr>
-<td>split-size</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.target-size and read.split.metadata-target-size</td>
-</tr>
-<tr>
-<td>lookback</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.planning-lookback</td>
-</tr>
-<tr>
-<td>file-open-cost</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.split.open-file-cost</td>
-</tr>
-<tr>
-<td>vectorization-enabled</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.parquet.vectorization.enabled</td>
-</tr>
-<tr>
-<td>batch-size</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s read.parquet.vectorization.batch-size</td>
-</tr>
-</tbody>
-</table>
-<h3 id="write-options">Write options<a class="headerlink" href="#write-options" title="Permanent link">&para;</a></h3>
-<p>Spark write options are passed when configuring the DataFrameWriter, like this:</p>
-<pre><code class="scala">// write with Avro instead of Parquet
-df.write
-    .option(&quot;write-format&quot;, &quot;avro&quot;)
-    .option(&quot;snapshot-property.key&quot;, &quot;value&quot;)
-    .insertInto(&quot;catalog.db.table&quot;)
-</code></pre>
-
-<table>
-<thead>
-<tr>
-<th>Spark option</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>write-format</td>
-<td>Table write.format.default</td>
-<td>File format to use for this write operation; parquet, avro, or orc</td>
-</tr>
-<tr>
-<td>target-file-size-bytes</td>
-<td>As per table property</td>
-<td>Overrides this table&rsquo;s write.target-file-size-bytes</td>
-</tr>
-<tr>
-<td>check-nullability</td>
-<td>true</td>
-<td>Sets the nullable check on fields</td>
-</tr>
-<tr>
-<td>snapshot-property.<em>custom-key</em></td>
-<td>null</td>
-<td>Adds an entry with custom-key and corresponding value in the snapshot summary</td>
-</tr>
-<tr>
-<td>fanout-enabled</td>
-<td>false</td>
-<td>Overrides this table&rsquo;s write.spark.fanout.enabled</td>
-</tr>
-<tr>
-<td>check-ordering</td>
-<td>true</td>
-<td>Checks if input schema and table schema are same</td>
-</tr>
-</tbody>
-</table></div>
+Hive Metastore before the lock is retried from Iceberg.</p></div>
         
         
     </div>
