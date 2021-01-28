@@ -431,10 +431,10 @@
 <li><strong>Update</strong> &ndash; widen the type of a column, struct field, map key, map value, or list element</li>
 <li><strong>Reorder</strong> &ndash; change the order of columns or fields in a nested struct</li>
 </ul>
-<p>Iceberg schema updates are metadata changes. Data files are not eagerly rewritten.</p>
+<p>Iceberg schema updates are <strong>metadata changes</strong>, so no data files need to be rewritten to perform the update.</p>
 <p>Note that map keys do not support adding or dropping struct fields that would change equality.</p>
 <h3 id="correctness">Correctness<a class="headerlink" href="#correctness" title="Permanent link">&para;</a></h3>
-<p>Iceberg guarantees that <strong>schema evolution changes are independent and free of side-effects</strong>:</p>
+<p>Iceberg guarantees that <strong>schema evolution changes are independent and free of side-effects</strong>, without rewriting files:</p>
 <ol>
 <li>Added columns never read existing values from another column.</li>
 <li>Dropping a column or field does not change the values in any other column.</li>
