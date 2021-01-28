@@ -11,7 +11,7 @@
     <link rel="../img/favicon.ico">
 
     
-    <title>Definitions - Apache Iceberg</title>
+    <title>Blogs - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -71,7 +71,7 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -94,8 +94,8 @@
 
                         
                             
-<li >
-    <a href="../blogs/">Blogs</a>
+<li class="active">
+    <a href="./">Blogs</a>
 </li>
 
                         
@@ -308,13 +308,13 @@
                 
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Format <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li class="active">
-    <a href="./">Definitions</a>
+<li >
+    <a href="../terms/">Definitions</a>
 </li>
 
                         
@@ -377,12 +377,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="../python-feature-support/">
+                        <a rel="prev" href="../releases/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../spec/">
+                        <a rel="next" href="../trademarks/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -396,18 +396,18 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#terms">Terms</a></li>
-            <li class="second-level"><a href="#snapshot">Snapshot</a></li>
+        <li class="first-level active"><a href="#iceberg-blogs">Iceberg Blogs</a></li>
+            <li class="second-level"><a href="#a-short-introduction-to-apache-iceberg">A Short Introduction to Apache Iceberg</a></li>
                 
-            <li class="second-level"><a href="#manifest-list">Manifest list</a></li>
+            <li class="second-level"><a href="#fastingest-low-latency-gobblin-with-apache-iceberg-and-orc-format">FastIngest: Low-latency Gobblin with Apache Iceberg and ORC format</a></li>
                 
-            <li class="second-level"><a href="#manifest-file">Manifest file</a></li>
+            <li class="second-level"><a href="#high-throughput-ingestion-with-iceberg">High Throughput Ingestion with Iceberg</a></li>
                 
-            <li class="second-level"><a href="#partition-spec">Partition spec</a></li>
+            <li class="second-level"><a href="#optimizing-data-warehouse-storage">Optimizing data warehouse storage</a></li>
                 
-            <li class="second-level"><a href="#partition-tuple">Partition tuple</a></li>
+            <li class="second-level"><a href="#iceberg-at-adobe">Iceberg at Adobe</a></li>
                 
-            <li class="second-level"><a href="#snapshot-log-history-table">Snapshot log (history table)</a></li>
+            <li class="second-level"><a href="#bulldozer-batch-data-moving-from-data-warehouse-to-online-key-value-stores">Bulldozer: Batch Data Moving from Data Warehouse to Online Key-Value Stores</a></li>
                 
     </ul>
 </div></div>
@@ -430,27 +430,26 @@
  - limitations under the License.
  -->
 
-<h1 id="terms">Terms<a class="headerlink" href="#terms" title="Permanent link">&para;</a></h1>
-<h3 id="snapshot">Snapshot<a class="headerlink" href="#snapshot" title="Permanent link">&para;</a></h3>
-<p>A <strong>snapshot</strong> is the state of a table at some time.</p>
-<p>Each snapshot lists all of the data files that make up the table&rsquo;s contents at the time of the snapshot. Data files are stored across multiple <a href="#manifest-file">manifest</a> files, and the manifests for a snapshot are listed in a single <a href="#manifest-list">manifest list</a> file.</p>
-<h3 id="manifest-list">Manifest list<a class="headerlink" href="#manifest-list" title="Permanent link">&para;</a></h3>
-<p>A <strong>manifest list</strong> is a metadata file that lists the <a href="#manifest-file">manifests</a> that make up a table snapshot.</p>
-<p>Each manifest file in the manifest list is stored with information about its contents, like partition value ranges, used to speed up metadata operations.</p>
-<h3 id="manifest-file">Manifest file<a class="headerlink" href="#manifest-file" title="Permanent link">&para;</a></h3>
-<p>A <strong>manifest file</strong> is a metadata file that lists a subset of data files that make up a snapshot.</p>
-<p>Each data file in a manifest is stored with a <a href="#partition-tuple">partition tuple</a>, column-level stats, and summary information used to prune splits during <a href="../performance/#scan-planning">scan planning</a>.</p>
-<h3 id="partition-spec">Partition spec<a class="headerlink" href="#partition-spec" title="Permanent link">&para;</a></h3>
-<p>A <strong>partition spec</strong> is a description of how to <a href="../partitioning/">partition</a> data in a table.</p>
-<p>A spec consists of a list of source columns and transforms. A transform produces a partition value from a source value. For example, <code>date(ts)</code> produces the date associated with a timestamp column named <code>ts</code>.</p>
-<h3 id="partition-tuple">Partition tuple<a class="headerlink" href="#partition-tuple" title="Permanent link">&para;</a></h3>
-<p>A <strong>partition tuple</strong> is a tuple or struct of partition data stored with each data file.</p>
-<p>All values in a partition tuple are the same for all rows stored in a data file. Partition tuples are produced by transforming values from row data using a partition spec.</p>
-<p>Iceberg stores partition values unmodified, unlike Hive tables that convert values to and from strings in file system paths and keys.</p>
-<h3 id="snapshot-log-history-table">Snapshot log (history table)<a class="headerlink" href="#snapshot-log-history-table" title="Permanent link">&para;</a></h3>
-<p>The <strong>snapshot log</strong> is a metadata log of how the table&rsquo;s current snapshot has changed over time.</p>
-<p>The log is a list of timestamp and ID pairs: when the current snapshot changed and the snapshot ID the current snapshot was changed to.</p>
-<p>The snapshot log is stored in <a href="../spec/#table-metadata-fields">table metadata as <code>snapshot-log</code></a>.</p></div>
+<h2 id="iceberg-blogs">Iceberg Blogs<a class="headerlink" href="#iceberg-blogs" title="Permanent link">&para;</a></h2>
+<p>Here is a list of company blogs that talk about Iceberg. The blogs are ordered from most recent to oldest.</p>
+<h3 id="a-short-introduction-to-apache-iceberg"><a href="https://medium.com/expedia-group-tech/a-short-introduction-to-apache-iceberg-d34f628b6799">A Short Introduction to Apache Iceberg</a><a class="headerlink" href="#a-short-introduction-to-apache-iceberg" title="Permanent link">&para;</a></h3>
+<p><strong>Date</strong>: Jan 26th, 2021, <strong>Company</strong>: Expedia</p>
+<p><strong>Author</strong>: <a href="https://www.linkedin.com/in/christine-mathiesen-676a98159/">Christine Mathiesen</a></p>
+<h3 id="fastingest-low-latency-gobblin-with-apache-iceberg-and-orc-format"><a href="https://engineering.linkedin.com/blog/2021/fastingest-low-latency-gobblin">FastIngest: Low-latency Gobblin with Apache Iceberg and ORC format</a><a class="headerlink" href="#fastingest-low-latency-gobblin-with-apache-iceberg-and-orc-format" title="Permanent link">&para;</a></h3>
+<p><strong>Date</strong>: Jan 6th, 2021, <strong>Company</strong>: Linkedin</p>
+<p><strong>Author</strong>: <a href="https://www.linkedin.com/in/zihan-li-0a8a15149/">Zihan Li</a>, <a href="https://www.linkedin.com/in/suddu/">Sudarshan Vasudevan</a>, <a href="https://www.linkedin.com/in/lei-s-a93138a0/">Lei Sun</a>, <a href="https://www.linkedin.com/in/shirshankadas/">Shirshanka Das</a></p>
+<h3 id="high-throughput-ingestion-with-iceberg"><a href="https://medium.com/adobetech/high-throughput-ingestion-with-iceberg-ccf7877a413f">High Throughput Ingestion with Iceberg</a><a class="headerlink" href="#high-throughput-ingestion-with-iceberg" title="Permanent link">&para;</a></h3>
+<p><strong>Date</strong>: Dec 22nd, 2020, <strong>Company</strong>: Adobe</p>
+<p><strong>Author</strong>: <a href="http://linkedin.com/in/andreiionescu">Andrei Ionescu</a>, <a href="https://www.linkedin.com/in/shonesadler/">Shone Sadler</a>, <a href="https://www.linkedin.com/in/anil-malkani-52861a/">Anil Malkani</a></p>
+<h3 id="optimizing-data-warehouse-storage"><a href="https://netflixtechblog.com/optimizing-data-warehouse-storage-7b94a48fdcbe">Optimizing data warehouse storage</a><a class="headerlink" href="#optimizing-data-warehouse-storage" title="Permanent link">&para;</a></h3>
+<p><strong>Date</strong>: Dec 21st, 2020, <strong>Company</strong>: Netflix</p>
+<p><strong>Author</strong>: <a href="https://www.linkedin.com/in/anupom/">Anupom Syam</a></p>
+<h3 id="iceberg-at-adobe"><a href="https://medium.com/adobetech/iceberg-at-adobe-88cf1950e866">Iceberg at Adobe</a><a class="headerlink" href="#iceberg-at-adobe" title="Permanent link">&para;</a></h3>
+<p><strong>Date</strong>: Dec 3rd, 2020, <strong>Company</strong>: Adobe</p>
+<p><strong>Author</strong>: <a href="https://www.linkedin.com/in/shonesadler/">Shone Sadler</a>, <a href="https://www.linkedin.com/in/rominparekh/">Romin Parekh</a>, <a href="https://www.linkedin.com/in/anil-malkani-52861a/">Anil Malkani</a></p>
+<h3 id="bulldozer-batch-data-moving-from-data-warehouse-to-online-key-value-stores"><a href="https://netflixtechblog.com/bulldozer-batch-data-moving-from-data-warehouse-to-online-key-value-stores-41bac13863f8">Bulldozer: Batch Data Moving from Data Warehouse to Online Key-Value Stores</a><a class="headerlink" href="#bulldozer-batch-data-moving-from-data-warehouse-to-online-key-value-stores" title="Permanent link">&para;</a></h3>
+<p><strong>Date</strong>: Oct 27th, 2020, <strong>Company</strong>: Netflix</p>
+<p><strong>Author</strong>: <a href="https://www.linkedin.com/in/tianlong-chen-39189b7a/">Tianlong Chen</a>, <a href="https://www.linkedin.com/in/ipapapa/">Ioannis Papapanagiotou</a></p></div>
         
         
     </div>
