@@ -431,7 +431,7 @@
 <p>If you want to include Iceberg in your Spark installation, add the <a href="https://search.maven.org/remotecontent?filepath=org/apache/iceberg/iceberg-spark3-runtime/0.11.0/iceberg-spark3-runtime-0.11.0.jar"><code>iceberg-spark3-runtime</code> Jar</a> to Spark&rsquo;s <code>jars</code> folder.</p>
 </div>
 <h3 id="adding-catalogs">Adding catalogs<a class="headerlink" href="#adding-catalogs" title="Permanent link">&para;</a></h3>
-<p>Iceberg comes with <a href="../spark/#configuring-catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
+<p>Iceberg comes with <a href="../spark-configuration/#catalogs">catalogs</a> that enable SQL commands to manage tables and load them by name. Catalogs are configured using properties under <code>spark.sql.catalog.(catalog_name)</code>.</p>
 <p>This command creates a path-based catalog named <code>local</code> for tables under <code>$PWD/warehouse</code> and adds support for Iceberg tables to Spark&rsquo;s built-in catalog:</p>
 <pre><code class="sh">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.11.0 \
     --conf spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions \
@@ -443,31 +443,31 @@
 </code></pre>
 
 <h3 id="creating-a-table">Creating a table<a class="headerlink" href="#creating-a-table" title="Permanent link">&para;</a></h3>
-<p>To create your first Iceberg table in Spark, use the <code>spark-sql</code> shell or <code>spark.sql(...)</code> to run a <a href="../spark/#create-table"><code>CREATE TABLE</code></a> command:</p>
+<p>To create your first Iceberg table in Spark, use the <code>spark-sql</code> shell or <code>spark.sql(...)</code> to run a <a href="../spark-ddl/#create-table"><code>CREATE TABLE</code></a> command:</p>
 <pre><code class="sql">-- local is the path-based catalog defined above
 CREATE TABLE local.db.table (id bigint, data string) USING iceberg
 </code></pre>
 
 <p>Iceberg catalogs support the full range of SQL DDL commands, including:</p>
 <ul>
-<li><a href="../spark/#create-table"><code>CREATE TABLE ... PARTITIONED BY</code></a></li>
-<li><a href="../spark/#create-table-as-select"><code>CREATE TABLE ... AS SELECT</code></a></li>
-<li><a href="../spark/#alter-table"><code>ALTER TABLE</code></a></li>
-<li><a href="../spark/#drop-table"><code>DROP TABLE</code></a></li>
+<li><a href="../spark-ddl/#create-table"><code>CREATE TABLE ... PARTITIONED BY</code></a></li>
+<li><a href="../spark-ddl/#create-table-as-select"><code>CREATE TABLE ... AS SELECT</code></a></li>
+<li><a href="../spark-ddl/#alter-table"><code>ALTER TABLE</code></a></li>
+<li><a href="../spark-ddl/#drop-table"><code>DROP TABLE</code></a></li>
 </ul>
 <h3 id="writing">Writing<a class="headerlink" href="#writing" title="Permanent link">&para;</a></h3>
-<p>Once your table is created, insert data using <a href="../spark/#insert-into"><code>INSERT INTO</code></a>:</p>
+<p>Once your table is created, insert data using <a href="../spark-writes/#insert-into"><code>INSERT INTO</code></a>:</p>
 <pre><code class="sql">INSERT INTO local.db.table VALUES (1, 'a'), (2, 'b'), (3, 'c');
 INSERT INTO local.db.table SELECT id, data FROM source WHERE length(data) = 1;
 </code></pre>
 
-<p>Iceberg also adds row-level SQL updates to Spark, <a href="../spark/#merge-into"><code>MERGE INTO</code></a> and <a href="../spark/#delete-from"><code>DELETE FROM</code></a>:</p>
+<p>Iceberg also adds row-level SQL updates to Spark, <a href="../spark-writes/#merge-into"><code>MERGE INTO</code></a> and <a href="../spark-writes/#delete-from"><code>DELETE FROM</code></a>:</p>
 <pre><code class="sql">MERGE INTO local.db.target t USING (SELECT * FROM updates) u ON t.id = u.id
 WHEN MATCHED THEN UPDATE SET t.count = t.count + u.count
 WHEN NOT MATCHED THEN INSERT *
 </code></pre>
 
-<p>Iceberg supports writing DataFrames using the new <a href="../spark/#writing-with-dataframes">v2 DataFrame write API</a>:</p>
+<p>Iceberg supports writing DataFrames using the new <a href="../spark-writes/#writing-with-dataframes">v2 DataFrame write API</a>:</p>
 <pre><code class="scala">spark.table(&quot;source&quot;).select(&quot;id&quot;, &quot;data&quot;)
      .writeTo(&quot;local.db.table&quot;).append()
 </code></pre>
@@ -480,7 +480,7 @@ FROM local.db.table
 GROUP BY data
 </code></pre>
 
-<p>SQL is also the recommended way to <a href="../spark/#inspecting-tables">inspect tables</a>. To view all of the snapshots in a table, use the <code>snapshots</code> metadata table:</p>
+<p>SQL is also the recommended way to <a href="../spark-queries/#inspecting-tables">inspect tables</a>. To view all of the snapshots in a table, use the <code>snapshots</code> metadata table:</p>
 <pre><code class="sql">SELECT * FROM local.db.table.snapshots
 </code></pre>
 
@@ -494,13 +494,19 @@ GROUP BY data
 +-------------------------+----------------+-----------+-----------+----------------------------------------------------+-----+
 </code></pre>
 
-<p><a href="../spark/#querying-with-dataframes">DataFrame reads</a> are supported and can now reference tables by name using <code>spark.table</code>:</p>
+<p><a href="../spark-queries/#querying-with-dataframes">DataFrame reads</a> are supported and can now reference tables by name using <code>spark.table</code>:</p>
 <pre><code class="scala">val df = spark.table(&quot;local.db.table&quot;)
 df.count()
 </code></pre>
 
 <h3 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
-<p>Next, you can learn more about <a href="../spark/">Iceberg tables in Spark</a>, or about the <a href="../api/">Iceberg Table API</a>.</p></div>
+<p>Next, you can learn more about Iceberg tables in Spark:</p>
+<ul>
+<li><a href="../spark-ddl/">DDL commands</a>: <code>CREATE</code>, <code>ALTER</code>, and <code>DROP</code></li>
+<li><a href="../spark-queries/">Querying data</a>: <code>SELECT</code> queries and metadata tables</li>
+<li><a href="../spark-writes/">Writing data</a>: <code>INSERT INTO</code> and <code>MERGE INTO</code></li>
+<li><a href="../spark-procedures/">Maintaining tables</a> with stored procedures</li>
+</ul></div>
         
         
     </div>
