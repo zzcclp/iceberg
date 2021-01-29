@@ -404,6 +404,7 @@
                 <li class="third-level"><a href="#hive-catalog">Hive catalog</a></li>
                 <li class="third-level"><a href="#hadoop-catalog">Hadoop catalog</a></li>
                 <li class="third-level"><a href="#custom-catalog">Custom catalog</a></li>
+                <li class="third-level"><a href="#create-through-yaml-config">Create through YAML config</a></li>
             <li class="second-level"><a href="#ddl-commands">DDL commands</a></li>
                 
                 <li class="third-level"><a href="#create-database">CREATE DATABASE</a></li>
@@ -623,6 +624,15 @@ When <code>catalog-impl</code> is set, the value of <code>catalog-type</code> is
   'catalog-impl'='com.my.custom.CatalogImpl',
   'my-additional-catalog-config'='my-value'
 );
+</code></pre>
+
+<h3 id="create-through-yaml-config">Create through YAML config<a class="headerlink" href="#create-through-yaml-config" title="Permanent link">&para;</a></h3>
+<p>Catalogs can be registered in <code>sql-client-defaults.yaml</code> before starting the SQL client. Here is an example:</p>
+<pre><code class="yaml">catalogs: 
+  - name: my_catalog
+    type: iceberg
+    catalog-type: hadoop
+    warehouse: hdfs://nn:8020/warehouse/path
 </code></pre>
 
 <h2 id="ddl-commands">DDL commands<a class="headerlink" href="#ddl-commands" title="Permanent link">&para;</a></h2>

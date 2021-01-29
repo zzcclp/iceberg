@@ -468,6 +468,7 @@ spark-sql --packages $DEPENDENCIES \
 </code></pre>
 
 <p>As you can see, In the shell command, we use <code>--packages</code> to specify the additional AWS bundle and HTTP client dependencies with their version as <code>2.15.40</code>.</p>
+<p>For integration with other engines such as Flink, please read their engine documentation pages that explain how to load a custom catalog. </p>
 <h2 id="glue-catalog">Glue Catalog<a class="headerlink" href="#glue-catalog" title="Permanent link">&para;</a></h2>
 <p>Iceberg enables the use of <a href="https://aws.amazon.com/glue">AWS Glue</a> as the <code>Catalog</code> implementation.
 When used, an Iceberg namespace is stored as a <a href="https://docs.aws.amazon.com/glue/latest/dg/aws-glue-api-catalog-databases.html">Glue Database</a>, 

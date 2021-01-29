@@ -484,11 +484,13 @@
 </ul>
 <p>Important bug fixes:</p>
 <ul>
-<li><a href="https://github.com/apache/iceberg/pull/2091">#2091</a> fixes Parquet vectorized reads when column types are promoted</li>
-<li><a href="https://github.com/apache/iceberg/pull/1991">#1991</a> fixes Avro schema conversions to preserve field docs</li>
-<li><a href="https://github.com/apache/iceberg/pull/1981">#1981</a> fixes bug that date and timestamp transforms were producing incorrect values for negative dates and times</li>
-<li><a href="https://github.com/apache/iceberg/pull/1798">#1798</a> fixes read failure when encountering duplicate entries of data files</li>
-<li><a href="https://github.com/apache/iceberg/pull/1785">#1785</a> fixes invalidation of metadata tables in CachingCatalog</li>
+<li><a href="https://github.com/apache/iceberg/pull/1981">#1981</a> fixes bug that date and timestamp transforms were producing incorrect values for dates and times before 1970. Before the fix, negative values were incorrectly transformed by date and timestamp transforms to 1 larger than the correct value. For example, <code>day(1969-12-31 10:00:00)</code> produced 0 instead of -1. The fix is backwards compatible, which means predicate projection can still work with the incorrectly transformed partitions written using older versions.</li>
+<li><a href="https://github.com/apache/iceberg/pull/2091">#2091</a> fixes <code>ClassCastException</code> for type promotion <code>int</code> to <code>long</code> and <code>float</code> to <code>double</code> during Parquet vectorized read. Now Arrow vector is created by looking at Parquet file schema instead of Iceberg schema for <code>int</code> and <code>float</code> fields.</li>
+<li><a href="https://github.com/apache/iceberg/pull/1998">#1998</a> fixes bug in <code>HiveTableOperation</code> that <code>unlock</code> is not called if new metadata cannot be deleted. Now it is guaranteed that <code>unlock</code> is always called for Hive catalog users.</li>
+<li><a href="https://github.com/apache/iceberg/pull/1979">#1979</a> fixes table listing failure in Hadoop catalog when user does not have permission to some tables. Now the tables with no permission are ignored in listing.</li>
+<li><a href="https://github.com/apache/iceberg/pull/1798">#1798</a> fixes scan task failure when encountering duplicate entries of data files. Spark and Flink readers can now ignore duplicated entries in data files for each scan task.</li>
+<li><a href="https://github.com/apache/iceberg/pull/1785">#1785</a> fixes invalidation of metadata tables in <code>CachingCatalog</code>. When a table is dropped, all the metadata tables associated with it are also invalidated in the cache.</li>
+<li><a href="https://github.com/apache/iceberg/pull/1960">#1960</a> fixes bug that ORC writer does not read metrics config and always use the default. Now customized metrics config is respected.</li>
 </ul>
 <p>Other notable changes:</p>
 <ul>
@@ -497,8 +499,10 @@
 <li>Spark and Flink now support dynamically loading customized <code>Catalog</code> and <code>FileIO</code> implementations</li>
 <li>Spark 2 now supports loading tables from other catalogs, like Spark 3</li>
 <li>Spark 3 now supports catalog names in DataFrameReader when using Iceberg as a format</li>
+<li>Flink now uses the number of Iceberg read splits as its job parallelism to improve performance and save resource.</li>
 <li>Hive (experimental) now supports INSERT INTO, case insensitive query, projection pushdown, create DDL with schema and auto type conversion</li>
 <li>ORC now supports reading tinyint, smallint, char, varchar types</li>
+<li>Avro to Iceberg schema conversion now preserves field docs</li>
 </ul>
 <h2 id="past-releases">Past releases<a class="headerlink" href="#past-releases" title="Permanent link">&para;</a></h2>
 <h3 id="0100">0.10.0<a class="headerlink" href="#0100" title="Permanent link">&para;</a></h3>

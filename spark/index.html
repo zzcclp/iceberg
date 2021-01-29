@@ -490,7 +490,7 @@
 <td><a href="#alter-table"><code>ALTER TABLE</code></a></td>
 <td>✔️</td>
 <td></td>
-<td>⚠ requires extensions enabled to update partition field and sort order</td>
+<td>⚠ Requires <a href="../spark-configuration/#sql-extensions">SQL extensions</a> enabled to update partition field and sort order</td>
 </tr>
 <tr>
 <td><a href="#drop-table"><code>DROP TABLE</code></a></td>
@@ -560,7 +560,6 @@
 </tr>
 </tbody>
 </table>
-<p>To enable Iceberg SQL extensions, set Spark configuration <code>spark.sql.extensions</code> as <code>org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions</code>. </p>
 <h2 id="configuring-catalogs">Configuring catalogs<a class="headerlink" href="#configuring-catalogs" title="Permanent link">&para;</a></h2>
 <p>Spark 3.0 adds an API to plug in table catalogs that are used to load, create, and manage Iceberg tables. Spark catalogs are configured by setting <a href="../configuration/#catalogs">Spark properties</a> under <code>spark.sql.catalog</code>.</p>
 <p>This creates an Iceberg catalog named <code>hive_prod</code> that loads tables from a Hive metastore:</p>
