@@ -252,6 +252,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../nessie/">Nessie</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -598,7 +604,7 @@ export HADOOP_CLASSPATH=`$HADOOP_HOME/bin/hadoop classpath`
 <li><code>catalog-type</code>: Iceberg currently support <code>hive</code> or <code>hadoop</code> catalog type. (Required)</li>
 <li><code>uri</code>: The Hive metastore&rsquo;s thrift URI. (Required)</li>
 <li><code>clients</code>: The Hive metastore client pool size, default value is 2. (Optional)</li>
-<li><code>property-version</code>: Version number to describe the property version. This property can be used for backwards compatibility in case the property format changes. The currently property version is <code>1</code>. (Optional)</li>
+<li><code>property-version</code>: Version number to describe the property version. This property can be used for backwards compatibility in case the property format changes. The current property version is <code>1</code>. (Optional)</li>
 <li><code>warehouse</code>: The Hive warehouse location, users should specify this path if neither set the <code>hive-conf-dir</code> to specify a location containing a <code>hive-site.xml</code> configuration file nor add a correct <code>hive-site.xml</code> to classpath.</li>
 <li><code>hive-conf-dir</code>: Path to a directory containing a <code>hive-site.xml</code> configuration file which will be used to provide custom Hive configuration values. The value of <code>hive.metastore.warehouse.dir</code> from <code>&lt;hive-conf-dir&gt;/hive-site.xml</code> (or hive configure file from classpath) will be overwrote with the <code>warehouse</code> value if setting both <code>hive-conf-dir</code> and <code>warehouse</code> when creating iceberg catalog.</li>
 </ul>
