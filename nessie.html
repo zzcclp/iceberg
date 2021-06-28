@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="img/favicon.ico">
 
     
-    <title>About - Apache Iceberg</title>
+    <title>Nessie - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
@@ -70,12 +70,12 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li class="active">
+<li >
     <a href="index.html">About</a>
 </li>
 
@@ -241,7 +241,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -252,7 +252,7 @@
 
                         
                             
-<li >
+<li class="active">
     <a href="nessie.html">Nessie</a>
 </li>
 
@@ -381,13 +381,13 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                    <li class="disabled">
-                        <a rel="prev" >
+                    <li >
+                        <a rel="prev" href="aws.html">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="community.html">
+                        <a rel="next" href="api.html">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -401,62 +401,144 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#_1"></a></li>
-            <li class="second-level"><a href="#user-experience">User experience</a></li>
+        <li class="first-level active"><a href="#iceberg-nessie-integration">Iceberg Nessie Integration</a></li>
+            <li class="second-level"><a href="#enabling-nessie-catalog">Enabling Nessie Catalog</a></li>
                 
-            <li class="second-level"><a href="#reliability-and-performance">Reliability and performance</a></li>
+            <li class="second-level"><a href="#nessie-catalog">Nessie Catalog</a></li>
                 
-            <li class="second-level"><a href="#open-standard">Open standard</a></li>
+            <li class="second-level"><a href="#nessie-and-iceberg">Nessie and Iceberg</a></li>
+                
+                <li class="third-level"><a href="#loosely-coupled-transactions">Loosely coupled transactions</a></li>
+                <li class="third-level"><a href="#experimentation">Experimentation</a></li>
+                <li class="third-level"><a href="#further-use-cases">Further use cases</a></li>
+            <li class="second-level"><a href="#example">Example</a></li>
+                
+            <li class="second-level"><a href="#future-improvements">Future Improvements</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+ - Licensed to the Apache Software Foundation (ASF) under one or more
+ - contributor license agreements.  See the NOTICE file distributed with
+ - this work for additional information regarding copyright ownership.
+ - The ASF licenses this file to You under the Apache License, Version 2.0
+ - (the "License"); you may not use this file except in compliance with
+ - the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+ -->
 
-<h1 id="_1"><img alt="Iceberg" src="img/Iceberg-logo.png" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p><strong>Apache Iceberg is an open table format for huge analytic datasets.</strong> Iceberg adds tables to Trino and Spark that use a high-performance format that works just like a SQL table.</p>
-<h3 id="user-experience">User experience<a class="headerlink" href="#user-experience" title="Permanent link">&para;</a></h3>
-<p>Iceberg avoids unpleasant surprises. Schema evolution works and won&rsquo;t inadvertently un-delete data. Users don&rsquo;t need to know about partitioning to get fast queries.</p>
+<h1 id="iceberg-nessie-integration">Iceberg Nessie Integration<a class="headerlink" href="#iceberg-nessie-integration" title="Permanent link">&para;</a></h1>
+<p>Iceberg provides integration with Nessie through the <code>iceberg-nessie</code> module.
+This section describes how to use Iceberg with Nessie. Nessie provides several key features on top of Iceberg:</p>
 <ul>
-<li><a href="evolution#schema-evolution">Schema evolution</a> supports add, drop, update, or rename, and has <a href="evolution#correctness">no side-effects</a></li>
-<li><a href="partitioning">Hidden partitioning</a> prevents user mistakes that cause silently incorrect results or extremely slow queries</li>
-<li><a href="evolution#partition-evolution">Partition layout evolution</a> can update the layout of a table as data volume or query patterns change</li>
-<li><a href="spark#time-travel">Time travel</a> enables reproducible queries that use exactly the same table snapshot, or lets users easily examine changes</li>
-<li>Version rollback allows users to quickly correct problems by resetting tables to a good state</li>
+<li>multi-table transactions</li>
+<li>git-like operations (eg branches, tags, commits)</li>
+<li>hive-like metastore capabilities</li>
 </ul>
-<h3 id="reliability-and-performance">Reliability and performance<a class="headerlink" href="#reliability-and-performance" title="Permanent link">&para;</a></h3>
-<p>Iceberg was built for huge tables. Iceberg is used in production where a single table can contain tens of petabytes of data and even these huge tables can be read without a distributed SQL engine.</p>
+<p>See <a href="https://projectnessie.org">Project Nessie</a> for more information on Nessie. Nessie requires a server to run, see
+<a href="https://projectnessie.org/try/">Getting Started</a> to start a Nessie server.</p>
+<h2 id="enabling-nessie-catalog">Enabling Nessie Catalog<a class="headerlink" href="#enabling-nessie-catalog" title="Permanent link">&para;</a></h2>
+<p>The <code>iceberg-nessie</code> module is bundled with Spark and Flink runtimes for all versions from <code>0.11.0</code>. To get started
+with Nessie and Iceberg simply add the Iceberg runtime to your process. Eg: <code>spark-sql --packages
+org.apache.iceberg:iceberg-spark3-runtiume:0.11.1</code>. </p>
+<h2 id="nessie-catalog">Nessie Catalog<a class="headerlink" href="#nessie-catalog" title="Permanent link">&para;</a></h2>
+<p>One major feature introduced in release <code>0.11.0</code> is the ability to easily interact with a <a href="../custom-catalog">Custom
+Catalog</a> from Spark and Flink. See <a href="../spark-configuration#catalog-configuration">Spark Configuration</a>
+  and <a href="../flink#custom-catalog">Flink Configuration</a> for instructions for adding a custom catalog to Iceberg. </p>
+<p>To use the Nessie Catalog the following properties are required:</p>
 <ul>
-<li><a href="performance#scan-planning">Scan planning is fast</a> &ndash; a distributed SQL engine isn&rsquo;t needed to read a table or find files</li>
-<li><a href="performance#data-filtering">Advanced filtering</a> &ndash; data files are pruned with partition and column-level stats, using table metadata</li>
+<li><code>warehouse</code>. Like most other catalogs the warehouse property is a file path to where this catalog should store tables.</li>
+<li><code>uri</code>. This is the Nessie server base uri. Eg <code>http://localhost:19120/api/v1</code>.</li>
+<li><code>ref</code> (optional). This is the Nessie branch or tag you want to work in.</li>
 </ul>
-<p>Iceberg was designed to solve correctness problems in eventually-consistent cloud object stores.</p>
+<p>To run directly in Java this looks like:</p>
+<pre><code class="language-java">Map&lt;String, String&gt; options = new HashMap&lt;&gt;();
+options.put(&quot;warehouse&quot;, &quot;/path/to/warehouse&quot;);
+options.put(&quot;ref&quot;, &quot;main&quot;);
+options.put(&quot;uri&quot;, &quot;https://localhost:19120/api/v1&quot;);
+Catalog nessieCatalog = CatalogUtil.loadCatalog(&quot;org.apache.iceberg.nessie.NessieCatalog&quot;, &quot;nessie&quot;, hadoopConfig, options);
+</code></pre>
+<p>and in Spark:</p>
+<pre><code class="language-java">conf.set(&quot;spark.sql.catalog.nessie.warehouse&quot;, &quot;/path/to/warehouse&quot;);
+conf.set(&quot;spark.sql.catalog.nessie.uri&quot;, &quot;http://localhost:19120/api/v1&quot;)
+conf.set(&quot;spark.sql.catalog.nessie.ref&quot;, &quot;main&quot;)
+conf.set(&quot;spark.sql.catalog.nessie.catalog-impl&quot;, &quot;org.apache.iceberg.nessie.NessieCatalog&quot;)
+conf.set(&quot;spark.sql.catalog.nessie&quot;, &quot;org.apache.iceberg.spark.SparkCatalog&quot;)
+</code></pre>
+<p>This is how it looks in Flink via the Python API (additional details can be found <a href="flink.html">here</a>):</p>
+<pre><code class="language-python">import os
+from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.table import StreamTableEnvironment
+
+env = StreamExecutionEnvironment.get_execution_environment()
+iceberg_flink_runtime_jar = os.path.join(os.getcwd(), &quot;iceberg-flink-runtime-0.11.1.jar&quot;)
+env.add_jars(&quot;file://{}&quot;.format(iceberg_flink_runtime_jar))
+table_env = StreamTableEnvironment.create(env)
+
+table_env.execute_sql(&quot;CREATE CATALOG nessie_catalog WITH (&quot;
+                      &quot;'type'='iceberg', &quot;
+                      &quot;'catalog-impl'='org.apache.iceberg.nessie.NessieCatalog', &quot;
+                      &quot;'uri'='http://localhost:19120/api/v1', &quot;
+                      &quot;'ref'='main', &quot;
+                      &quot;'warehouse'='/path/to/warehouse')&quot;)
+</code></pre>
+<p>There is nothing special above about the <code>nessie</code> name. A spark catalog can have any name, the important parts are the 
+settings for the <code>catalog-impl</code> and the required config to start Nessie correctly.
+Once you have a Nessie catalog you have access to your entire Nessie repo. You can then perform create/delete/merge
+operations on branches and perform commits on branches. Each Iceberg table in a Nessie Catalog is identified by an
+arbitrary length namespace and table name (eg <code>data.base.name.table</code>). These namespaces are implicit and don&rsquo;t need to
+be created separately. Any transaction on a Nessie enabled Iceberg table is a single commit in Nessie. Nessie commits
+can encompass an arbitrary number of actions on an arbitrary number of tables, however in Iceberg this will be limited
+to the set of single table transactions currently available.</p>
+<p>Further operations such as merges, viewing the commit log or diffs are performed by direct interaction with the
+<code>NessieClient</code> in java or by using the python client or cli. See <a href="https://projectnessie.org/tools/cli/">Nessie CLI</a> for
+more details on the CLI and <a href="https://projectnessie.org/tools/spark/">Spark Guide</a> for a more complete description of 
+Nessie functionality.</p>
+<h2 id="nessie-and-iceberg">Nessie and Iceberg<a class="headerlink" href="#nessie-and-iceberg" title="Permanent link">&para;</a></h2>
+<p>For most cases Nessie acts just like any other Catalog for Iceberg: providing a logical organization of a set of tables
+and providing atomicity to transactions. However, using Nessie opens up other interesting possibilities. When using Nessie with
+Iceberg every Iceberg transaction becomes a Nessie commit. This history can be listed, merged or cherry-picked across branches.</p>
+<h3 id="loosely-coupled-transactions">Loosely coupled transactions<a class="headerlink" href="#loosely-coupled-transactions" title="Permanent link">&para;</a></h3>
+<p>By creating a branch and performing a set of operations on that branch you can approximate a multi-table transaction.
+A sequence of commits can be performed on the newly created branch and then merged back into the main branch atomically.
+This gives the appearance of a series of connected changes being exposed to the main branch simultaneously. While downstream
+consumers will see multiple transactions appear at once this isn&rsquo;t a true multi-table transaction on the database. It is 
+effectively a fast-forward merge of multiple commits (in git language) and each operation from the branch is its own distinct
+transaction and commit. This is different from a real multi-table transaction where all changes would be in the same commit.
+This does allow multiple applications to take part in modifying a branch and for this distributed set of transactions to be 
+exposed to the downstream users simultaneously.</p>
+<h3 id="experimentation">Experimentation<a class="headerlink" href="#experimentation" title="Permanent link">&para;</a></h3>
+<p>Changes to a table can be tested in a branch before merging back into main. This is particularly useful when performing
+large changes like schema evolution or partition evolution. A partition evolution could be performed in a branch and you
+would be able to test out the change (eg performance benchmarks) before merging it. This provides great flexibility in
+performing on-line table modifications and testing without interrupting downstream use cases. If the changes are
+incorrect or not performant the branch can be dropped without being merged.</p>
+<h3 id="further-use-cases">Further use cases<a class="headerlink" href="#further-use-cases" title="Permanent link">&para;</a></h3>
+<p>Please see the <a href="https://projectnessie.org/features/">Nessie Documentation</a> for further descriptions of 
+Nessie features.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Regular table maintenance in Iceberg is complicated when using nessie. Please consult
+<a href="https://projectnessie.org/features/management/">Management Services</a> before performing any 
+<a href="../maintenance">table maintenance</a>.</p>
+</div>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
+<p>Please have a look at the <a href="https://github.com/projectnessie/nessie-demos">Nessie Demos repo</a>
+for different examples of Nessie and Iceberg in action together.</p>
+<h2 id="future-improvements">Future Improvements<a class="headerlink" href="#future-improvements" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="reliability">Works with any cloud store</a> and reduces NN congestion when in HDFS, by avoiding listing and renames</li>
-<li><a href="reliability">Serializable isolation</a> &ndash; table changes are atomic and readers never see partial or uncommitted changes</li>
-<li><a href="reliability#concurrent-write-operations">Multiple concurrent writers</a> use optimistic concurrency and will retry to ensure that compatible updates succeed, even when writes conflict</li>
-</ul>
-<h3 id="open-standard">Open standard<a class="headerlink" href="#open-standard" title="Permanent link">&para;</a></h3>
-<p>Iceberg has been designed and developed to be an open community standard with a <a href="spec">specification</a> to ensure compatibility across languages and implementations.</p>
-<p><a href="community">Apache Iceberg is open source</a>, and is developed at the <a href="https://www.apache.org/">Apache Software Foundation</a>.</p></div>
+<li>Nessie SQL extensions to manage the Nessie repo from Spark SQL</li>
+<li>Iceberg multi-table transactions. Changes to multiple Iceberg tables in the same transaction, isolation levels etc</li>
+</ul></div>
         
         
     </div>
