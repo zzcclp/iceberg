@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="img/favicon.ico">
 
     
-    <title>About - Apache Iceberg</title>
+    <title>Maintenance - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
@@ -70,12 +70,12 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li class="active">
+<li >
     <a href="index.html">About</a>
 </li>
 
@@ -115,7 +115,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -144,7 +144,7 @@
 
                         
                             
-<li >
+<li class="active">
     <a href="maintenance.html">Maintenance</a>
 </li>
 
@@ -381,13 +381,13 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                    <li class="disabled">
-                        <a rel="prev" >
+                    <li >
+                        <a rel="prev" href="evolution.html">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="community.html">
+                        <a rel="next" href="performance.html">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -401,62 +401,137 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#_1"></a></li>
-            <li class="second-level"><a href="#user-experience">User experience</a></li>
+        <li class="first-level active"><a href="#table-maintenance">Table Maintenance</a></li>
+            <li class="second-level"><a href="#recommended-maintenance">Recommended Maintenance</a></li>
                 
-            <li class="second-level"><a href="#reliability-and-performance">Reliability and performance</a></li>
+                <li class="third-level"><a href="#expire-snapshots">Expire Snapshots</a></li>
+                <li class="third-level"><a href="#remove-old-metadata-files">Remove old metadata files</a></li>
+                <li class="third-level"><a href="#remove-orphan-files">Remove orphan files</a></li>
+            <li class="second-level"><a href="#optional-maintenance">Optional Maintenance</a></li>
                 
-            <li class="second-level"><a href="#open-standard">Open standard</a></li>
-                
+                <li class="third-level"><a href="#compact-data-files">Compact data files</a></li>
+                <li class="third-level"><a href="#rewrite-manifests">Rewrite manifests</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+ - Licensed to the Apache Software Foundation (ASF) under one or more
+ - contributor license agreements.  See the NOTICE file distributed with
+ - this work for additional information regarding copyright ownership.
+ - The ASF licenses this file to You under the Apache License, Version 2.0
+ - (the "License"); you may not use this file except in compliance with
+ - the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+ -->
 
-<h1 id="_1"><img alt="Iceberg" src="img/Iceberg-logo.png" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p><strong>Apache Iceberg is an open table format for huge analytic datasets.</strong> Iceberg adds tables to Trino and Spark that use a high-performance format that works just like a SQL table.</p>
-<h3 id="user-experience">User experience<a class="headerlink" href="#user-experience" title="Permanent link">&para;</a></h3>
-<p>Iceberg avoids unpleasant surprises. Schema evolution works and won&rsquo;t inadvertently un-delete data. Users don&rsquo;t need to know about partitioning to get fast queries.</p>
-<ul>
-<li><a href="evolution#schema-evolution">Schema evolution</a> supports add, drop, update, or rename, and has <a href="evolution#correctness">no side-effects</a></li>
-<li><a href="partitioning">Hidden partitioning</a> prevents user mistakes that cause silently incorrect results or extremely slow queries</li>
-<li><a href="evolution#partition-evolution">Partition layout evolution</a> can update the layout of a table as data volume or query patterns change</li>
-<li><a href="spark#time-travel">Time travel</a> enables reproducible queries that use exactly the same table snapshot, or lets users easily examine changes</li>
-<li>Version rollback allows users to quickly correct problems by resetting tables to a good state</li>
-</ul>
-<h3 id="reliability-and-performance">Reliability and performance<a class="headerlink" href="#reliability-and-performance" title="Permanent link">&para;</a></h3>
-<p>Iceberg was built for huge tables. Iceberg is used in production where a single table can contain tens of petabytes of data and even these huge tables can be read without a distributed SQL engine.</p>
-<ul>
-<li><a href="performance#scan-planning">Scan planning is fast</a> &ndash; a distributed SQL engine isn&rsquo;t needed to read a table or find files</li>
-<li><a href="performance#data-filtering">Advanced filtering</a> &ndash; data files are pruned with partition and column-level stats, using table metadata</li>
-</ul>
-<p>Iceberg was designed to solve correctness problems in eventually-consistent cloud object stores.</p>
-<ul>
-<li><a href="reliability">Works with any cloud store</a> and reduces NN congestion when in HDFS, by avoiding listing and renames</li>
-<li><a href="reliability">Serializable isolation</a> &ndash; table changes are atomic and readers never see partial or uncommitted changes</li>
-<li><a href="reliability#concurrent-write-operations">Multiple concurrent writers</a> use optimistic concurrency and will retry to ensure that compatible updates succeed, even when writes conflict</li>
-</ul>
-<h3 id="open-standard">Open standard<a class="headerlink" href="#open-standard" title="Permanent link">&para;</a></h3>
-<p>Iceberg has been designed and developed to be an open community standard with a <a href="spec">specification</a> to ensure compatibility across languages and implementations.</p>
-<p><a href="community">Apache Iceberg is open source</a>, and is developed at the <a href="https://www.apache.org/">Apache Software Foundation</a>.</p></div>
+<h1 id="table-maintenance">Table Maintenance<a class="headerlink" href="#table-maintenance" title="Permanent link">&para;</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Maintenance operations require the <code>Table</code> instance. Please refer <a href="/java-api-quickstart/#create-a-table">Java API quickstart</a> page to refer how to load an existing table.</p>
+</div>
+<h2 id="recommended-maintenance">Recommended Maintenance<a class="headerlink" href="#recommended-maintenance" title="Permanent link">&para;</a></h2>
+<h3 id="expire-snapshots">Expire Snapshots<a class="headerlink" href="#expire-snapshots" title="Permanent link">&para;</a></h3>
+<p>Each write to an Iceberg table creates a new <em>snapshot</em>, or version, of a table. Snapshots can be used for time-travel queries, or the table can be rolled back to any valid snapshot.</p>
+<p>Snapshots accumulate until they are expired by the <a href="javadoc/master/org/apache/iceberg/Table.html#expireSnapshots--"><code>expireSnapshots</code></a> operation. Regularly expiring snapshots is recommended to delete data files that are no longer needed, and to keep the size of table metadata small.</p>
+<p>This example expires snapshots that are older than 1 day:</p>
+<pre><code class="language-java">Table table = ...
+long tsToExpire = System.currentTimeMillis() - (1000 * 60 * 60 * 24); // 1 day
+table.expireSnapshots()
+     .expireOlderThan(tsToExpire)
+     .commit();
+</code></pre>
+<p>See the <a href="javadoc/master/org/apache/iceberg/ExpireSnapshots.html"><code>ExpireSnapshots</code> Javadoc</a> to see more configuration options.</p>
+<p>There is also a Spark action that can run table expiration in parallel for large tables:</p>
+<pre><code class="language-java">Actions.forTable(table)
+    .expireSnapshots()
+    .expireOlderThan(tsToExpire)
+    .execute();
+</code></pre>
+<p>Expiring old snapshots removes them from metadata, so they are no longer available for time travel queries.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Data files are not deleted until they are no longer referenced by a snapshot that may be used for time travel or rollback.
+Regularly expiring snapshots deletes unused data files.</p>
+</div>
+<h3 id="remove-old-metadata-files">Remove old metadata files<a class="headerlink" href="#remove-old-metadata-files" title="Permanent link">&para;</a></h3>
+<p>Iceberg keeps track of table metadata using JSON files. Each change to a table produces a new metadata file to provide atomicity.</p>
+<p>Old metadata files are kept for history by default. Tables with frequent commits, like those written by streaming jobs, may need to regularly clean metadata files.</p>
+<p>To automatically clean metadata files, set <code>write.metadata.delete-after-commit.enabled=true</code> in table properties. This will keep some metadata files (up to <code>write.metadata.previous-versions-max</code>) and will delete the oldest metadata file after each new one is created.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>write.metadata.delete-after-commit.enabled</code></td>
+<td>Whether to delete old metadata files after each table commit</td>
+</tr>
+<tr>
+<td><code>write.metadata.previous-versions-max</code></td>
+<td>The number of old metadata files to keep</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="/configuration/#write-properties">table write properties</a> for more details.</p>
+<h3 id="remove-orphan-files">Remove orphan files<a class="headerlink" href="#remove-orphan-files" title="Permanent link">&para;</a></h3>
+<p>In Spark and other distributed processing engines, task or job failures can leave files that are not referenced by table metadata, and in some cases normal snapshot expiration may not be able to determine a file is no longer needed and delete it.</p>
+<p>To clean up these &ldquo;orphan&rdquo; files under a table location, use the <code>removeOrphanFiles</code> action.</p>
+<pre><code class="language-java">Table table = ...
+Actions.forTable(table)
+    .removeOrphanFiles()
+    .execute();
+</code></pre>
+<p>See the <a href="./javadoc/master/org/apache/iceberg/RemoveOrphanFilesAction.html">RemoveOrphanFilesAction Javadoc</a> to see more configuration options.</p>
+<p>This action may take a long time to finish if you have lots of files in data and metadata directories. It is recommended to execute this periodically, but you may not need to execute this often.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is dangerous to remove orphan files with a retention interval shorter than the time expected for any write to complete because it
+might corrupt the table if in-progress files are considered orphaned and are deleted. The default interval is 3 days.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Iceberg uses the string representations of paths when determining which files need to be removed. On some file systems,
+the path can change over time, but it still represents the same file. For example, if you change authorities for an HDFS cluster, 
+none of the old path urls used during creation will match those that appear in a current listing. <em>This will lead to data loss when 
+RemoveOrphanFiles is run</em>. Please be sure the entries in your MetadataTables match those listed by the Hadoop
+FileSystem API to avoid unintentional deletion. </p>
+</div>
+<h2 id="optional-maintenance">Optional Maintenance<a class="headerlink" href="#optional-maintenance" title="Permanent link">&para;</a></h2>
+<p>Some tables require additional maintenance. For example, streaming queries may produce small data files that should be <a href="#compact-data-files">compacted into larger files</a>. And some tables can benefit from <a href="#rewrite-manifests">rewriting manifest files</a> to make locating data for queries much faster.</p>
+<h3 id="compact-data-files">Compact data files<a class="headerlink" href="#compact-data-files" title="Permanent link">&para;</a></h3>
+<p>Iceberg tracks each data file in a table. More data files leads to more metadata stored in manifest files, and small data files causes an unnecessary amount of metadata and less efficient queries from file open costs.</p>
+<p>Iceberg can compact data files in parallel using Spark with the <code>rewriteDataFiles</code> action. This will combine small files into larger files to reduce metadata overhead and runtime file open cost.</p>
+<pre><code class="language-java">Table table = ...
+Actions.forTable(table).rewriteDataFiles()
+    .filter(Expressions.equal(&quot;date&quot;, &quot;2020-08-18&quot;))
+    .targetSizeInBytes(500 * 1024 * 1024) // 500 MB
+    .execute();
+</code></pre>
+<p>The <code>files</code> metadata table is useful for inspecting data file sizes and determining when to compact partitons.</p>
+<p>See the <a href="./javadoc/master/org/apache/iceberg/RewriteDataFilesAction.html"><code>RewriteDataFilesAction</code> Javadoc</a> to see more configuration options.</p>
+<h3 id="rewrite-manifests">Rewrite manifests<a class="headerlink" href="#rewrite-manifests" title="Permanent link">&para;</a></h3>
+<p>Iceberg uses metadata in its manifest list and manifest files speed up query planning and to prune unnecessary data files. The metadata tree functions as an index over a table&rsquo;s data.</p>
+<p>Manifests in the metadata tree are automatically compacted in the order they are added, which makes queries faster when the write pattern aligns with read filters. For example, writing hourly-partitioned data as it arrives is aligned with time range query filters.</p>
+<p>When a table&rsquo;s write pattern doesn&rsquo;t align with the query pattern, metadata and be rewritten to re-group data files into manifests using <code>rewriteManifests</code> or the <code>rewriteManifests</code> action (for parallel rewrites using Spark).</p>
+<p>This example rewrites small manifests and groups data files by the first partition field.</p>
+<pre><code class="language-java">Table table = ...
+table.rewriteManifests()
+    .rewriteIf(file -&gt; file.length() &lt; 10 * 1024 * 1024) // 10 MB
+    .clusterBy(file -&gt; file.partition().get(0, Integer.class))
+    .commit();
+</code></pre>
+<p>See the <a href="./javadoc/master/org/apache/iceberg/RewriteManifestsAction.html"><code>RewriteManifestsAction</code> Javadoc</a> to see more configuration options.</p></div>
         
         
     </div>

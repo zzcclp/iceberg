@@ -11,7 +11,7 @@
     <link rel="shortcut icon" href="img/favicon.ico">
 
     
-    <title>About - Apache Iceberg</title>
+    <title>Java Custom Catalog - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
@@ -70,12 +70,12 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li class="active">
+<li >
     <a href="index.html">About</a>
 </li>
 
@@ -262,7 +262,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -285,7 +285,7 @@
 
                         
                             
-<li >
+<li class="active">
     <a href="custom-catalog.html">Java Custom Catalog</a>
 </li>
 
@@ -381,13 +381,13 @@
                 </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                    <li class="disabled">
-                        <a rel="prev" >
+                    <li >
+                        <a rel="prev" href="java-api-quickstart.html">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="community.html">
+                        <a rel="next" href="python-quickstart.html">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -401,62 +401,262 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#_1"></a></li>
-            <li class="second-level"><a href="#user-experience">User experience</a></li>
+        <li class="first-level active"><a href="#custom-catalog-implementation">Custom Catalog Implementation</a></li>
+            <li class="second-level"><a href="#custom-table-operations-implementation">Custom table operations implementation</a></li>
                 
-            <li class="second-level"><a href="#reliability-and-performance">Reliability and performance</a></li>
+            <li class="second-level"><a href="#custom-catalog-implementation_1">Custom catalog implementation</a></li>
                 
-            <li class="second-level"><a href="#open-standard">Open standard</a></li>
+            <li class="second-level"><a href="#custom-file-io-implementation">Custom file IO implementation</a></li>
+                
+            <li class="second-level"><a href="#custom-location-provider-implementation">Custom location provider implementation</a></li>
+                
+            <li class="second-level"><a href="#custom-icebergsource">Custom IcebergSource</a></li>
                 
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+ - Licensed to the Apache Software Foundation (ASF) under one or more
+ - contributor license agreements.  See the NOTICE file distributed with
+ - this work for additional information regarding copyright ownership.
+ - The ASF licenses this file to You under the Apache License, Version 2.0
+ - (the "License"); you may not use this file except in compliance with
+ - the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+ -->
 
-<h1 id="_1"><img alt="Iceberg" src="img/Iceberg-logo.png" /><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p><strong>Apache Iceberg is an open table format for huge analytic datasets.</strong> Iceberg adds tables to Trino and Spark that use a high-performance format that works just like a SQL table.</p>
-<h3 id="user-experience">User experience<a class="headerlink" href="#user-experience" title="Permanent link">&para;</a></h3>
-<p>Iceberg avoids unpleasant surprises. Schema evolution works and won&rsquo;t inadvertently un-delete data. Users don&rsquo;t need to know about partitioning to get fast queries.</p>
+<h1 id="custom-catalog-implementation">Custom Catalog Implementation<a class="headerlink" href="#custom-catalog-implementation" title="Permanent link">&para;</a></h1>
+<p>It&rsquo;s possible to read an iceberg table either from an hdfs path or from a hive table. It&rsquo;s also possible to use a custom metastore in place of hive. The steps to do that are as follows.</p>
 <ul>
-<li><a href="evolution#schema-evolution">Schema evolution</a> supports add, drop, update, or rename, and has <a href="evolution#correctness">no side-effects</a></li>
-<li><a href="partitioning">Hidden partitioning</a> prevents user mistakes that cause silently incorrect results or extremely slow queries</li>
-<li><a href="evolution#partition-evolution">Partition layout evolution</a> can update the layout of a table as data volume or query patterns change</li>
-<li><a href="spark#time-travel">Time travel</a> enables reproducible queries that use exactly the same table snapshot, or lets users easily examine changes</li>
-<li>Version rollback allows users to quickly correct problems by resetting tables to a good state</li>
+<li><a href="#custom-table-operations-implementation">Custom TableOperations</a></li>
+<li><a href="#custom-catalog-implementation">Custom Catalog</a></li>
+<li><a href="#custom-file-io-implementation">Custom FileIO</a></li>
+<li><a href="#custom-location-provider-implementation">Custom LocationProvider</a></li>
+<li><a href="#custom-icebergsource">Custom IcebergSource</a></li>
 </ul>
-<h3 id="reliability-and-performance">Reliability and performance<a class="headerlink" href="#reliability-and-performance" title="Permanent link">&para;</a></h3>
-<p>Iceberg was built for huge tables. Iceberg is used in production where a single table can contain tens of petabytes of data and even these huge tables can be read without a distributed SQL engine.</p>
-<ul>
-<li><a href="performance#scan-planning">Scan planning is fast</a> &ndash; a distributed SQL engine isn&rsquo;t needed to read a table or find files</li>
-<li><a href="performance#data-filtering">Advanced filtering</a> &ndash; data files are pruned with partition and column-level stats, using table metadata</li>
-</ul>
-<p>Iceberg was designed to solve correctness problems in eventually-consistent cloud object stores.</p>
-<ul>
-<li><a href="reliability">Works with any cloud store</a> and reduces NN congestion when in HDFS, by avoiding listing and renames</li>
-<li><a href="reliability">Serializable isolation</a> &ndash; table changes are atomic and readers never see partial or uncommitted changes</li>
-<li><a href="reliability#concurrent-write-operations">Multiple concurrent writers</a> use optimistic concurrency and will retry to ensure that compatible updates succeed, even when writes conflict</li>
-</ul>
-<h3 id="open-standard">Open standard<a class="headerlink" href="#open-standard" title="Permanent link">&para;</a></h3>
-<p>Iceberg has been designed and developed to be an open community standard with a <a href="spec">specification</a> to ensure compatibility across languages and implementations.</p>
-<p><a href="community">Apache Iceberg is open source</a>, and is developed at the <a href="https://www.apache.org/">Apache Software Foundation</a>.</p></div>
+<h3 id="custom-table-operations-implementation">Custom table operations implementation<a class="headerlink" href="#custom-table-operations-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>BaseMetastoreTableOperations</code> to provide implementation on how to read and write metadata</p>
+<p>Example:</p>
+<pre><code class="language-java">class CustomTableOperations extends BaseMetastoreTableOperations {
+  private String dbName;
+  private String tableName;
+  private Configuration conf;
+  private FileIO fileIO;
+
+  protected CustomTableOperations(Configuration conf, String dbName, String tableName) {
+    this.conf = conf;
+    this.dbName = dbName;
+    this.tableName = tableName;
+  }
+
+  // The doRefresh method should provide implementation on how to get the metadata location
+  @Override
+  public void doRefresh() {
+
+    // Example custom service which returns the metadata location given a dbName and tableName
+    String metadataLocation = CustomService.getMetadataForTable(conf, dbName, tableName);
+
+    // When updating from a metadata file location, call the helper method
+    refreshFromMetadataLocation(metadataLocation);
+
+  }
+
+  // The doCommit method should provide implementation on how to update with metadata location atomically
+  @Override
+  public void doCommit(TableMetadata base, TableMetadata metadata) {
+    String oldMetadataLocation = base.location();
+
+    // Write new metadata using helper method
+    String newMetadataLocation = writeNewMetadata(metadata, currentVersion() + 1);
+
+    // Example custom service which updates the metadata location for the given db and table atomically
+    CustomService.updateMetadataLocation(dbName, tableName, oldMetadataLocation, newMetadataLocation);
+
+  }
+
+  // The io method provides a FileIO which is used to read and write the table metadata files
+  @Override
+  public FileIO io() {
+    if (fileIO == null) {
+      fileIO = new HadoopFileIO(conf);
+    }
+    return fileIO;
+  }
+}
+</code></pre>
+<p>A <code>TableOperations</code> instance is usually obtained by calling <code>Catalog.newTableOps(TableIdentifier)</code>.
+See the next section about implementing and loading a custom catalog.</p>
+<h3 id="custom-catalog-implementation_1">Custom catalog implementation<a class="headerlink" href="#custom-catalog-implementation_1" title="Permanent link">&para;</a></h3>
+<p>Extend <code>BaseMetastoreCatalog</code> to provide default warehouse locations and instantiate <code>CustomTableOperations</code></p>
+<p>Example:</p>
+<pre><code class="language-java">public class CustomCatalog extends BaseMetastoreCatalog {
+
+  private Configuration configuration;
+
+  // must have a no-arg constructor to be dynamically loaded
+  // initialize(String name, Map&lt;String, String&gt; properties) will be called to complete initialization
+  public CustomCatalog() {
+  }
+
+  public CustomCatalog(Configuration configuration) {
+    this.configuration = configuration;
+  }
+
+  @Override
+  protected TableOperations newTableOps(TableIdentifier tableIdentifier) {
+    String dbName = tableIdentifier.namespace().level(0);
+    String tableName = tableIdentifier.name();
+    // instantiate the CustomTableOperations
+    return new CustomTableOperations(configuration, dbName, tableName);
+  }
+
+  @Override
+  protected String defaultWarehouseLocation(TableIdentifier tableIdentifier) {
+
+    // Can choose to use any other configuration name
+    String tableLocation = configuration.get(&quot;custom.iceberg.warehouse.location&quot;);
+
+    // Can be an s3 or hdfs path
+    if (tableLocation == null) {
+      throw new RuntimeException(&quot;custom.iceberg.warehouse.location configuration not set!&quot;);
+    }
+
+    return String.format(
+            &quot;%s/%s.db/%s&quot;, tableLocation,
+            tableIdentifier.namespace().levels()[0],
+            tableIdentifier.name());
+  }
+
+  @Override
+  public boolean dropTable(TableIdentifier identifier, boolean purge) {
+    // Example service to delete table
+    CustomService.deleteTable(identifier.namepsace().level(0), identifier.name());
+  }
+
+  @Override
+  public void renameTable(TableIdentifier from, TableIdentifier to) {
+    Preconditions.checkArgument(from.namespace().level(0).equals(to.namespace().level(0)),
+            &quot;Cannot move table between databases&quot;);
+    // Example service to rename table
+    CustomService.renameTable(from.namepsace().level(0), from.name(), to.name());
+  }
+
+  // implement this method to read catalog name and properties during initialization
+  public void initialize(String name, Map&lt;String, String&gt; properties) {
+  }
+}
+</code></pre>
+<p>Catalog implementations can be dynamically loaded in most compute engines.
+For Spark and Flink, you can specify the <code>catalog-impl</code> catalog property to load it.
+Read the <a href="../configuration/#catalog-properties">Configuration</a> section for more details.
+For MapReduce, implement <code>org.apache.iceberg.mr.CatalogLoader</code> and set Hadoop property <code>iceberg.mr.catalog.loader.class</code> to load it.
+If your catalog must read Hadoop configuration to access certain environment properties, make your catalog implement <code>org.apache.hadoop.conf.Configurable</code>.</p>
+<h3 id="custom-file-io-implementation">Custom file IO implementation<a class="headerlink" href="#custom-file-io-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>FileIO</code> and provide implementation to read and write data files</p>
+<p>Example:</p>
+<pre><code class="language-java">public class CustomFileIO implements FileIO {
+
+  // must have a no-arg constructor to be dynamically loaded
+  // initialize(Map&lt;String, String&gt; properties) will be called to complete initialization
+  public CustomFileIO() {
+  }
+
+  @Override
+  public InputFile newInputFile(String s) {
+    // you also need to implement the InputFile interface for a custom input file
+    return new CustomInputFile(s);
+  }
+
+  @Override
+  public OutputFile newOutputFile(String s) {
+    // you also need to implement the OutputFile interface for a custom output file
+    return new CustomOutputFile(s);
+  }
+
+  @Override
+  public void deleteFile(String path) {
+    Path toDelete = new Path(path);
+    FileSystem fs = Util.getFs(toDelete);
+    try {
+        fs.delete(toDelete, false /* not recursive */);
+    } catch (IOException e) {
+        throw new RuntimeIOException(e, &quot;Failed to delete file: %s&quot;, path);
+    }
+  }
+
+  // implement this method to read catalog properties during initialization
+  public void initialize(Map&lt;String, String&gt; properties) {
+  }
+}
+</code></pre>
+<p>If you are already implementing your own catalog, you can implement <code>TableOperations.io()</code> to use your custom <code>FileIO</code>.
+In addition, custom <code>FileIO</code> implementations can also be dynamically loaded in <code>HadoopCatalog</code> and <code>HiveCatalog</code> by specifying the <code>io-impl</code> catalog property.
+Read the <a href="../configuration/#catalog-properties">Configuration</a> section for more details.
+If your <code>FileIO</code> must read Hadoop configuration to access certain environment properties, make your <code>FileIO</code> implement <code>org.apache.hadoop.conf.Configurable</code>.</p>
+<h3 id="custom-location-provider-implementation">Custom location provider implementation<a class="headerlink" href="#custom-location-provider-implementation" title="Permanent link">&para;</a></h3>
+<p>Extend <code>LocationProvider</code> and provide implementation to determine the file path to write data</p>
+<p>Example:</p>
+<pre><code class="language-java">public class CustomLocationProvider implements LocationProvider {
+
+  private String tableLocation;
+
+  // must have a 2-arg constructor like this, or a no-arg constructor
+  public CustomLocationProvider(String tableLocation, Map&lt;String, String&gt; properties) {
+    this.tableLocation = tableLocation;
+  }
+
+  @Override
+  public String newDataLocation(String filename) {
+    // can use any custom method to generate a file path given a file name
+    return String.format(&quot;%s/%s/%s&quot;, tableLocation, UUID.randomUUID().toString(), filename);
+  }
+
+  @Override
+  public String newDataLocation(PartitionSpec spec, StructLike partitionData, String filename) {
+    // can use any custom method to generate a file path given a partition info and file name
+    return newDataLocation(filename);
+  }
+}
+</code></pre>
+<p>If you are already implementing your own catalog, you can override <code>TableOperations.locationProvider()</code> to use your custom default <code>LocationProvider</code>.
+To use a different custom location provider for a specific table, specify the implementation when creating the table using table property <code>write.location-provider.impl</code></p>
+<p>Example:</p>
+<pre><code class="language-sql">CREATE TABLE hive.default.my_table (
+  id bigint,
+  data string,
+  category string)
+USING iceberg
+OPTIONS (
+  'write.location-provider.impl'='com.my.CustomLocationProvider'
+)
+PARTITIONED BY (category);
+</code></pre>
+<h3 id="custom-icebergsource">Custom IcebergSource<a class="headerlink" href="#custom-icebergsource" title="Permanent link">&para;</a></h3>
+<p>Extend <code>IcebergSource</code> and provide implementation to read from <code>CustomCatalog</code></p>
+<p>Example:</p>
+<pre><code class="language-java">public class CustomIcebergSource extends IcebergSource {
+
+  @Override
+  protected Table findTable(DataSourceOptions options, Configuration conf) {
+    Optional&lt;String&gt; path = options.get(&quot;path&quot;);
+    Preconditions.checkArgument(path.isPresent(), &quot;Cannot open table: path is not set&quot;);
+
+    // Read table from CustomCatalog
+    CustomCatalog catalog = new CustomCatalog(conf);
+    TableIdentifier tableIdentifier = TableIdentifier.parse(path.get());
+    return catalog.loadTable(tableIdentifier);
+  }
+}
+</code></pre>
+<p>Register the <code>CustomIcebergSource</code> by updating  <code>META-INF/services/org.apache.spark.sql.sources.DataSourceRegister</code> with its fully qualified name</p></div>
         
         
     </div>
