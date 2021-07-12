@@ -568,7 +568,7 @@ an Iceberg table is stored as a <a href="https://docs.aws.amazon.com/glue/latest
 and every Iceberg table version is stored as a <a href="https://docs.aws.amazon.com/glue/latest/dg/aws-glue-api-catalog-tables.html#aws-glue-api-catalog-tables-TableVersion">Glue TableVersion</a>. 
 You can start using Glue catalog by specifying the <code>catalog-impl</code> as <code>org.apache.iceberg.aws.glue.GlueCatalog</code>,
 just like what is shown in the <a href="#enabling-aws-integration">enabling AWS integration</a> section above. 
-More details about loading the catalog can be found in individual engine pages, such as <a href="../spark/#loading-a-custom-catalog">Spark</a> and <a href="../flink/#creating-catalogs-and-using-catalogs">Flink</a>.</p>
+More details about loading the catalog can be found in individual engine pages, such as <a href="../spark-configuration/#loading-a-custom-catalog">Spark</a> and <a href="../flink/#creating-catalogs-and-using-catalogs">Flink</a>.</p>
 <h3 id="glue-catalog-id">Glue Catalog ID<a class="headerlink" href="#glue-catalog-id" title="Permanent link">&para;</a></h3>
 <p>There is a unique Glue metastore in each AWS account and each AWS region.
 By default, <code>GlueCatalog</code> chooses the Glue metastore to use based on the user&rsquo;s default AWS client credential and region setup.

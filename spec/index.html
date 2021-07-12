@@ -417,6 +417,7 @@
             <li class="second-level"><a href="#specification">Specification</a></li>
                 
                 <li class="third-level"><a href="#terms">Terms</a></li>
+                <li class="third-level"><a href="#writer-requirements">Writer requirements</a></li>
                 <li class="third-level"><a href="#schemas-and-data-types">Schemas and Data Types</a></li>
                 <li class="third-level"><a href="#partitioning">Partitioning</a></li>
                 <li class="third-level"><a href="#sorting">Sorting</a></li>
@@ -524,6 +525,83 @@
 <li><strong>Data file</strong> &ndash; A file that contains rows of a table.</li>
 <li><strong>Delete file</strong> &ndash; A file that encodes rows of a table that are deleted by position or data values.</li>
 </ul>
+<h4 id="writer-requirements">Writer requirements<a class="headerlink" href="#writer-requirements" title="Permanent link">&para;</a></h4>
+<p>Some tables in this spec have columns that specify requirements for v1 and v2 tables. These requirements are intended for writers when adding metadata files to a table with the given version.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Write behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(blank)</td>
+<td>The field should be omitted</td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td>The field can be written</td>
+</tr>
+<tr>
+<td><em>required</em></td>
+<td>The field must be written</td>
+</tr>
+</tbody>
+</table>
+<p>Readers should be more permissive because v1 metadata files are allowed in v2 tables so that tables can be upgraded to v2 without rewriting the metadata tree. For manifest list and manifest files, this table shows the expected v2 read behavior:</p>
+<table>
+<thead>
+<tr>
+<th>v1</th>
+<th>v2</th>
+<th>v2 read behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td><em>optional</em></td>
+<td>Read the field as <em>optional</em></td>
+</tr>
+<tr>
+<td></td>
+<td><em>required</em></td>
+<td>Read the field as <em>optional</em>; it may be missing in v1 files</td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td></td>
+<td>Ignore the field</td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>optional</em></td>
+<td>Read the field as <em>optional</em></td>
+</tr>
+<tr>
+<td><em>optional</em></td>
+<td><em>required</em></td>
+<td>Read the field as <em>optional</em>; it may be missing in v1 files</td>
+</tr>
+<tr>
+<td><em>required</em></td>
+<td></td>
+<td>Ignore the field</td>
+</tr>
+<tr>
+<td><em>required</em></td>
+<td><em>optional</em></td>
+<td>Read the field as <em>optional</em></td>
+</tr>
+<tr>
+<td><em>required</em></td>
+<td><em>required</em></td>
+<td>Fill in a default or throw an exception if the field is missing</td>
+</tr>
+</tbody>
+</table>
+<p>Readers may be more strict for metadata JSON files because the JSON files are not reused and will always match the table version. Required v2 fields that were not present in v1 or optional in v1 may be handled as required fields. For example, a v2 table that is missing <code>last-sequence-number</code> can throw an exception.</p>
 <h3 id="schemas-and-data-types">Schemas and Data Types<a class="headerlink" href="#schemas-and-data-types" title="Permanent link">&para;</a></h3>
 <p>A table&rsquo;s <strong>schema</strong> is a list of named columns. All data types are either primitives or nested types, which are maps, lists, or structs. A table schema is also a struct type.</p>
 <p>For the representations of these types in Avro, ORC, and Parquet file formats, see Appendix A.</p>
@@ -2619,27 +2697,83 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <h3 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link">&para;</a></h3>
 <p>Writing v1 metadata:</p>
 <ul>
-<li>Table metadata field <code>last-sequence-number</code> should not be written.</li>
-<li>Snapshot field <code>sequence-number</code> should not be written.</li>
+<li>Table metadata field <code>last-sequence-number</code> should not be written</li>
+<li>Snapshot field <code>sequence-number</code> should not be written</li>
+<li>Manifest list field <code>sequence-number</code> should not be written</li>
+<li>Manifest list field <code>min-sequence-number</code> should not be written</li>
+<li>Manifest list field <code>content</code> must be 0 (data) or omitted</li>
+<li>Manifest entry field <code>sequence_number</code> should not be written</li>
+<li>Data file field <code>content</code> must be 0 (data) or omitted</li>
 </ul>
-<p>Reading v1 metadata:</p>
+<p>Reading v1 metadata for v2:</p>
 <ul>
-<li>Table metadata field <code>last-sequence-number</code> must default to 0.</li>
-<li>Snapshot field <code>sequence-number</code> must default to 0.</li>
+<li>Table metadata field <code>last-sequence-number</code> must default to 0</li>
+<li>Snapshot field <code>sequence-number</code> must default to 0</li>
+<li>Manifest list field <code>sequence-number</code> must default to 0</li>
+<li>Manifest list field <code>min-sequence-number</code> must default to 0</li>
+<li>Manifest list field <code>content</code> must default to 0 (data)</li>
+<li>Manifest entry field <code>sequence_number</code> must default to 0</li>
+<li>Data file field <code>content</code> must default to 0 (data)</li>
 </ul>
 <p>Writing v2 metadata:</p>
 <ul>
-<li>Table metadata added required field <code>last-sequence-number</code>.</li>
-<li>Table metadata now requires field <code>table-uuid</code>.</li>
-<li>Table metadata now requires field <code>partition-specs</code>.</li>
-<li>Table metadata now requires field <code>default-spec-id</code>.</li>
-<li>Table metadata now requires field <code>last-partition-id</code>.</li>
-<li>Table metadata field <code>partition-spec</code> is no longer required and may be omitted.</li>
-<li>Snapshot added required field <code>sequence-number</code>.</li>
-<li>Snapshot now requires field <code>manifest-list</code>.</li>
-<li>Snapshot field <code>manifests</code> is no longer allowed.</li>
-<li>Table metadata now requires field <code>sort-orders</code>.</li>
-<li>Table metadata now requires field <code>default-sort-order-id</code>.</li>
+<li>Table metadata JSON:<ul>
+<li><code>last-sequence-number</code> was added and is required; default to 0 when reading v1 metadata</li>
+<li><code>table-uuid</code> is now required</li>
+<li><code>current-schema-id</code> is now required</li>
+<li><code>schemas</code> is now required</li>
+<li><code>partition-specs</code> is now required</li>
+<li><code>default-spec-id</code> is now required</li>
+<li><code>last-partition-id</code> is now required</li>
+<li><code>sort-orders</code> is now required</li>
+<li><code>default-sort-order-id</code> is now required</li>
+<li><code>schema</code> is no longer required and should be omitted; use <code>schemas</code> and <code>current-schema-id</code> instead</li>
+<li><code>partition-spec</code> is no longer required and should be omitted; use <code>partition-specs</code> and <code>default-spec-id</code> instead</li>
+</ul>
+</li>
+<li>Snapshot JSON:<ul>
+<li><code>sequence-number</code> was added and is required; default to 0 when reading v1 metadata</li>
+<li><code>manifest-list</code> is now required</li>
+<li><code>manifests</code> is no longer required and should be omitted; always use <code>manifest-list</code> instead</li>
+</ul>
+</li>
+<li>Manifest list <code>manifest_file</code>:<ul>
+<li><code>content</code> was added and is required; 0=data, 1=deletes; default to 0 when reading v1 manifest lists</li>
+<li><code>sequence_number</code> was added and is required</li>
+<li><code>min_sequence_number</code> was added and is required</li>
+<li><code>added_files_count</code> is now required</li>
+<li><code>existing_files_count</code> is now required</li>
+<li><code>deleted_files_count</code> is now required</li>
+<li><code>added_rows_count</code> is now required</li>
+<li><code>existing_rows_count</code> is now required</li>
+<li><code>deleted_rows_count</code> is now required</li>
+</ul>
+</li>
+<li>Manifest list <code>field_summary</code>:<ul>
+<li><code>contains_nan</code> is now required</li>
+</ul>
+</li>
+<li>Manifest key-value metadata:<ul>
+<li><code>schema-id</code> is now required</li>
+<li><code>partition-spec-id</code> is now required</li>
+<li><code>format-version</code> is now required</li>
+<li><code>content</code> was added and is required (must be &ldquo;data&rdquo; or &ldquo;deletes&rdquo;)</li>
+</ul>
+</li>
+<li>Manifest <code>manifest_entry</code>:<ul>
+<li><code>snapshot_id</code> is now optional to support inheritance</li>
+<li><code>sequence_number</code> was added and is optional, to support inheritance</li>
+</ul>
+</li>
+<li>Manifest <code>data_file</code>:<ul>
+<li><code>content</code> was added and is required; 0=data, 1=position deletes, 2=equality deletes; default to 0 when reading v1 manifests</li>
+<li><code>equality_ids</code> was added, to be used for equality deletes only</li>
+<li><code>block_size_in_bytes</code> was removed (breaks v1 reader compatibility)</li>
+<li><code>file_ordinal</code> was removed</li>
+<li><code>sort_columns</code> was removed</li>
+<li><code>distinct_counts</code> was removed</li>
+</ul>
+</li>
 </ul>
 <p>Note that these requirements apply when writing data to a v2 table. Tables that are upgraded from v1 may contain metadata that does not follow these requirements. Implementations should remain backward-compatible with v1 metadata requirements.</p></div>
         

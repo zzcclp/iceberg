@@ -472,7 +472,7 @@ sampleTable.updateSpec()
     .removeField(&quot;category&quot;)
     .commit();
 </code></pre>
-<p>Spark supports updating partition spec through its <code>ALTER TABLE</code> SQL statement, see more details in <a href="../spark/#alter-table-add-partition-field">Spark SQL</a>.</p>
+<p>Spark supports updating partition spec through its <code>ALTER TABLE</code> SQL statement, see more details in <a href="../spark-ddl/#alter-table-add-partition-field">Spark SQL</a>.</p>
 <h2 id="sort-order-evolution">Sort order evolution<a class="headerlink" href="#sort-order-evolution" title="Permanent link">&para;</a></h2>
 <p>Similar to partition spec, Iceberg sort order can also be updated in an existing table.
 When you evolve a sort order, the old data written with an earlier order remains unchanged.
@@ -487,7 +487,7 @@ sampleTable.replaceSortOrder()
    .dec(&quot;category&quot;, NullOrder.NULL_FIRST)
    .commit();
 </code></pre>
-<p>Spark supports updating sort order through its <code>ALTER TABLE</code> SQL statement, see more details in <a href="../spark/#alter-table-write-ordered-by">Spark SQL</a>.</p></div>
+<p>Spark supports updating sort order through its <code>ALTER TABLE</code> SQL statement, see more details in <a href="../spark-ddl/#alter-table-write-ordered-by">Spark SQL</a>.</p></div>
         
         
     </div>

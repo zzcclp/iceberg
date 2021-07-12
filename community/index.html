@@ -410,6 +410,11 @@
                 
             <li class="second-level"><a href="#mailing-lists">Mailing Lists</a></li>
                 
+            <li class="second-level"><a href="#setting-up-ide-and-code-style">Setting up IDE and Code Style</a></li>
+                
+                <li class="third-level"><a href="#configuring-code-formatter-for-intellij-idea">Configuring Code Formatter for IntelliJ IDEA</a></li>
+            <li class="second-level"><a href="#running-benchmarks">Running Benchmarks</a></li>
+                
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
@@ -480,7 +485,17 @@ let us know by sending an email to <a href="&#109;&#97;&#105;&#108;&#116;&#111;&
 <li><a href="https://lists.apache.org/list.html?private@iceberg.apache.org">Archive</a></li>
 </ul>
 </li>
-</ul></div>
+</ul>
+<h2 id="setting-up-ide-and-code-style">Setting up IDE and Code Style<a class="headerlink" href="#setting-up-ide-and-code-style" title="Permanent link">&para;</a></h2>
+<h3 id="configuring-code-formatter-for-intellij-idea">Configuring Code Formatter for IntelliJ IDEA<a class="headerlink" href="#configuring-code-formatter-for-intellij-idea" title="Permanent link">&para;</a></h3>
+<p>In the <strong>Settings/Preferences</strong> dialog go to <strong>Editor &gt; Code Style &gt; Java</strong>. Click on the gear wheel and select <strong>Import Scheme</strong> to import IntelliJ IDEA XML code style settings.
+Point to <a href="../../.baseline/idea/intellij-java-palantir-style.xml">intellij-java-palantir-style.xml</a> and hit <strong>OK</strong> (you might need to enable <strong>Show Hidden Files and Directories</strong> in the dialog). The code itself can then be formatted via <strong>Code &gt; Reformat Code</strong>.</p>
+<p>See also the IntelliJ <a href="https://www.jetbrains.com/help/idea/copying-code-style-settings.html">Code Style docs</a> and <a href="https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html">Reformat Code docs</a> for additional details.</p>
+<h2 id="running-benchmarks">Running Benchmarks<a class="headerlink" href="#running-benchmarks" title="Permanent link">&para;</a></h2>
+<p>Some PRs/changesets might require running benchmarks to determine whether they are affecting the baseline performance. Currently there is 
+no &ldquo;push a single button to get a performance comparison&rdquo; solution available, therefore one has to run JMH performance tests on their local machine and
+post the results on the PR.</p>
+<p>See <a href="../benchmarks/">Benchmarks</a> for a summary of available benchmarks and how to run them.</p></div>
         
         
     </div>

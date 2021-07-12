@@ -476,12 +476,12 @@ data.writeStream
 <li><code>append</code>: appends the rows of every micro-batch to the table</li>
 <li><code>complete</code>: replaces the table contents every micro-batch</li>
 </ul>
-<p>The table should be created in prior to start the streaming query. Refer <a href="/spark/#create-table">SQL create table</a>
+<p>The table should be created in prior to start the streaming query. Refer <a href="/spark-ddl/#create-table">SQL create table</a>
 on Spark page to see how to create the Iceberg table.</p>
 <h3 id="writing-against-partitioned-table">Writing against partitioned table<a class="headerlink" href="#writing-against-partitioned-table" title="Permanent link">&para;</a></h3>
 <p>Iceberg requires the data to be sorted according to the partition spec per task (Spark partition) in prior to write
 against partitioned table. For batch queries you&rsquo;re encouraged to do explicit sort to fulfill the requirement
-(see <a href="/spark/#writing-against-partitioned-table">here</a>), but the approach would bring additional latency as
+(see <a href="/spark-writes/#writing-to-partitioned-tables">here</a>), but the approach would bring additional latency as
 repartition and sort are considered as heavy operations for streaming workload. To avoid additional latency, you can
 enable fanout writer to eliminate the requirement.</p>
 <pre><code class="language-scala">val tableIdentifier: String = ...

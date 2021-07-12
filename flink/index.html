@@ -808,7 +808,7 @@ For an unpartitioned iceberg table, its data will be completely overwritten by <
 <h3 id="batch-read">Batch Read<a class="headerlink" href="#batch-read" title="Permanent link">&para;</a></h3>
 <p>This example will read all records from iceberg table and then print to the stdout console in flink batch job:</p>
 <pre><code class="language-java">StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
-TableLoader tableLoader = TableLoader.fromHadooptable(&quot;hdfs://nn:8020/warehouse/path&quot;);
+TableLoader tableLoader = TableLoader.fromHadoopTable(&quot;hdfs://nn:8020/warehouse/path&quot;);
 DataStream&lt;RowData&gt; batch = FlinkSource.forRowData()
      .env(env)
      .tableLoader(tableLoader)
