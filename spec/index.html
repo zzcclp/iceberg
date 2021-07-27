@@ -110,6 +110,12 @@
 </li>
 
                         
+                            
+<li >
+    <a href="../security/">Security</a>
+</li>
+
+                        
                         </ul>
                     </li>
                 
@@ -254,6 +260,12 @@
                             
 <li >
     <a href="../nessie/">Nessie</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../jdbc/">JDBC</a>
 </li>
 
                         
@@ -1109,10 +1121,10 @@
 </tr>
 <tr>
 <td><em>optional</em></td>
-<td></td>
-<td><del><strong><code>111 distinct_counts</code></strong></del></td>
+<td><em>optional</em></td>
+<td><strong><code>111  distinct_counts</code></strong></td>
 <td><code>map&lt;123: int, 124: long&gt;</code></td>
-<td><strong>Deprecated. Do not write.</strong></td>
+<td>Map from column id to number of distinct values in the column; distinct counts must be derived using values in the file by counting or using sketches, but not using methods like merging existing distinct counts</td>
 </tr>
 <tr>
 <td><em>optional</em></td>
@@ -1404,7 +1416,7 @@
 </tr>
 <tr>
 <td><em>optional</em></td>
-<td><em>required</em></td>
+<td><em>optional</em></td>
 <td><strong><code>518 contains_nan</code></strong></td>
 <td><code>boolean</code></td>
 <td>Whether the manifest contains at least one partition with a NaN value for the field</td>
@@ -2194,12 +2206,12 @@
 <tr>
 <td><strong><code>fixed(L)</code></strong></td>
 <td><code>hashBytes(v)</code></td>
-<td><code>00 01 02 03</code> ￫ <code>188683207</code></td>
+<td><code>00 01 02 03</code> ￫ <code>-188683207</code></td>
 </tr>
 <tr>
 <td><strong><code>binary</code></strong></td>
 <td><code>hashBytes(v)</code></td>
-<td><code>00 01 02 03</code> ￫ <code>188683207</code></td>
+<td><code>00 01 02 03</code> ￫ <code>-188683207</code></td>
 </tr>
 </tbody>
 </table>
@@ -2749,10 +2761,6 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <li><code>deleted_rows_count</code> is now required</li>
 </ul>
 </li>
-<li>Manifest list <code>field_summary</code>:<ul>
-<li><code>contains_nan</code> is now required</li>
-</ul>
-</li>
 <li>Manifest key-value metadata:<ul>
 <li><code>schema-id</code> is now required</li>
 <li><code>partition-spec-id</code> is now required</li>
@@ -2771,7 +2779,6 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 <li><code>block_size_in_bytes</code> was removed (breaks v1 reader compatibility)</li>
 <li><code>file_ordinal</code> was removed</li>
 <li><code>sort_columns</code> was removed</li>
-<li><code>distinct_counts</code> was removed</li>
 </ul>
 </li>
 </ul>

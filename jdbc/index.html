@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A table format for large, slow-moving tabular data">
     
-    <link rel="canonical" href="https://iceberg.apache.org/community/">
+    <link rel="canonical" href="https://iceberg.apache.org/jdbc/">
     <link rel="shortcut icon" href="../img/favicon.ico">
 
     
-    <title>Community - Apache Iceberg</title>
+    <title>JDBC - Apache Iceberg</title>
     
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
@@ -70,7 +70,7 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -81,8 +81,8 @@
 
                         
                             
-<li class="active">
-    <a href="./">Community</a>
+<li >
+    <a href="../community/">Community</a>
 </li>
 
                         
@@ -247,7 +247,7 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
@@ -264,8 +264,8 @@
 
                         
                             
-<li >
-    <a href="../jdbc/">JDBC</a>
+<li class="active">
+    <a href="./">JDBC</a>
 </li>
 
                         
@@ -394,12 +394,12 @@
 
             <ul class="nav navbar-nav navbar-right">
                     <li >
-                        <a rel="prev" href="..">
+                        <a rel="prev" href="../nessie/">
                             <i class="fas fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="next" href="../releases/">
+                        <a rel="next" href="../api/">
                             Next <i class="fas fa-arrow-right"></i>
                         </a>
                     </li>
@@ -413,101 +413,85 @@
         
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#welcome">Welcome!</a></li>
-            <li class="second-level"><a href="#contributing">Contributing</a></li>
+        <li class="first-level active"><a href="#iceberg-jdbc-integration">Iceberg JDBC Integration</a></li>
+            <li class="second-level"><a href="#jdbc-catalog">JDBC Catalog</a></li>
                 
-            <li class="second-level"><a href="#issues">Issues</a></li>
-                
-            <li class="second-level"><a href="#slack">Slack</a></li>
-                
-            <li class="second-level"><a href="#mailing-lists">Mailing Lists</a></li>
-                
-            <li class="second-level"><a href="#setting-up-ide-and-code-style">Setting up IDE and Code Style</a></li>
-                
-                <li class="third-level"><a href="#configuring-code-formatter-for-intellij-idea">Configuring Code Formatter for IntelliJ IDEA</a></li>
-            <li class="second-level"><a href="#running-benchmarks">Running Benchmarks</a></li>
-                
+                <li class="third-level"><a href="#configurations">Configurations</a></li>
+                <li class="third-level"><a href="#examples">Examples</a></li>
     </ul>
 </div></div>
         <div class="col-md-9" role="main">
 
 <!--
-  - Licensed to the Apache Software Foundation (ASF) under one
-  - or more contributor license agreements.  See the NOTICE file
-  - distributed with this work for additional information
-  - regarding copyright ownership.  The ASF licenses this file
-  - to you under the Apache License, Version 2.0 (the
-  - "License"); you may not use this file except in compliance
-  - with the License.  You may obtain a copy of the License at
-  -
-  -   http://www.apache.org/licenses/LICENSE-2.0
-  -
-  - Unless required by applicable law or agreed to in writing,
-  - software distributed under the License is distributed on an
-  - "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-  - KIND, either express or implied.  See the License for the
-  - specific language governing permissions and limitations
-  - under the License.
-  -->
+ - Licensed to the Apache Software Foundation (ASF) under one or more
+ - contributor license agreements.  See the NOTICE file distributed with
+ - this work for additional information regarding copyright ownership.
+ - The ASF licenses this file to You under the Apache License, Version 2.0
+ - (the "License"); you may not use this file except in compliance with
+ - the License.  You may obtain a copy of the License at
+ -
+ -   http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS,
+ - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ - See the License for the specific language governing permissions and
+ - limitations under the License.
+ -->
 
-<h1 id="welcome">Welcome!<a class="headerlink" href="#welcome" title="Permanent link">&para;</a></h1>
-<p>Apache Iceberg tracks issues in GitHub and prefers to receive contributions as pull requests.</p>
-<p>Community discussions happen primarily on the dev mailing list, on the #iceberg channel on the ASF&rsquo;s Slack workspace, and on specific Github issues.</p>
-<h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
-<p>The Iceberg Project is hosted on Github at <a href="https://github.com/apache/iceberg">https://github.com/apache/iceberg</a>.</p>
-<p>The Iceberg community prefers to receive contributions as <a href="https://help.github.com/articles/about-pull-requests/">Github pull requests</a>.</p>
-<ul>
-<li><a href="https://github.com/apache/iceberg/pulls">View open pull requests</a></li>
-<li><a href="https://help.github.com/articles/about-pull-requests/">Learn about pull requests</a></li>
-</ul>
-<h2 id="issues">Issues<a class="headerlink" href="#issues" title="Permanent link">&para;</a></h2>
-<p>Issues are tracked in GitHub:</p>
-<ul>
-<li><a href="https://github.com/apache/iceberg/issues">View open issues</a></li>
-<li><a href="https://github.com/apache/iceberg/issues/new">Open a new issue</a></li>
-</ul>
-<h2 id="slack">Slack<a class="headerlink" href="#slack" title="Permanent link">&para;</a></h2>
-<p>We use the <a href="https://the-asf.slack.com/archives/CF01LKV9S">#iceberg</a> channel on
-the ASF&rsquo;s Slack workspace. You get can an invitation to join this workspace at
-<a href="https://s.apache.org/slack-invite">https://s.apache.org/slack-invite</a>. Please note that this link occasionally
-breaks when Slack does an upgrade. If you encounter problems using it, please
-let us know by sending an email to <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#100;&#101;&#118;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;">&#100;&#101;&#118;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;</a>.</p>
-<h2 id="mailing-lists">Mailing Lists<a class="headerlink" href="#mailing-lists" title="Permanent link">&para;</a></h2>
-<p>Iceberg has four mailing lists:</p>
-<ul>
-<li><strong>Developers</strong>: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#100;&#101;&#118;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;">&#100;&#101;&#118;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;</a> &ndash; used for community discussions<ul>
-<li><a href="mailto:dev-subscribe@iceberg.apache.org">Subscribe</a></li>
-<li><a href="mailto:dev-unsubscribe@iceberg.apache.org">Unsubscribe</a></li>
-<li><a href="https://lists.apache.org/list.html?dev@iceberg.apache.org">Archive</a></li>
-</ul>
-</li>
-<li><strong>Commits</strong>: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#99;&#111;&#109;&#109;&#105;&#116;&#115;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;">&#99;&#111;&#109;&#109;&#105;&#116;&#115;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;</a> &ndash; distributes commit notifications<ul>
-<li><a href="mailto:commits-subscribe@iceberg.apache.org">Subscribe</a></li>
-<li><a href="mailto:commits-unsubscribe@iceberg.apache.org">Unsubscribe</a></li>
-<li><a href="https://lists.apache.org/list.html?commits@iceberg.apache.org">Archive</a></li>
-</ul>
-</li>
-<li><strong>Issues</strong>: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#105;&#115;&#115;&#117;&#101;&#115;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;">&#105;&#115;&#115;&#117;&#101;&#115;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;</a> &ndash; Github issue tracking<ul>
-<li><a href="mailto:issues-subscribe@iceberg.apache.org">Subscribe</a></li>
-<li><a href="mailto:issues-unsubscribe@iceberg.apache.org">Unsubscribe</a></li>
-<li><a href="https://lists.apache.org/list.html?issues@iceberg.apache.org">Archive</a></li>
-</ul>
-</li>
-<li><strong>Private</strong>: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#112;&#114;&#105;&#118;&#97;&#116;&#101;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;">&#112;&#114;&#105;&#118;&#97;&#116;&#101;&#64;&#105;&#99;&#101;&#98;&#101;&#114;&#103;&#46;&#97;&#112;&#97;&#99;&#104;&#101;&#46;&#111;&#114;&#103;</a> &ndash; private list for the PMC to discuss sensitive issues related to the health of the project<ul>
-<li><a href="https://lists.apache.org/list.html?private@iceberg.apache.org">Archive</a></li>
-</ul>
-</li>
-</ul>
-<h2 id="setting-up-ide-and-code-style">Setting up IDE and Code Style<a class="headerlink" href="#setting-up-ide-and-code-style" title="Permanent link">&para;</a></h2>
-<h3 id="configuring-code-formatter-for-intellij-idea">Configuring Code Formatter for IntelliJ IDEA<a class="headerlink" href="#configuring-code-formatter-for-intellij-idea" title="Permanent link">&para;</a></h3>
-<p>In the <strong>Settings/Preferences</strong> dialog go to <strong>Editor &gt; Code Style &gt; Java</strong>. Click on the gear wheel and select <strong>Import Scheme</strong> to import IntelliJ IDEA XML code style settings.
-Point to <a href="https://github.com/apache/iceberg/blob/master/.baseline/idea/intellij-java-palantir-style.xml">intellij-java-palantir-style.xml</a> and hit <strong>OK</strong> (you might need to enable <strong>Show Hidden Files and Directories</strong> in the dialog). The code itself can then be formatted via <strong>Code &gt; Reformat Code</strong>.</p>
-<p>See also the IntelliJ <a href="https://www.jetbrains.com/help/idea/copying-code-style-settings.html">Code Style docs</a> and <a href="https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html">Reformat Code docs</a> for additional details.</p>
-<h2 id="running-benchmarks">Running Benchmarks<a class="headerlink" href="#running-benchmarks" title="Permanent link">&para;</a></h2>
-<p>Some PRs/changesets might require running benchmarks to determine whether they are affecting the baseline performance. Currently there is 
-no &ldquo;push a single button to get a performance comparison&rdquo; solution available, therefore one has to run JMH performance tests on their local machine and
-post the results on the PR.</p>
-<p>See <a href="../benchmarks/">Benchmarks</a> for a summary of available benchmarks and how to run them.</p></div>
+<h1 id="iceberg-jdbc-integration">Iceberg JDBC Integration<a class="headerlink" href="#iceberg-jdbc-integration" title="Permanent link">&para;</a></h1>
+<h2 id="jdbc-catalog">JDBC Catalog<a class="headerlink" href="#jdbc-catalog" title="Permanent link">&para;</a></h2>
+<p>Iceberg supports using a table in a relational database to manage Iceberg tables through JDBC.
+The database that JDBC connects to must support atomic transaction to allow the JDBC catalog implementation to 
+properly support atomic Iceberg table commits and read serializable isolation.</p>
+<h3 id="configurations">Configurations<a class="headerlink" href="#configurations" title="Permanent link">&para;</a></h3>
+<p>Because each database and database service provider might require different configurations,
+the JDBC catalog allows arbitrary configurations through:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uri</td>
+<td></td>
+<td>the JDBC connection string</td>
+</tr>
+<tr>
+<td>jdbc.&lt;property_key></td>
+<td></td>
+<td>any key value pairs to configure the JDBC connection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
+<h4 id="spark">Spark<a class="headerlink" href="#spark" title="Permanent link">&para;</a></h4>
+<p>You can start a Spark session with a MySQL JDBC connection using the following configurations:</p>
+<pre><code class="language-shell">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.11.1 \
+    --conf spark.sql.catalog.my_catalog=org.apache.iceberg.spark.SparkCatalog \
+    --conf spark.sql.catalog.my_catalog.warehouse=s3://my-bucket/my/key/prefix \
+    --conf spark.sql.catalog.my_catalog.catalog-impl=org.apache.iceberg.jdbc.JdbcCatalog \
+    --conf spark.sql.catalog.my_catalog.uri=jdbc:mysql://test.1234567890.us-west-2.rds.amazonaws.com:3306/default \
+    --conf spark.sql.catalog.my_catalog.jdbc.verifyServerCertificate=true \
+    --conf spark.sql.catalog.my_catalog.jdbc.useSSL=true \
+    --conf spark.sql.catalog.my_catalog.jdbc.user=admin \
+    --conf spark.sql.catalog.my_catalog.jdbc.password=pass
+</code></pre>
+<h4 id="java-api">Java API<a class="headerlink" href="#java-api" title="Permanent link">&para;</a></h4>
+<pre><code class="language-java">Class.forName(&quot;com.mysql.cj.jdbc.Driver&quot;); // ensure JDBC driver is at runtime classpath
+Map&lt;String, String&gt; properties = new HashMap&lt;&gt;();
+properties.put(CatalogProperties.CATALOG_IMPL, JdbcCatalog.class.getName());
+properties.put(CatalogProperties.URI, &quot;jdbc:mysql://localhost:3306/test&quot;);
+properties.put(JdbcCatalog.PROPERTY_PREFIX + &quot;user&quot;, &quot;admin&quot;);
+properties.put(JdbcCatalog.PROPERTY_PREFIX + &quot;password&quot;, &quot;pass&quot;);
+properties.put(CatalogProperties.WAREHOUSE_LOCATION, &quot;s3://warehouse/path&quot;);
+Configuration hadoopConf = new Configuration(); // configs if you use HadoopFileIO
+JdbcCatalog catalog = CatalogUtil.buildIcebergCatalog(&quot;test_jdbc_catalog&quot;, properties, hadoopConf);
+</code></pre></div>
         
         
     </div>
