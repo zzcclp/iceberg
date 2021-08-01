@@ -479,7 +479,7 @@
 <h1 id="iceberg-table-spec">Iceberg Table Spec<a class="headerlink" href="#iceberg-table-spec" title="Permanent link">&para;</a></h1>
 <p>This is a specification for the Iceberg table format that is designed to manage a large, slow-changing collection of files in a distributed file system or key-value store as a table.</p>
 <h4 id="version-1-analytic-data-tables">Version 1: Analytic Data Tables<a class="headerlink" href="#version-1-analytic-data-tables" title="Permanent link">&para;</a></h4>
-<p><strong>Iceberg format version 1 is the current version</strong>. It defines how to manage large analytic tables using immutable file formats, like Parquet, Avro, and ORC.</p>
+<p><strong>Iceberg format version 1 is the current version</strong>. It defines how to manage large analytic tables using immutable file formats: Parquet, Avro, and ORC.</p>
 <h4 id="version-2-row-level-deletes">Version 2: Row-level Deletes<a class="headerlink" href="#version-2-row-level-deletes" title="Permanent link">&para;</a></h4>
 <p>The Iceberg community is currently working on version 2 of the Iceberg format that supports encoding row-level deletes. <strong>The v2 specification is incomplete and may change until it is finished and adopted.</strong> This document includes tentative v2 format requirements, but there are currently no compatibility guarantees with the unfinished v2 spec.</p>
 <p>The primary goal of version 2 is to provide a way to encode row-level deletes. This update can be used to delete or replace individual rows in an immutable data file without rewriting the file.</p>
