@@ -121,6 +121,12 @@
                 
                 
                 
+                    <li >
+                        <a href="../getting-started/">Getting Started</a>
+                    </li>
+                
+                
+                
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -173,76 +179,91 @@
                 
                 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Engines <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Spark</a>
+    <ul class="dropdown-menu">
+        
+            
 <li >
     <a href="../getting-started/">Getting Started</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-configuration/">Configuration</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-ddl/">DDL</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-queries/">Queries</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-writes/">Writes</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-procedures/">Maintenance Procedures</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-structured-streaming/">Structured Streaming</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-queries/#time-travel">Time Travel</a>
 </li>
 
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../flink/">Flink</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="../hive/">Hive</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="https://prestodb.io/docs/current/connector/iceberg.html">PrestoDB</a>
+</li>
+
                         
                         </ul>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../flink/">Flink</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../hive/">Hive</a>
                     </li>
                 
                 
@@ -414,10 +435,10 @@
         <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
         <li class="first-level active"><a href="#iceberg-table-spec">Iceberg Table Spec</a></li>
-            <li class="second-level"><a href="#version-1-analytic-data-tables">Version 1: Analytic Data Tables</a></li>
+            <li class="second-level"><a href="#format-versioning">Format Versioning</a></li>
                 
-            <li class="second-level"><a href="#version-2-row-level-deletes">Version 2: Row-level Deletes</a></li>
-                
+                <li class="third-level"><a href="#version-1-analytic-data-tables">Version 1: Analytic Data Tables</a></li>
+                <li class="third-level"><a href="#version-2-row-level-deletes">Version 2: Row-level Deletes</a></li>
             <li class="second-level"><a href="#goals">Goals</a></li>
                 
             <li class="second-level"><a href="#overview">Overview</a></li>
@@ -452,7 +473,7 @@
                 <li class="third-level"><a href="#table-metadata-and-snapshots">Table Metadata and Snapshots</a></li>
             <li class="second-level"><a href="#appendix-d-single-value-serialization">Appendix D: Single-value serialization</a></li>
                 
-            <li class="second-level"><a href="#format-version-changes">Format version changes</a></li>
+            <li class="second-level"><a href="#appendix-e-format-version-changes">Appendix E: Format version changes</a></li>
                 
                 <li class="third-level"><a href="#version-2">Version 2</a></li>
     </ul>
@@ -478,11 +499,16 @@
 
 <h1 id="iceberg-table-spec">Iceberg Table Spec<a class="headerlink" href="#iceberg-table-spec" title="Permanent link">&para;</a></h1>
 <p>This is a specification for the Iceberg table format that is designed to manage a large, slow-changing collection of files in a distributed file system or key-value store as a table.</p>
+<h2 id="format-versioning">Format Versioning<a class="headerlink" href="#format-versioning" title="Permanent link">&para;</a></h2>
+<p>Versions 1 and 2 of the Iceberg spec are complete and adopted by the community.</p>
+<p>The format version number is incremented when new features are added that will break forward-compatibility&mdash;that is, when older readers would not read newer table features correctly. Tables may continue to be written with an older version of the spec to ensure compatibility by not using features that are not yet implemented by processing engines.</p>
 <h4 id="version-1-analytic-data-tables">Version 1: Analytic Data Tables<a class="headerlink" href="#version-1-analytic-data-tables" title="Permanent link">&para;</a></h4>
-<p><strong>Iceberg format version 1 is the current version</strong>. It defines how to manage large analytic tables using immutable file formats: Parquet, Avro, and ORC.</p>
+<p>Version 1 of the Iceberg spec defines how to manage large analytic tables using immutable file formats: Parquet, Avro, and ORC.</p>
+<p>All version 1 data and metadata files are valid after upgrading a table to version 2. <a href="#version-2">Appendix E</a> documents how to default version 2 fields when reading version 1 metadata.</p>
 <h4 id="version-2-row-level-deletes">Version 2: Row-level Deletes<a class="headerlink" href="#version-2-row-level-deletes" title="Permanent link">&para;</a></h4>
-<p>The Iceberg community is currently working on version 2 of the Iceberg format that supports encoding row-level deletes. <strong>The v2 specification is incomplete and may change until it is finished and adopted.</strong> This document includes tentative v2 format requirements, but there are currently no compatibility guarantees with the unfinished v2 spec.</p>
-<p>The primary goal of version 2 is to provide a way to encode row-level deletes. This update can be used to delete or replace individual rows in an immutable data file without rewriting the file.</p>
+<p>Version 2 of the Iceberg spec adds row-level updates and deletes for analytic tables with immutable files.</p>
+<p>The primary change in version 2 adds delete files to encode that rows that are deleted in existing data files. This version can be used to delete or replace individual rows in immutable data files without rewriting the files.</p>
+<p>In addition to row-level deletes, version 2 makes some requirements stricter for writers. The full set of changes are listed in <a href="#version-2">Appendix E</a>.</p>
 <h2 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Serializable isolation</strong> &ndash; Reads will be isolated from concurrent writes and always use a committed snapshot of a table’s data. Writes will support removing and adding files in a single operation and are never partially visible. Readers will not acquire locks.</li>
@@ -2705,7 +2731,7 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 </tr>
 </tbody>
 </table>
-<h2 id="format-version-changes">Format version changes<a class="headerlink" href="#format-version-changes" title="Permanent link">&para;</a></h2>
+<h2 id="appendix-e-format-version-changes">Appendix E: Format version changes<a class="headerlink" href="#appendix-e-format-version-changes" title="Permanent link">&para;</a></h2>
 <h3 id="version-2">Version 2<a class="headerlink" href="#version-2" title="Permanent link">&para;</a></h3>
 <p>Writing v1 metadata:</p>
 <ul>
