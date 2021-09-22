@@ -82,6 +82,12 @@
                         
                             
 <li >
+    <a href="../roadmap/">Roadmap</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../community/">Community</a>
 </li>
 
@@ -240,9 +246,24 @@
 
                         
                             
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Flink</a>
+    <ul class="dropdown-menu">
+        
+            
 <li >
-    <a href="../flink/">Flink</a>
+    <a href="../flink/">Getting Started</a>
 </li>
+
+        
+            
+<li >
+    <a href="../flink-connector/">Flink Connector</a>
+</li>
+
+        
+    </ul>
+  </li>
 
                         
                             
@@ -836,7 +857,7 @@ For more details, please read <a href="https://docs.aws.amazon.com/AmazonS3/late
 Data stored in S3 with a traditional Hive storage layout can face S3 request throttling as objects are stored under the same filepath prefix.</p>
 <p>Iceberg by default uses the Hive storage layout, but can be switched to use the <code>ObjectStoreLocationProvider</code>. 
 With <code>ObjectStoreLocationProvider</code>, a determenistic hash is generated for each stored file, with the hash appended 
-directly after the <code>write.object-storage.path</code>. This ensures files written to s3 are equally distributed across multiple <a href="https://aws.amazon.com/premiumsupport/knowledge-center/s3-object-key-naming-pattern/">prefixes</a> in the S3 bucket. Resulting in minimized throttling and maximized throughput for S3-related IO operations. When using <code>ObjectStoreLocationProvider</code> having a shared and short <code>write.object-storage.path</code> across your Iceberg tables will improve performance.</p>
+directly after the <code>write.data.path</code>. This ensures files written to s3 are equally distributed across multiple <a href="https://aws.amazon.com/premiumsupport/knowledge-center/s3-object-key-naming-pattern/">prefixes</a> in the S3 bucket. Resulting in minimized throttling and maximized throughput for S3-related IO operations. When using <code>ObjectStoreLocationProvider</code> having a shared and short <code>write.data.path</code> across your Iceberg tables will improve performance.</p>
 <p>For more information on how S3 scales API QPS, checkout the 2018 re:Invent session on <a href="https://youtu.be/rHeTn9pHNKo?t=3219">Best Practices for Amazon S3 and Amazon S3 Glacier</a>. At <a href="https://youtu.be/rHeTn9pHNKo?t=3219">53:39</a> it covers how S3 scales/partitions &amp; at <a href="https://youtu.be/rHeTn9pHNKo?t=3290">54:50</a> it discusses the 30-60 minute wait time before new partitions are created.</p>
 <p>To use the <code>ObjectStorageLocationProvider</code> add <code>'write.object-storage.enabled'=true</code> in the table&rsquo;s properties. 
 Below is an example Spark SQL command to create a table using the <code>ObjectStorageLocationProvider</code>:</p>
@@ -847,7 +868,7 @@ Below is an example Spark SQL command to create a table using the <code>ObjectSt
 USING iceberg
 OPTIONS (
     'write.object-storage.enabled'=true, 
-    'write.object-storage.path'='s3://my-table-data-bucket')
+    'write.data.path'='s3://my-table-data-bucket')
 PARTITIONED BY (category);
 </code></pre>
 <p>We can then insert a single row into this new table</p>
@@ -856,10 +877,10 @@ PARTITIONED BY (category);
 <p>Which will write the data to S3 with a hash (<code>2d3905f8</code>) appended directly after the <code>write.object-storage.path</code>, ensuring reads to the table are spread evenly  across <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html">S3 bucket prefixes</a>, and improving performance.</p>
 <pre><code>s3://my-table-data-bucket/2d3905f8/my_ns.db/my_table/category=orders/00000-0-5affc076-96a4-48f2-9cd2-d5efbc9f0c94-00001.parquet
 </code></pre>
-<p>Note, the path resolution logic for <code>ObjectStoreLocationProvider</code> is as follows:
-- if <code>write.object-storage.path</code> is set, use it
-- if not found, fallback to <code>write.folder-storage.path</code>
-- if not found, use <code>&lt;tableLocation&gt;/data</code></p>
+<p>Note, the path resolution logic for <code>ObjectStoreLocationProvider</code> is <code>write.data.path</code> then <code>&lt;tableLocation&gt;/data</code>.
+However, for the older versions up to 0.12.0, the logic is as follows:
+- before 0.12.0, <code>write.object-storage.path</code> must be set.
+- at 0.12.0, <code>write.object-storage.path</code> then <code>write.folder-storage.path</code> then <code>&lt;tableLocation&gt;/data</code>.</p>
 <p>For more details, please refer to the <a href="../custom-catalog/#custom-location-provider-implementation">LocationProvider Configuration</a> section.  </p>
 <h3 id="s3-strong-consistency">S3 Strong Consistency<a class="headerlink" href="#s3-strong-consistency" title="Permanent link">&para;</a></h3>
 <p>In November 2020, S3 announced <a href="https://aws.amazon.com/s3/consistency/">strong consistency</a> for all read operations, and Iceberg is updated to fully leverage this feature.

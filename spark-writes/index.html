@@ -82,6 +82,12 @@
                         
                             
 <li >
+    <a href="../roadmap/">Roadmap</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../community/">Community</a>
 </li>
 
@@ -117,6 +123,12 @@
 
                         
                         </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../getting-started/">Getting Started</a>
                     </li>
                 
                 
@@ -173,76 +185,106 @@
                 
                 
                     <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Engines <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Spark</a>
+    <ul class="dropdown-menu">
+        
+            
 <li >
     <a href="../getting-started/">Getting Started</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-configuration/">Configuration</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-ddl/">DDL</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-queries/">Queries</a>
 </li>
 
-                        
-                            
+        
+            
 <li class="active">
     <a href="./">Writes</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-procedures/">Maintenance Procedures</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-structured-streaming/">Structured Streaming</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-queries/#time-travel">Time Travel</a>
 </li>
 
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Flink</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../flink/">Getting Started</a>
+</li>
+
+        
+            
+<li >
+    <a href="../flink-connector/">Flink Connector</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../hive/">Hive</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="https://prestodb.io/docs/current/connector/iceberg.html">PrestoDB</a>
+</li>
+
                         
                         </ul>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../flink/">Flink</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../hive/">Hive</a>
                     </li>
                 
                 
@@ -420,6 +462,7 @@
                 <li class="third-level"><a href="#merge-into">MERGE INTO</a></li>
                 <li class="third-level"><a href="#insert-overwrite">INSERT OVERWRITE</a></li>
                 <li class="third-level"><a href="#delete-from">DELETE FROM</a></li>
+                <li class="third-level"><a href="#update">UPDATE</a></li>
             <li class="second-level"><a href="#writing-with-dataframes">Writing with DataFrames</a></li>
                 
                 <li class="third-level"><a href="#appending-data">Appending data</a></li>
@@ -489,6 +532,12 @@
 <td>✔️</td>
 <td></td>
 <td>⚠ Row-level delete requires Spark extensions</td>
+</tr>
+<tr>
+<td><a href="#update">SQL update</a></td>
+<td>✔️</td>
+<td></td>
+<td>⚠ Requires Iceberg Spark extensions</td>
 </tr>
 <tr>
 <td><a href="#appending-data">DataFrame append</a></td>
@@ -590,6 +639,14 @@ GROUP BY uuid
 WHERE ts &gt;= '2020-05-01 00:00:00' and ts &lt; '2020-06-01 00:00:00'
 </code></pre>
 <p>If the delte filter matches entire partitions of the table, Iceberg will perform a metadata-only delete. If the filter matches individual rows of a table, then Iceberg will rewrite only the affected data files.</p>
+<h3 id="update"><code>UPDATE</code><a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
+<p>Spark 3.1 added support for <code>UPDATE</code> queries that update matching rows in tables.</p>
+<p>Update queries accept a filter to match rows to update.</p>
+<pre><code class="language-sql">UPDATE prod.db.table
+SET c1 = 'update_c1', c2 = 'update_c2'
+WHERE ts &gt;= '2020-05-01 00:00:00' and ts &lt; '2020-06-01 00:00:00'
+</code></pre>
+<p>For more complex row-level updates based on incoming data, see the section on <code>MERGE INTO</code>.</p>
 <h2 id="writing-with-dataframes">Writing with DataFrames<a class="headerlink" href="#writing-with-dataframes" title="Permanent link">&para;</a></h2>
 <p>Spark 3 introduced the new <code>DataFrameWriterV2</code> API for writing to tables using data frames. The v2 API is recommended for several reasons:</p>
 <ul>

@@ -82,6 +82,12 @@
                         
                             
 <li >
+    <a href="../roadmap/">Roadmap</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../community/">Community</a>
 </li>
 
@@ -117,6 +123,12 @@
 
                         
                         </ul>
+                    </li>
+                
+                
+                
+                    <li >
+                        <a href="../getting-started/">Getting Started</a>
                     </li>
                 
                 
@@ -173,76 +185,106 @@
                 
                 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Spark <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Engines <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Spark</a>
+    <ul class="dropdown-menu">
+        
+            
 <li >
     <a href="../getting-started/">Getting Started</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-configuration/">Configuration</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-ddl/">DDL</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-queries/">Queries</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-writes/">Writes</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-procedures/">Maintenance Procedures</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-structured-streaming/">Structured Streaming</a>
 </li>
 
-                        
-                            
+        
+            
 <li >
     <a href="../spark-queries/#time-travel">Time Travel</a>
 </li>
 
+        
+    </ul>
+  </li>
+
+                        
+                            
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Flink</a>
+    <ul class="dropdown-menu">
+        
+            
+<li >
+    <a href="../flink/">Getting Started</a>
+</li>
+
+        
+            
+<li >
+    <a href="../flink-connector/">Flink Connector</a>
+</li>
+
+        
+    </ul>
+  </li>
+
+                        
+                            
+<li >
+    <a href="../hive/">Hive</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
+</li>
+
+                        
+                            
+<li >
+    <a href="https://prestodb.io/docs/current/connector/iceberg.html">PrestoDB</a>
+</li>
+
                         
                         </ul>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../flink/">Flink</a>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../hive/">Hive</a>
                     </li>
                 
                 
@@ -472,6 +514,7 @@
 <li><code>locationProvider</code> returns a <code>LocationProvider</code> used to create paths for data and metadata files</li>
 </ul>
 <h3 id="scanning">Scanning<a class="headerlink" href="#scanning" title="Permanent link">&para;</a></h3>
+<h4 id="file-level">File level<a class="headerlink" href="#file-level" title="Permanent link">&para;</a></h4>
 <p>Iceberg table scans start by creating a <code>TableScan</code> object with <code>newScan</code>.</p>
 <pre><code class="language-java">TableScan scan = table.newScan();
 </code></pre>
@@ -488,6 +531,19 @@ Schema projection = scan.schema();
 Iterable&lt;CombinedScanTask&gt; tasks = scan.planTasks();
 </code></pre>
 <p>Use <code>asOfTime</code> or <code>useSnapshot</code> to configure the table snapshot for time travel queries.</p>
+<h4 id="row-level">Row level<a class="headerlink" href="#row-level" title="Permanent link">&para;</a></h4>
+<p>Iceberg table scans start by creating a <code>ScanBuilder</code> object with <code>IcebergGenerics.read</code>.</p>
+<pre><code class="language-java">ScanBuilder scanBuilder = IcebergGenerics.read(table)
+</code></pre>
+<p>To configure a scan, call <code>where</code> and <code>select</code> on the <code>ScanBuilder</code> to get a new <code>ScanBuilder</code> with those changes.</p>
+<pre><code class="language-java">scanBuilder.where(Expressions.equal(&quot;id&quot;, 5))
+</code></pre>
+<p>When a scan is configured, call method <code>build</code> to execute scan. <code>build</code> return <code>CloseableIterable&lt;Record&gt;</code></p>
+<pre><code class="language-java">CloseableIterable&lt;Record&gt; result = IcebergGenerics.read(table)
+        .where(Expressions.lessThan(&quot;id&quot;, 5))
+        .build();
+</code></pre>
+<p>where <code>Record</code> is Iceberg record for iceberg-data module <code>org.apache.iceberg.data.Record</code>.</p>
 <h3 id="update-operations">Update operations<a class="headerlink" href="#update-operations" title="Permanent link">&para;</a></h3>
 <p><code>Table</code> also exposes operations that update the table. These operations use a builder pattern, <a href="../javadoc/master/?org/apache/iceberg/PendingUpdate.html"><code>PendingUpdate</code></a>, that commits when <code>PendingUpdate#commit</code> is called.</p>
 <p>For example, updating the table schema is done by calling <code>updateSchema</code>, adding updates to the builder, and finally calling <code>commit</code> to commit the pending changes to the table:</p>

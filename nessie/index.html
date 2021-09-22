@@ -82,6 +82,12 @@
                         
                             
 <li >
+    <a href="../roadmap/">Roadmap</a>
+</li>
+
+                        
+                            
+<li >
     <a href="../community/">Community</a>
 </li>
 
@@ -240,9 +246,24 @@
 
                         
                             
+  <li class="dropdown-submenu">
+    <a tabindex="-1" href="">Flink</a>
+    <ul class="dropdown-menu">
+        
+            
 <li >
-    <a href="../flink/">Flink</a>
+    <a href="../flink/">Getting Started</a>
 </li>
+
+        
+            
+<li >
+    <a href="../flink-connector/">Flink Connector</a>
+</li>
+
+        
+    </ul>
+  </li>
 
                         
                             
@@ -534,7 +555,7 @@ can encompass an arbitrary number of actions on an arbitrary number of tables, h
 to the set of single table transactions currently available.</p>
 <p>Further operations such as merges, viewing the commit log or diffs are performed by direct interaction with the
 <code>NessieClient</code> in java or by using the python client or cli. See <a href="https://projectnessie.org/tools/cli/">Nessie CLI</a> for
-more details on the CLI and <a href="https://projectnessie.org/tools/spark/">Spark Guide</a> for a more complete description of 
+more details on the CLI and <a href="https://projectnessie.org/tools/iceberg/spark/">Spark Guide</a> for a more complete description of 
 Nessie functionality.</p>
 <h2 id="nessie-and-iceberg">Nessie and Iceberg<a class="headerlink" href="#nessie-and-iceberg" title="Permanent link">&para;</a></h2>
 <p>For most cases Nessie acts just like any other Catalog for Iceberg: providing a logical organization of a set of tables
