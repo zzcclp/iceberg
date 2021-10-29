@@ -1,485 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  
+  
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A table format for large, slow-moving tabular data">
+    
     
     <link rel="canonical" href="https://iceberg.apache.org/spark-procedures/">
     <link rel="shortcut icon" href="../img/favicon.ico">
-
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <title>Maintenance Procedures - Apache Iceberg</title>
-    
-
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3.3.0/build/web/hack.min.css">
-    <link href='//rsms.me/inter/inter.css' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,400,300,600,700&subset=latin-ext,latin' rel='stylesheet' type='text/css'>
-    <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-    <link href="../css/base.min.css" rel="stylesheet">
-    <link href="../css/cinder.min.css" rel="stylesheet">
-
-    
-        
-        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/github.min.css">
-        
-    
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
     <link href="../css/extra.css" rel="stylesheet">
-
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-            <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
-        <![endif]-->
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
 
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
     
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Spark Procedures", url: "#_top", children: [
+              {title: "Usage", url: "#usage" },
+              {title: "Snapshot management", url: "#snapshot-management" },
+              {title: "Metadata management", url: "#metadata-management" },
+              {title: "Table migration", url: "#table-migration" },
+          ]},
+        ];
 
-     
+    </script>
+    <script src="../js/base.js"></script> 
 </head>
 
 <body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
 
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
 
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            
 
-            <!-- Main title -->
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
 
-            
-              <a class="navbar-brand" href="..">Apache Iceberg</a>
-            
-        </div>
-
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="..">About</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../roadmap/">Roadmap</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../community/">Community</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../releases/">Releases</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../blogs/">Blogs</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../trademarks/">Trademarks</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../how-to-release/">How to Release</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../security/">Security</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="../getting-started/">Getting Started</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tables <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../configuration/">Configuration</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../schemas/">Schemas</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../partitioning/">Partitioning</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../evolution/">Table evolution</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../maintenance/">Maintenance</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../performance/">Performance</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../reliability/">Reliability</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown active">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Engines <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Spark</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../getting-started/">Getting Started</a>
-</li>
-
-        
-            
-<li >
-    <a href="../spark-configuration/">Configuration</a>
-</li>
-
-        
-            
-<li >
-    <a href="../spark-ddl/">DDL</a>
-</li>
-
-        
-            
-<li >
-    <a href="../spark-queries/">Queries</a>
-</li>
-
-        
-            
-<li >
-    <a href="../spark-writes/">Writes</a>
-</li>
-
-        
-            
-<li class="active">
-    <a href="./">Maintenance Procedures</a>
-</li>
-
-        
-            
-<li >
-    <a href="../spark-structured-streaming/">Structured Streaming</a>
-</li>
-
-        
-            
-<li >
-    <a href="../spark-queries/#time-travel">Time Travel</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-  <li class="dropdown-submenu">
-    <a tabindex="-1" href="">Flink</a>
-    <ul class="dropdown-menu">
-        
-            
-<li >
-    <a href="../flink/">Getting Started</a>
-</li>
-
-        
-            
-<li >
-    <a href="../flink-connector/">Flink Connector</a>
-</li>
-
-        
-    </ul>
-  </li>
-
-                        
-                            
-<li >
-    <a href="../hive/">Hive</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="https://trino.io/docs/current/connector/iceberg.html">Trino</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="https://prestodb.io/docs/current/connector/iceberg.html">PrestoDB</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Integrations <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../aws/">AWS</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../nessie/">Nessie</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../jdbc/">JDBC</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">API <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="/javadoc/">Javadoc</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../api/">Java API intro</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../java-api-quickstart/">Java Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../custom-catalog/">Java Custom Catalog</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../python-quickstart/">Python Quickstart</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../python-api-intro/">Python API Intro</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../python-feature-support/">Python Feature Support</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Format <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="../terms/">Definitions</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="../spec/">Spec</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                
-                    <li >
-                        <a href="https://github.com/apache/iceberg">GitHub</a>
-                    </li>
-                
-                
-                
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">ASF <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                        
-                            
-<li >
-    <a href="https://www.apache.org/licenses/">License</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="https://www.apache.org/security/">Security</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="https://www.apache.org/foundation/thanks.html">Sponsors</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="https://www.apache.org/foundation/sponsorship.html">Donate</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="https://www.apache.org/events/current-event.html">Events</a>
-</li>
-
-                        
-                        </ul>
-                    </li>
-                
-                
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                    <li >
-                        <a rel="prev" href="../spark-writes/">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="next" href="../spark-structured-streaming/">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </a>
-                    </li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-    <div class="container">
-        
-        
-        <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="first-level active"><a href="#spark-procedures">Spark Procedures</a></li>
-            <li class="second-level"><a href="#usage">Usage</a></li>
-                
-                <li class="third-level"><a href="#named-arguments">Named arguments</a></li>
-                <li class="third-level"><a href="#positional-arguments">Positional arguments</a></li>
-            <li class="second-level"><a href="#snapshot-management">Snapshot management</a></li>
-                
-                <li class="third-level"><a href="#rollback_to_snapshot">rollback_to_snapshot</a></li>
-                <li class="third-level"><a href="#rollback_to_timestamp">rollback_to_timestamp</a></li>
-                <li class="third-level"><a href="#set_current_snapshot">set_current_snapshot</a></li>
-                <li class="third-level"><a href="#cherrypick_snapshot">cherrypick_snapshot</a></li>
-            <li class="second-level"><a href="#metadata-management">Metadata management</a></li>
-                
-                <li class="third-level"><a href="#expire_snapshots">expire_snapshots</a></li>
-                <li class="third-level"><a href="#remove_orphan_files">remove_orphan_files</a></li>
-                <li class="third-level"><a href="#rewrite_manifests">rewrite_manifests</a></li>
-            <li class="second-level"><a href="#table-migration">Table migration</a></li>
-                
-                <li class="third-level"><a href="#snapshot">snapshot</a></li>
-                <li class="third-level"><a href="#migrate">migrate</a></li>
-    </ul>
-</div></div>
-        <div class="col-md-9" role="main">
-
-<!--
+    <!--
  - Licensed to the Apache Software Foundation (ASF) under one or more
  - contributor license agreements.  See the NOTICE file distributed with
  - this work for additional information regarding copyright ownership.
@@ -1059,80 +636,71 @@ Existing data files are added to the Iceberg table&rsquo;s metadata and can be r
 </code></pre>
 <p>Migrate <code>db.sample</code> in the current catalog to an Iceberg table without adding any additional properties:</p>
 <pre><code class="language-sql">CALL catalog_name.system.migrate('db.sample')
-</code></pre></div>
-        
-        
-    </div>
+</code></pre>
+<h3 id="add_files"><code>add_files</code><a class="headerlink" href="#add_files" title="Permanent link">&para;</a></h3>
+<p>Attempts to directly add files from a Hive or file based table into a given Iceberg table. Unlike migrate or
+snapshot, <code>add_files</code> can import files from a specific partition or partitions and does not create a new Iceberg table.
+This command will create metadata for the new files and will not move them. This procedure will not analyze the schema 
+of the files to determine if they actually match the schema of the Iceberg table. Upon completion, the Iceberg table 
+will then treat these files as if they are part of the set of files  owned by Iceberg. This means any subsequent 
+<code>expire_snapshot</code> calls will be able to physically delete the added files. This method should not be used if 
+<code>migrate</code> or <code>snapshot</code> are possible.</p>
+<h4 id="usage_10">Usage<a class="headerlink" href="#usage_10" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Table which will have files added to</td>
+</tr>
+<tr>
+<td><code>source_table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Table where files should come from, paths are also possible in the form of `file_format`.`path`</td>
+</tr>
+<tr>
+<td><code>partition_filter</code></td>
+<td>️</td>
+<td>map<string, string></td>
+<td>A map of partitions in the source table to import from</td>
+</tr>
+</tbody>
+</table>
+<p>Warning : Schema is not validated, adding files with different schema to the Iceberg table will cause issues.</p>
+<p>Warning : Files added by this method can be physically deleted by Iceberg operations</p>
+<h4 id="examples_6">Examples<a class="headerlink" href="#examples_6" title="Permanent link">&para;</a></h4>
+<p>Add the files from table <code>db.src_table</code>, a Hive or Spark table registered in the session Catalog, to Iceberg table
+<code>db.tbl</code>. Only add files that exist within partitions where <code>part_col_1</code> is equal to <code>A</code>.</p>
+<pre><code class="language-sql">CALL spark_catalog.system.add_files(
+table =&gt; 'db.tbl',
+source_table =&gt; 'db.src_tbl',
+partition_filter =&gt; map('part_col_1', 'A')
+)
+</code></pre>
+<p>Add files from a <code>parquet</code> file based table at location <code>path/to/table</code> to the Iceberg table <code>db.tbl</code>. Add all
+files regardless of what partition they belong to.</p>
+<pre><code class="language-sql">CALL spark_catalog.system.add_files(
+  table =&gt; 'db.tbl',
+  source_table =&gt; '`parquet`.`path/to/table`'
+)
+</code></pre>
 
-    
-      <footer class="col-md-12 text-center">
-          
-          
-            <hr>
-            <p>
-            <small>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.</small><br>
-            
-            <small>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</small>
-            </p>
-          
-
-          
-          
-      </footer>
-    
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="../js/bootstrap-3.0.3.min.js"></script>
-
-    
-    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
-        
-    <script>hljs.initHighlightingOnLoad();</script>
-    
-
-    <script>var base_url = ".."</script>
-    
-    <script src="../js/base.js"></script>
-
-    <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            </div>
-            <div class="modal-body">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width: 20%;">Keys</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="help shortcut"><kbd>?</kbd></td>
-                    <td>Open this help</td>
-                  </tr>
-                  <tr>
-                    <td class="next shortcut"><kbd>n</kbd></td>
-                    <td>Next page</td>
-                  </tr>
-                  <tr>
-                    <td class="prev shortcut"><kbd>p</kbd></td>
-                    <td>Previous page</td>
-                  </tr>
-                  <tr>
-                    <td class="search shortcut"><kbd>s</kbd></td>
-                    <td>Search</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
+  <br>
 </div>
-    </body>
 
+<footer class="container-fluid wm-page-content"><p>Copyright 2018-2021 <a href='https://www.apache.org/'>The Apache Software Foundation</a><br />Apache Iceberg, Iceberg, Apache, the Apache feather logo, and the Apache Iceberg project logo are either registered<br />trademarks or trademarks of The Apache Software Foundation in the United States and other countries.</p>
+  <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
 </html>
