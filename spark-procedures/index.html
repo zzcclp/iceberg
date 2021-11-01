@@ -38,6 +38,7 @@
               {title: "Snapshot management", url: "#snapshot-management" },
               {title: "Metadata management", url: "#metadata-management" },
               {title: "Table migration", url: "#table-migration" },
+              {title: "Metadata information", url: "#metadata-information" },
           ]},
         ];
 
@@ -693,6 +694,73 @@ files regardless of what partition they belong to.</p>
   table =&gt; 'db.tbl',
   source_table =&gt; '`parquet`.`path/to/table`'
 )
+</code></pre>
+<h2 id="metadata-information"><code>Metadata information</code><a class="headerlink" href="#metadata-information" title="Permanent link">&para;</a></h2>
+<h3 id="ancestors_of"><code>ancestors_of</code><a class="headerlink" href="#ancestors_of" title="Permanent link">&para;</a></h3>
+<p>Report the live snapshot IDs of parents of a specified snapshot</p>
+<h4 id="usage_11">Usage<a class="headerlink" href="#usage_11" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Argument Name</th>
+<th>Required?</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>table</code></td>
+<td>✔️</td>
+<td>string</td>
+<td>Name of the table to report live snapshot IDs</td>
+</tr>
+<tr>
+<td><code>snapshot_id</code></td>
+<td>️</td>
+<td>long</td>
+<td>Use a specified snapshot to get the live snapshot IDs of parents</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>tip : Using snapshot_id</p>
+<p>Given snapshots history with roll back to B and addition of C&rsquo; -&gt; D&rsquo;
+<code>shell
+A -&gt; B - &gt; C -&gt; D
+      \ -&gt; C' -&gt; (D')</code>
+Not specifying the snapshot ID would return A -&gt; B -&gt; C&rsquo; -&gt; D&rsquo;, while providing the snapshot ID of
+D as an argument would return A-&gt; B -&gt; C -&gt; D</p>
+</blockquote>
+<h4 id="output_9">Output<a class="headerlink" href="#output_9" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Output Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>snapshot_id</code></td>
+<td>long</td>
+<td>the ancestor snapshot id</td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>long</td>
+<td>snapshot creation time</td>
+</tr>
+</tbody>
+</table>
+<h4 id="examples_7">Examples<a class="headerlink" href="#examples_7" title="Permanent link">&para;</a></h4>
+<p>Get all the snapshot ancestors of current snapshots(default)</p>
+<pre><code class="language-sql">CALL spark_catalog.system.ancestors_of('db.tbl')
+</code></pre>
+<p>Get all the snapshot ancestors by a particular snapshot</p>
+<pre><code class="language-sql">CALL spark_catalog.system.ancestors_of('db.tbl', 1)
+CALL spark_catalog.system.ancestors_of(snapshot_id =&gt; 1, table =&gt; 'db.tbl')
 </code></pre>
 
   <br>
