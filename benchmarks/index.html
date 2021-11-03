@@ -34,6 +34,10 @@
         
         var pageToc = [
           {title: "Available Benchmarks and how to run them", url: "#_top", children: [
+          ]},
+          {title: "Running Benchmarks on GitHub", url: "#running-benchmarks-on-github", children: [
+          ]},
+          {title: "Running Benchmarks locally", url: "#running-benchmarks-locally", children: [
               {title: "IcebergSourceNestedListParquetDataWriteBenchmark", url: "#icebergsourcenestedlistparquetdatawritebenchmark" },
               {title: "SparkParquetReadersNestedDataBenchmark", url: "#sparkparquetreadersnesteddatabenchmark" },
               {title: "SparkParquetWritersFlatDataBenchmark", url: "#sparkparquetwritersflatdatabenchmark" },
@@ -92,6 +96,16 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <h2 id="available-benchmarks-and-how-to-run-them">Available Benchmarks and how to run them<a class="headerlink" href="#available-benchmarks-and-how-to-run-them" title="Permanent link">&para;</a></h2>
 <p>Benchmarks are located under <code>&lt;project-name&gt;/jmh</code>. It is generally favorable to only run the tests of interest rather than running all available benchmarks.
 Also note that JMH benchmarks run within the same JVM as the system-under-test, so results might vary between runs.</p>
+<h2 id="running-benchmarks-on-github">Running Benchmarks on GitHub<a class="headerlink" href="#running-benchmarks-on-github" title="Permanent link">&para;</a></h2>
+<p>It is possible to run one or more Benchmarks via the <strong>JMH Benchmarks</strong> GH action on your own fork of the Iceberg repo. This GH action takes the following inputs:
+* The repository name where those benchmarks should be run against, such as <code>apache/iceberg</code> or <code>&lt;user&gt;/iceberg</code>
+* The branch name to run benchmarks against, such as <code>master</code> or <code>my-cool-feature-branch</code>
+* A list of comma-separated double-quoted Benchmark names, such as <code>"IcebergSourceFlatParquetDataReadBenchmark", "IcebergSourceFlatParquetDataFilterBenchmark", "IcebergSourceNestedListParquetDataWriteBenchmark"</code></p>
+<p>Benchmark results will be uploaded once <strong>all</strong> benchmarks are done.</p>
+<p>It is worth noting that the GH runners have limited resources so the benchmark results should rather be seen as an indicator to guide developers in understanding code changes.
+It is likely that there is variability in results across different runs, therefore the benchmark results shouldn&rsquo;t be used to form assumptions around production choices.</p>
+<h2 id="running-benchmarks-locally">Running Benchmarks locally<a class="headerlink" href="#running-benchmarks-locally" title="Permanent link">&para;</a></h2>
+<p>Below are the existing benchmarks shown with the actual commands on how to run them locally.</p>
 <h3 id="icebergsourcenestedlistparquetdatawritebenchmark">IcebergSourceNestedListParquetDataWriteBenchmark<a class="headerlink" href="#icebergsourcenestedlistparquetdatawritebenchmark" title="Permanent link">&para;</a></h3>
 <p>A benchmark that evaluates the performance of writing nested Parquet data using Iceberg and the built-in file source in Spark. To run this benchmark for either spark-2 or spark-3:</p>
 <p><code>./gradlew :iceberg-spark:iceberg-spark[2|3]:jmh -PjmhIncludeRegex=IcebergSourceNestedListParquetDataWriteBenchmark -PjmhOutputPath=benchmark/iceberg-source-nested-list-parquet-data-write-benchmark-result.txt</code></p>
