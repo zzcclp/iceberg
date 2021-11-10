@@ -102,7 +102,7 @@ the JDBC catalog allows arbitrary configurations through:</p>
 <h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
 <h4 id="spark">Spark<a class="headerlink" href="#spark" title="Permanent link">&para;</a></h4>
 <p>You can start a Spark session with a MySQL JDBC connection using the following configurations:</p>
-<pre><code class="language-shell">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.12.0 \
+<pre><code class="language-shell">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.12.1 \
     --conf spark.sql.catalog.my_catalog=org.apache.iceberg.spark.SparkCatalog \
     --conf spark.sql.catalog.my_catalog.warehouse=s3://my-bucket/my/key/prefix \
     --conf spark.sql.catalog.my_catalog.catalog-impl=org.apache.iceberg.jdbc.JdbcCatalog \

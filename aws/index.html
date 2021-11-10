@@ -94,7 +94,7 @@ Here are some examples.</p>
 <h3 id="spark">Spark<a class="headerlink" href="#spark" title="Permanent link">&para;</a></h3>
 <p>For example, to use AWS features with Spark 3 and AWS clients version 2.15.40, you can start the Spark SQL shell with:</p>
 <pre><code class="language-sh"># add Iceberg dependency
-ICEBERG_VERSION=0.12.0
+ICEBERG_VERSION=0.12.1
 DEPENDENCIES=&quot;org.apache.iceberg:iceberg-spark3-runtime:$ICEBERG_VERSION&quot;
 
 # add AWS dependnecy
@@ -121,7 +121,7 @@ spark-sql --packages $DEPENDENCIES \
 <h3 id="flink">Flink<a class="headerlink" href="#flink" title="Permanent link">&para;</a></h3>
 <p>To use AWS module with Flink, you can download the necessary dependencies and specify them when starting the Flink SQL client:</p>
 <pre><code class="language-sh"># download Iceberg dependency
-ICEBERG_VERSION=0.12.0
+ICEBERG_VERSION=0.12.1
 MAVEN_URL=https://repo1.maven.org/maven2
 ICEBERG_MAVEN_URL=$MAVEN_URL/org/apache/iceberg
 wget $ICEBERG_MAVEN_URL/iceberg-flink-runtime/$ICEBERG_VERSION/iceberg-flink-runtime-$ICEBERG_VERSION.jar
@@ -513,7 +513,7 @@ This also serves as an example for users who would like to implement their own A
 <p>By using this client factory, an STS client is initialized with the default credential and region to assume the specified role.
 The Glue, S3 and DynamoDB clients are then initialized with the assume-role credential and region to access resources.
 Here is an example to start Spark shell with this client factory:</p>
-<pre><code class="language-shell">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.12.0,software.amazon.awssdk:bundle:2.15.40 \
+<pre><code class="language-shell">spark-sql --packages org.apache.iceberg:iceberg-spark3-runtime:0.12.1,software.amazon.awssdk:bundle:2.15.40 \
     --conf spark.sql.catalog.my_catalog=org.apache.iceberg.spark.SparkCatalog \
     --conf spark.sql.catalog.my_catalog.warehouse=s3://my-bucket/my/key/prefix \    
     --conf spark.sql.catalog.my_catalog.catalog-impl=org.apache.iceberg.aws.glue.GlueCatalog \
@@ -530,7 +530,7 @@ Here is an example to start Spark shell with this client factory:</p>
 <pre><code class="language-sh">#!/bin/bash
 
 AWS_SDK_VERSION=2.15.40
-ICEBERG_VERSION=0.12.0
+ICEBERG_VERSION=0.12.1
 MAVEN_URL=https://repo1.maven.org/maven2
 ICEBERG_MAVEN_URL=$MAVEN_URL/org/apache/iceberg
 AWS_MAVEN_URL=$MAVEN_URL/software/amazon/awssdk

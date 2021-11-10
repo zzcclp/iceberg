@@ -88,11 +88,11 @@ This section describes how to use Iceberg with Nessie. Nessie provides several k
 <h2 id="enabling-nessie-catalog">Enabling Nessie Catalog<a class="headerlink" href="#enabling-nessie-catalog" title="Permanent link">&para;</a></h2>
 <p>The <code>iceberg-nessie</code> module is bundled with Spark and Flink runtimes for all versions from <code>0.11.0</code>. To get started
 with Nessie and Iceberg simply add the Iceberg runtime to your process. Eg: <code>spark-sql --packages
-org.apache.iceberg:iceberg-spark3-runtiume:0.12.0</code>. </p>
+org.apache.iceberg:iceberg-spark3-runtiume:0.12.1</code>. </p>
 <h2 id="spark-sql-extensions">Spark SQL Extensions<a class="headerlink" href="#spark-sql-extensions" title="Permanent link">&para;</a></h2>
 <p>From spark, Nessie SQL extensions can be used to manage the Nessie repo as shown below. </p>
 <pre><code>bin/spark-sql 
-  --packages &quot;org.apache.iceberg:iceberg-spark3-runtime:0.12.0,org.projectnessie:nessie-spark-extensions:0.9.2&quot;
+  --packages &quot;org.apache.iceberg:iceberg-spark3-runtime:0.12.1,org.projectnessie:nessie-spark-extensions:0.9.2&quot;
   --conf spark.sql.extensions=&quot;org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions&quot;
   --conf &lt;other settings&gt;
 </code></pre>
@@ -128,7 +128,7 @@ from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import StreamTableEnvironment
 
 env = StreamExecutionEnvironment.get_execution_environment()
-iceberg_flink_runtime_jar = os.path.join(os.getcwd(), &quot;iceberg-flink-runtime-0.12.0.jar&quot;)
+iceberg_flink_runtime_jar = os.path.join(os.getcwd(), &quot;iceberg-flink-runtime-0.12.1.jar&quot;)
 env.add_jars(&quot;file://{}&quot;.format(iceberg_flink_runtime_jar))
 table_env = StreamTableEnvironment.create(env)
 

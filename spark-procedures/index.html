@@ -194,8 +194,8 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 </tbody>
 </table>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">&para;</a></h4>
-<p>Roll back <code>db.sample</code> to a day ago</p>
-<pre><code class="language-sql">CALL catalog_name.system.rollback_to_timestamp('db.sample', date_sub(current_date(), 1))
+<p>Roll back <code>db.sample</code> to one day</p>
+<pre><code class="language-sql">CALL catalog_name.system.rollback_to_timestamp('db.sample', TIMESTAMP '2021-06-30 00:00:00.000')
 </code></pre>
 <h3 id="set_current_snapshot"><code>set_current_snapshot</code><a class="headerlink" href="#set_current_snapshot" title="Permanent link">&para;</a></h3>
 <p>Sets the current snapshot ID for a table.</p>
@@ -378,8 +378,8 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 </tbody>
 </table>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
-<p>Remove snapshots older than 10 days ago, but retain the last 100 snapshots:</p>
-<pre><code class="language-sql">CALL hive_prod.system.expire_snapshots('db.sample', date_sub(current_date(), 10), 100)
+<p>Remove snapshots older than one day, but retain the last 100 snapshots:</p>
+<pre><code class="language-sql">CALL hive_prod.system.expire_snapshots('db.sample', TIMESTAMP '2021-06-30 00:00:00.000', 100)
 </code></pre>
 <p>Erase all snapshots older than the current timestamp but retain the last 5 snapshots:</p>
 <pre><code class="language-sql">CALL hive_prod.system.expire_snapshots(table =&gt; 'db.sample', older_than =&gt; now(), retain_last =&gt; 5)
@@ -450,7 +450,7 @@ the <code>expire_snapshots</code> procedure will never remove files which are st
 <h3 id="rewrite_manifests"><code>rewrite_manifests</code><a class="headerlink" href="#rewrite_manifests" title="Permanent link">&para;</a></h3>
 <p>Rewrite manifests for a table to optimize scan planning.</p>
 <p>Data files in manifests are sorted by fields in the partition spec. This procedure runs in parallel using a Spark job.</p>
-<p>See the <a href="../javadoc/0.12.0/org/apache/iceberg/actions/RewriteManifestsAction.html"><code>RewriteManifestsAction</code> Javadoc</a>
+<p>See the <a href="../javadoc/0.12.1/org/apache/iceberg/actions/RewriteManifestsAction.html"><code>RewriteManifestsAction</code> Javadoc</a>
 to see more configuration options.</p>
 <p><strong>Note</strong> this procedure invalidates all cached Spark plans that reference the affected table.</p>
 <h4 id="usage_7">Usage<a class="headerlink" href="#usage_7" title="Permanent link">&para;</a></h4>
