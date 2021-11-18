@@ -335,6 +335,24 @@ if (is_top_frame) { $('body').addClass('wm-top-page'); }
 <h4 id="column-projection">Column Projection<a class="headerlink" href="#column-projection" title="Permanent link">&para;</a></h4>
 <p>Columns in Iceberg data files are selected by field id. The table schema&rsquo;s column names and order may change after a data file is written, and projection must be done using field ids. If a field id is missing from a data file, its value for each row should be <code>null</code>.</p>
 <p>For example, a file may be written with schema <code>1: a int, 2: b string, 3: c double</code> and read using projection schema <code>3: measurement, 2: name, 4: a</code>. This must select file columns <code>c</code> (renamed to <code>measurement</code>), <code>b</code> (now called <code>name</code>), and a column of <code>null</code> values called <code>a</code>; in that order.</p>
+<p>Tables may also define a property <code>schema.name-mapping.default</code> with a JSON name mapping containing a list of field mapping objects. These mappings provide fallback field ids to be used when a data file does not contain field id information. Each object should contain</p>
+<ul>
+<li><code>names</code>: A required list of 0 or more names for a field. </li>
+<li><code>field-id</code>: An optional Iceberg field ID used when a field&rsquo;s name is present in <code>names</code></li>
+<li><code>fields</code>: An optional list of field mappings for child field of structs, maps, and lists.</li>
+</ul>
+<p>Field mapping fields are constrained by the following rules:</p>
+<ul>
+<li>A name may contain <code>.</code> but this refers to a literal name, not a nested field. For example, <code>a.b</code> refers to a field named <code>a.b</code>, not child field <code>b</code> of field <code>a</code>. </li>
+<li>Each child field should be defined with their own field mapping under <code>fields</code>. </li>
+<li>Multiple values for <code>names</code> may be mapped to a single field ID to support cases where a field may have different names in different data files. For example, all Avro field aliases should be listed in <code>names</code>.</li>
+<li>Fields which exist only in the Iceberg schema and not in imported data files may use an empty <code>names</code> list.</li>
+<li>Fields that exist in imported files but not in the Iceberg schema may omit <code>field-id</code>.</li>
+<li>List types should contain a mapping in <code>fields</code> for <code>element</code>. </li>
+<li>Map types should contain mappings in <code>fields</code> for <code>key</code> and <code>value</code>. </li>
+<li>Struct types should contain mappings in <code>fields</code> for their child fields.</li>
+</ul>
+<p>For details on serialization, see <a href="#name-mapping-serialization">Appendix C</a>.</p>
 <h4 id="identifier-field-ids">Identifier Field IDs<a class="headerlink" href="#identifier-field-ids" title="Permanent link">&para;</a></h4>
 <p>A schema can optionally track the set of primitive fields that identify rows in a table, using the property <code>identifier-field-ids</code> (see JSON encoding in Appendix C).</p>
 <p>Two rows are the &ldquo;same&rdquo;&mdash;that is, the rows represent the same entity&mdash;if the identifier fields are equal. However, uniqueness of rows by this identifier is not guaranteed or required by Iceberg and it is the responsibility of processing engines or data providers to enforce.</p>
@@ -2247,6 +2265,42 @@ Hash results are not dependent on decimal scale, which is part of the type, not 
 </tr>
 </tbody>
 </table>
+<h3 id="name-mapping-serialization">Name Mapping Serialization<a class="headerlink" href="#name-mapping-serialization" title="Permanent link">&para;</a></h3>
+<p>Name mapping is serialized as a list of field mapping JSON Objects which are serialized as follows</p>
+<table>
+<thead>
+<tr>
+<th>Field mapping field</th>
+<th>JSON representation</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>names</code></strong></td>
+<td><code>JSON list of strings</code></td>
+<td><code>["latitude", "lat"]</code></td>
+</tr>
+<tr>
+<td><strong><code>field_id</code></strong></td>
+<td><code>JSON int</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><strong><code>fields</code></strong></td>
+<td><code>JSON field mappings (list of objects)</code></td>
+<td><code>[{</code><br />&nbsp;&nbsp;<code>"field-id": 4,</code><br />&nbsp;&nbsp;<code>"names": ["latitude", "lat"]</code><br /><code>}, {</code><br />&nbsp;&nbsp;<code>"field-id": 5,</code><br />&nbsp;&nbsp;<code>"names": ["longitude", "long"]</code><br /><code>}]</code></td>
+</tr>
+</tbody>
+</table>
+<p>Example</p>
+<pre><code class="language-json">[ { &quot;field-id&quot;: 1, &quot;names&quot;: [&quot;id&quot;, &quot;record_id&quot;] },
+   { &quot;field-id&quot;: 2, &quot;names&quot;: [&quot;data&quot;] },
+   { &quot;field-id&quot;: 3, &quot;names&quot;: [&quot;location&quot;], &quot;fields&quot;: [
+       { &quot;field-id&quot;: 4, &quot;names&quot;: [&quot;latitude&quot;, &quot;lat&quot;] },
+       { &quot;field-id&quot;: 5, &quot;names&quot;: [&quot;longitude&quot;, &quot;long&quot;] }
+     ] } ]
+</code></pre>
 <h2 id="appendix-d-single-value-serialization">Appendix D: Single-value serialization<a class="headerlink" href="#appendix-d-single-value-serialization" title="Permanent link">&para;</a></h2>
 <p>This serialization scheme is for storing single values as individual binary values in the lower and upper bounds maps of manifest files.</p>
 <table>
