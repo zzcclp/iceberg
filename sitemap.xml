@@ -71,6 +71,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://iceberg.apache.org/how-to-verify-a-release/</loc>
+         <lastmod>2021-11-21</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://iceberg.apache.org/java-api-quickstart/</loc>
          <lastmod>2021-11-21</lastmod>
          <changefreq>daily</changefreq>
